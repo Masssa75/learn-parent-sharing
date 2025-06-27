@@ -1,0 +1,9 @@
+[
+  {
+    "action": "execute",
+    "params": {
+      "command": "cd /Users/marcschwyn/Desktop/projects/Learn/app && git remote add origin https://github.com/marcschwyn/learn-parent-sharing.git || true",
+      "cwd": "/Users/marcschwyn/Desktop/projects/Learn/app"
+    }
+  }
+]
