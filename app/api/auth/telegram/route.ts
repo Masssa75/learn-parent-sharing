@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+
+// Use service role key for server-side operations
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 interface TelegramAuthData {
   id: number
@@ -40,6 +45,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const authData = body as TelegramAuthData
+    
+    console.log('Telegram auth request received:', {
+      id: authData.id,
+      username: authData.username,
+      timestamp: new Date().toISOString()
+    })
     
     // For development, skip verification if bot token is not set
     const botToken = process.env.TELEGRAM_BOT_TOKEN || 'development'
@@ -124,12 +135,19 @@ export async function POST(request: NextRequest) {
       sessionToken
     })
     
-    // Set session cookie
+    // Set session cookie with proper configuration
     response.cookies.set('session', sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7 // 7 days
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/'
+    })
+    
+    console.log('Session cookie set:', {
+      userId,
+      cookieSet: true,
+      secure: process.env.NODE_ENV === 'production'
     })
     
     return response

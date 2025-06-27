@@ -15,7 +15,7 @@ interface TelegramLoginProps {
 }
 
 export default function TelegramLogin({ 
-  botUsername = 'your_bot_username', // Replace with actual bot username
+  botUsername = 'learn_notification_bot',
   onAuth 
 }: TelegramLoginProps) {
   const ref = useRef<HTMLDivElement>(null)
@@ -40,8 +40,8 @@ export default function TelegramLogin({
           if (onAuth) {
             onAuth(user)
           }
-          // Redirect to home or onboarding
-          router.push('/feed')
+          // Redirect to home page
+          router.push('/')
         } else {
           console.error('Authentication failed:', data.error)
         }
