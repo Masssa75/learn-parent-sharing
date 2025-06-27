@@ -7,9 +7,12 @@ A social platform for parents to discover and share apps, toys, books, and tips 
 - ✅ Project initialized with Next.js 15 and TypeScript
 - ✅ Dark theme UI implemented based on selected design
 - ✅ Supabase database schema created
-- ✅ Telegram authentication system set up
+- ✅ Telegram authentication system set up (Bot Token: 7807046295:AAGAK8EgrwpYod7R06MLq6rfigvm-6HJ3eY)
 - ✅ Core pages created: Login, Feed, Create Post
 - ✅ Mobile-optimized responsive design
+- ✅ Production build successful
+- ✅ Ready for deployment (netlify.toml configured)
+- ⚠️ Using shared Supabase instance with monitoor project
 
 ## Tech Stack
 - **Frontend**: Next.js 15, TypeScript, Tailwind CSS
