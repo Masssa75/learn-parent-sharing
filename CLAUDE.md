@@ -134,11 +134,28 @@ netlify deploy --prod  # Deploy to Netlify
 ```
 
 ## Important: Deployment Workflow
-When making changes to the codebase:
-1. **Always commit and push changes**: After implementing features, commit with descriptive messages and push to GitHub
-2. **Wait for build completion**: Monitor the Netlify deployment (usually 1-2 minutes)
-3. **Test with Playwright**: Once deployed, run Playwright tests to verify the changes work in production
-4. **Never leave changes unpushed**: All code modifications should be deployed and tested
+⚠️ **CRITICAL**: When making ANY changes to the codebase, you MUST follow this workflow:
+
+1. **ALWAYS commit and push changes immediately after implementation**
+2. **ALWAYS wait ~2 minutes for Netlify deployment to complete**
+3. **ALWAYS test the deployed changes with Playwright browser**
+4. **NEVER leave changes unpushed or untested**
+
+Example workflow:
+```bash
+# After making changes
+git add -A
+git commit -m "Descriptive commit message"
+git push origin main
+
+# MANDATORY: Wait 2 minutes for Netlify deployment
+# You can check deployment status at: https://app.netlify.com/sites/learn-parent-sharing-app/deploys
+
+# Then test with Playwright to verify changes work in production
+npx playwright test --headed
+```
+
+This is non-negotiable - every code change must be deployed and tested in production.
 
 Example workflow:
 ```bash
