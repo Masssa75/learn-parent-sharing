@@ -225,12 +225,19 @@ npx playwright test --headed
 None! All issues have been resolved. ✅
 
 ## Next Autonomous Tasks
-1. **Add Image Upload**: Implement file storage for posts
-2. **User Profiles**: Build profile pages with user's posts
-3. **Search/Filter**: Add category and age range filtering
-4. **Social Features**: Implement likes, saves, comments
-5. **Real Telegram Auth**: Complete the Telegram authentication flow
-6. **User Onboarding**: Create profile setup flow for new users
+1. **Consolidate Homepage and Feed Pages** ⚠️ PRIORITY
+   - Currently have two pages (`/` and `/feed`) showing the same content
+   - Creates confusing UX: logged-in users on homepage click profile → goes to `/feed` (not profile page)
+   - Should be ONE page at `/` that adapts based on auth state
+   - Profile button should go to actual `/profile` page, not `/feed`
+   - Keep all existing functionality (real posts, categories, YouTube embeds, etc.)
+   - Benefits: Less code duplication, better UX, single source of truth
+2. **Add Image Upload**: Implement file storage for posts
+3. **User Profiles**: Build profile pages with user's posts
+4. **Search/Filter**: Add category and age range filtering
+5. **Social Features**: Implement likes, saves, comments
+6. **Real Telegram Auth**: Complete the Telegram authentication flow
+7. **User Onboarding**: Create profile setup flow for new users
 
 The foundation is solid and ready for autonomous development! 🚀
 
