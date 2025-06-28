@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { YouTubePreview } from '@/components/YouTubePreview'
 import { isYouTubeUrl } from '@/utils/youtube'
@@ -22,10 +22,18 @@ export default function CreatePage() {
   const [category, setCategory] = useState('')
   const [selectedAges, setSelectedAges] = useState<string[]>([])
   const [link, setLink] = useState('')
-  const [inputMode, setInputMode] = useState<'manual' | 'voice'>('manual')
+  const [inputMode, setInputMode] = useState<'manual' | 'voice'>('voice') // Default to voice
   const [isRecording, setIsRecording] = useState(false)
   const [voiceTranscript, setVoiceTranscript] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
+  const [recognition, setRecognition] = useState<any>(null)
+  const [interimTranscript, setInterimTranscript] = useState('')
+  const [aiProcessedData, setAiProcessedData] = useState<{
+    title: string
+    description: string
+    category: string
+    ageRange: string
+  } | null>(null)
   
   const handleAgeToggle = (age: string) => {
     setSelectedAges(prev =>
@@ -33,6 +41,129 @@ export default function CreatePage() {
         ? prev.filter(a => a !== age)
         : [...prev, age]
     )
+  }
+  
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).webkitSpeechRecognition
+      const recognitionInstance = new SpeechRecognition()
+      
+      recognitionInstance.continuous = true
+      recognitionInstance.interimResults = true
+      recognitionInstance.lang = 'en-US'
+      
+      recognitionInstance.onresult = (event: any) => {
+        let interim = ''
+        let final = ''
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript
+          if (event.results[i].isFinal) {
+            final += transcript + ' '
+          } else {
+            interim += transcript
+          }
+        }
+        
+        if (final) {
+          setVoiceTranscript(prev => prev + final)
+        }
+        setInterimTranscript(interim)
+      }
+      
+      recognitionInstance.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error)
+        setIsRecording(false)
+      }
+      
+      recognitionInstance.onend = () => {
+        setIsRecording(false)
+      }
+      
+      setRecognition(recognitionInstance)
+    }
+  }, [])
+  
+  // Handle recording toggle
+  const toggleRecording = () => {
+    if (!recognition) {
+      alert('Speech recognition is not supported in your browser. Please use Chrome.')
+      return
+    }
+    
+    if (isRecording) {
+      recognition.stop()
+      setIsRecording(false)
+      if (voiceTranscript) {
+        processWithAI()
+      }
+    } else {
+      setVoiceTranscript('')
+      setInterimTranscript('')
+      recognition.start()
+      setIsRecording(true)
+    }
+  }
+  
+  // Process with Gemini AI
+  const processWithAI = async () => {
+    if (!link) {
+      alert('Please paste a link first before recording')
+      return
+    }
+    
+    if (!voiceTranscript.trim()) {
+      return
+    }
+    
+    setIsProcessing(true)
+    
+    try {
+      const response = await fetch('/api/ai/gemini', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transcript: voiceTranscript,
+          linkUrl: link
+        })
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to process with AI')
+      }
+      
+      const data = await response.json()
+      
+      setAiProcessedData({
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        ageRange: data.ageRange
+      })
+      
+      // Set the form fields
+      setTitle(data.title)
+      setDescription(data.description)
+      setCategory(data.category)
+      setSelectedAges([data.ageRange])
+      
+    } catch (error) {
+      console.error('AI processing error:', error)
+      alert('Failed to process with AI. Please try again.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+  
+  // Handle voice submit
+  const handleVoiceSubmit = async () => {
+    if (!aiProcessedData || !link) return
+    
+    // Use the same submit logic as manual form
+    handleSubmit(new Event('submit') as any)
   }
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -260,11 +391,36 @@ export default function CreatePage() {
         </form>
       ) : (
         /* Voice Input Interface */
-        <div className="p-5">
+        <div className="p-5 space-y-5">
+          {/* Link URL Input for Voice Mode */}
+          <div className="relative">
+            {link && isYouTubeUrl(link) ? (
+              <YouTubePreview 
+                url={link} 
+                onRemove={() => setLink('')} 
+              />
+            ) : (
+              <div className="relative">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <input
+                  type="url"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  placeholder="Paste link to app, video, or website"
+                  className="w-full bg-black border border-dark-border rounded-input pl-12 pr-4 py-3 text-text-primary text-body placeholder-text-muted outline-none focus:border-brand-yellow transition-colors"
+                />
+              </div>
+            )}
+          </div>
+          
+          {/* Voice Recording Interface */}
           <div className="text-center py-10">
             <div className="relative inline-block mb-5">
               <button
-                onClick={() => setIsRecording(!isRecording)}
+                onClick={toggleRecording}
                 className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
                   isRecording
                     ? 'bg-red-500 animate-pulse'
@@ -283,9 +439,36 @@ export default function CreatePage() {
               )}
             </div>
             <p className="text-text-muted text-body">
-              {isRecording ? 'Listening...' : 'Tap to start speaking'}
+              {isProcessing ? 'AI is processing...' : isRecording ? 'Listening...' : 'Tap to start speaking'}
             </p>
           </div>
+          
+          {/* AI Processing Animation */}
+          {isProcessing && (
+            <div className="flex justify-center gap-2 py-4">
+              <div className="w-3 h-3 bg-brand-yellow rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-3 h-3 bg-brand-yellow rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-3 h-3 bg-brand-yellow rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+          )}
+          
+          {/* Voice Transcript Display */}
+          {aiProcessedData && !isProcessing && (
+            <div className="bg-dark-surface rounded-card p-4 space-y-3">
+              <div>
+                <h3 className="text-brand-yellow text-body font-semibold mb-1">Title:</h3>
+                <p className="text-text-primary text-body">{aiProcessedData.title}</p>
+              </div>
+              <div>
+                <h3 className="text-brand-yellow text-body font-semibold mb-1">Description:</h3>
+                <p className="text-text-secondary text-body">{aiProcessedData.description}</p>
+              </div>
+              <div className="flex gap-4 text-sm">
+                <span className="text-text-muted">Category: <span className="text-text-secondary">{categories.find(c => c.id === aiProcessedData.category)?.name}</span></span>
+                <span className="text-text-muted">Age: <span className="text-text-secondary">{aiProcessedData.ageRange}</span></span>
+              </div>
+            </div>
+          )}
           
           {/* Voice Actions */}
           <div className="flex gap-4 pt-6">
@@ -298,8 +481,8 @@ export default function CreatePage() {
             </button>
             <button
               type="button"
-              onClick={() => {}}
-              disabled={!voiceTranscript}
+              onClick={handleVoiceSubmit}
+              disabled={!aiProcessedData || !link}
               className="flex-1 px-6 py-3.5 rounded-button font-semibold text-body bg-brand-yellow text-black hover:bg-[#f5e147] hover:scale-[1.02] btn-transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               Share
