@@ -187,27 +187,208 @@ npx playwright test --headed
    - Title: 24px (section headers)
    - Body: 16px (regular text)
 
-## Next Steps for Future Sessions
-1. **Fix Authentication Persistence**:
-   - Test Telegram login flow thoroughly
-   - Consider migrating to Supabase Auth
-   - Ensure cookies work in production
+## Autonomous Development Setup ✅
 
-2. **Complete Features**:
-   - Implement real data fetching from Supabase
-   - Add post creation functionality
-   - Build user feed/profile pages
-   - Add search and filtering
+### Test User System
+- **Dev Login URL**: https://learn-parent-sharing-app.netlify.app/test-auth
+- **Password**: test-learn-2025
+- **Test Users**: devtest (999999999), admintest (888888888)
 
-3. **Polish**:
-   - Add loading states
-   - Error handling
-   - Responsive design improvements
-   - Performance optimization
+### Critical Workflows
+1. **Always Deploy & Test**: Make changes → Push → Wait 2min → Test on live site
+2. **Check Deployment**: `node scripts/check-netlify-deploy.js`
+3. **Debug Database**: `node scripts/debug-users-table.js`
+4. **Apply Migrations**: `npx supabase db push`
 
-## Testing Notes
-- Authentication test files created but need manual Telegram login
-- Design system successfully deployed and live
-- All endpoints returning correct responses
+### Common Issues & Solutions
+- **RLS Blocking Access**: Apply policies via Supabase CLI
+- **Column Name Mismatch**: Database uses `telegram_username`, not `username`
+- **API 404**: Check deployment completed, files pushed to GitHub
+- **TypeScript Errors**: Run `npx tsc --noEmit` before pushing
 
-Great progress! The app now has a bold, modern design system and improved authentication flow. 🎉
+### Key Documentation
+- See `AUTONOMOUS_WORKFLOW_GUIDE.md` for detailed patterns
+- See `QUICK_START_AUTONOMOUS.md` for quick reference
+- All tokens available in `.env` file
+
+## Recent Accomplishments ✅
+1. **Content Submission**: Full create/read functionality via `/api/posts`
+2. **Test User System**: Secure dev login with real database users
+3. **RLS Policies**: Fixed to allow anon key access to test users
+4. **Deployment Monitoring**: Scripts to check and debug deployments
+
+## Next Autonomous Tasks
+1. **Test Full Flow**: Login → Create Post → Verify in Feed
+2. **Add Image Upload**: Implement file storage for posts
+3. **User Profiles**: Build profile pages with user's posts
+4. **Search/Filter**: Add category and age range filtering
+5. **Social Features**: Implement likes, saves, comments
+
+The foundation is solid and ready for autonomous development! 🚀
+
+## 📚 Complete Autonomous Workflow Documentation
+
+### 🔑 Test User Login System
+**This is critical for autonomous testing!**
+- **URL**: https://learn-parent-sharing-app.netlify.app/test-auth
+- **Password**: `test-learn-2025`
+- **Test Users Created**:
+  - `devtest` - Telegram ID: 999999999, User ID: cdad4b8b-0355-414b-90ef-9769a1045b80
+  - `admintest` - Telegram ID: 888888888, User ID: de2f7130-7682-4bc0-aad1-e1b83c07cb43
+
+### 🚀 The Golden Workflow Rule
+```bash
+# ALWAYS follow this pattern:
+1. Make code changes
+2. git add -A && git commit -m "Description" && git push origin main
+3. sleep 120  # MUST wait 2 minutes for Netlify deployment
+4. node test-script.js  # Test on DEPLOYED site, not local
+```
+
+### 🛠️ Essential Scripts Created This Session
+
+#### Check Deployment Status
+```bash
+node scripts/check-netlify-deploy.js
+# Site ID: 8d8b1724-b6a0-4b98-a84e-7a8b81baf85c
+```
+
+#### Test Dev Login
+```javascript
+// test-dev-login-with-password.js
+const data = JSON.stringify({ password: 'test-learn-2025' });
+// POST to https://learn-parent-sharing-app.netlify.app/api/auth/dev-login
+```
+
+#### Debug Database Issues
+```bash
+node scripts/debug-users-table.js  # Check what's in users table
+node scripts/check-rls-policies.js  # Check if RLS is blocking
+```
+
+#### Create Test Users
+```bash
+node scripts/create-prod-test-users.js  # Creates test users in production DB
+```
+
+### 🗄️ Critical Database Discoveries
+
+1. **Column Name Issue**: 
+   - Database uses `telegram_username` NOT `username`
+   - Always check actual schema with debug script
+
+2. **RLS (Row Level Security) Issue**:
+   - Problem: Anon key couldn't read users table
+   - Solution: Applied RLS policy via Supabase CLI
+   ```bash
+   npx supabase link --project-ref yvzinotrjggncbwflxok
+   npx supabase db push  # This fixed it!
+   ```
+   - Created migration: `supabase/migrations/20250628_add_users_rls_policy.sql`
+
+3. **Environment Variables on Netlify**:
+   - `ALLOW_DEV_LOGIN=true` ✅ Set
+   - `DEV_LOGIN_PASSWORD=test-learn-2025` ✅ Set
+   - Without these, dev login won't work!
+
+### 🐛 Common Issues & Solutions
+
+#### "API returns 404"
+1. Check deployment completed: `node scripts/check-netlify-deploy.js`
+2. Make sure file was pushed: `git status`
+3. Wait full 2 minutes after push
+
+#### "Cannot read from database"
+1. It's almost always RLS policies
+2. Test with service key vs anon key to confirm
+3. Apply migration with `npx supabase db push`
+
+#### "Test user not found"
+1. User exists but RLS blocking (most common)
+2. Check with: `node scripts/debug-users-table.js`
+3. Apply RLS fix if needed
+
+#### "TypeScript errors on build"
+```bash
+npx tsc --noEmit  # Check before pushing
+# Fix pattern for catch blocks:
+catch (error) {
+  error instanceof Error ? error.message : 'Unknown error'
+}
+```
+
+### 📝 What We Implemented This Session
+
+1. **Content Submission System**:
+   - `/api/posts` - GET (fetch posts) and POST (create posts)
+   - Connected create form to API
+   - Feed page fetches real posts from database
+
+2. **Secure Test User System**:
+   - Password-protected dev login endpoint
+   - Real database users (not mocks)
+   - RLS policies fixed to allow access
+
+3. **Deployment Monitoring**:
+   - Scripts to check Netlify deployment status
+   - List all sites and get site IDs
+   - Trigger manual deployments
+
+4. **Database Debugging Tools**:
+   - Check table structure
+   - Test RLS policies
+   - Debug user data
+
+### 🎯 Key Success Patterns
+
+1. **Always Test Deployed Version**
+   - Local works ≠ Production works
+   - Netlify has different env vars
+   - RLS policies affect production
+
+2. **Debug Systematically**
+   ```bash
+   # Is it deployed?
+   node scripts/check-netlify-deploy.js
+   
+   # Is it a database issue?
+   node scripts/debug-users-table.js
+   
+   # Is it RLS?
+   node scripts/check-rls-policies.js
+   ```
+
+3. **Use Real Database Operations**
+   - No mocking - test real flows
+   - Service key for debugging
+   - Anon key for production testing
+
+### 🔧 Supabase CLI Commands Used
+```bash
+# These saved us!
+npx supabase link --project-ref yvzinotrjggncbwflxok
+npx supabase db push  # Applies migrations
+npx supabase init  # Already done
+```
+
+### 🚨 Emergency Procedures
+
+**If deploy fails**: Check TypeScript errors with `npx tsc --noEmit`
+**If DB inaccessible**: Check RLS with both keys
+**If login fails**: Verify env vars on Netlify + test users exist
+
+### 📋 Tokens Available in .env
+All automation tokens are stored in `.env`:
+- GitHub token (for pushing)
+- Netlify token (for deployment checks)
+- Supabase keys (for database access)
+- Various API keys
+
+### 🎉 Session Accomplishments Summary
+1. ✅ Implemented full content submission flow
+2. ✅ Created secure test user system with password
+3. ✅ Fixed RLS policies blocking database access
+4. ✅ Set up comprehensive debugging scripts
+5. ✅ Documented everything for autonomous work
+
+**The app is now ready for autonomous development and testing!**
