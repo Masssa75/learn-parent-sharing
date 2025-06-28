@@ -32,6 +32,9 @@ module.exports = {
         'avatar': '12px',
         'fab': '20px',
       },
+      borderWidth: {
+        '3': '3px'
+      },
     },
   },
   plugins: [],
