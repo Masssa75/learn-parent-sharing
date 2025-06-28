@@ -75,9 +75,13 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('POST /api/posts - Starting...')
+    
     // Check if user is authenticated
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')
+    
+    console.log('Session cookie:', sessionCookie ? 'Present' : 'Missing')
     
     if (!sessionCookie) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -88,10 +92,14 @@ export async function POST(request: NextRequest) {
       Buffer.from(sessionCookie.value, 'base64').toString()
     )
     const userId = sessionData.userId
+    
+    console.log('User ID from session:', userId)
 
     // Get the post data from request body
     const body = await request.json()
     const { title, description, category, ageRanges, linkUrl } = body
+    
+    console.log('Post data received:', { title, category, ageRanges: ageRanges?.length })
 
     // Validate required fields
     if (!title || !description || !category || !ageRanges || ageRanges.length === 0) {
@@ -99,6 +107,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get category ID from category name
+    console.log('Looking up category:', category)
     const { data: categoryData, error: categoryError } = await supabase
       .from('categories')
       .select('id')
@@ -106,8 +115,16 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (categoryError || !categoryData) {
-      return NextResponse.json({ error: 'Invalid category' }, { status: 400 })
+      console.error('Category lookup failed:', categoryError)
+      console.log('Available categories should be checked in the database')
+      return NextResponse.json({ 
+        error: 'Invalid category', 
+        details: categoryError?.message || 'Category not found',
+        categorySearched: category 
+      }, { status: 400 })
     }
+    
+    console.log('Category found:', categoryData.id)
 
     // Create the post
     const { data: post, error: postError } = await supabase

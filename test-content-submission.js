@@ -66,14 +66,36 @@ async function testContentSubmission() {
     
     // 4. Submit the form
     console.log('4️⃣ Submitting post...');
-    await page.click('button[type="submit"]');
     
-    // Wait for either success (redirect) or error
-    await Promise.race([
-      page.waitForURL(`${SITE_URL}/feed`, { timeout: 10000 }),
-      page.waitForURL(SITE_URL, { timeout: 10000 }),
-      page.waitForSelector('.text-red-500', { timeout: 10000 })
-    ]);
+    // Set up console logging to see any errors
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        console.log('Browser console error:', msg.text());
+      }
+    });
+    
+    // Click the Share button
+    await page.click('button:has-text("Share"):not(:has-text("Cancel"))');
+    
+    // Wait a bit to see what happens
+    await page.waitForTimeout(2000);
+    
+    // Check current URL
+    console.log('Current URL after submit:', page.url());
+    
+    // Check for any error messages
+    const errorElement = await page.locator('.text-red-500').first();
+    if (await errorElement.count() > 0) {
+      const errorText = await errorElement.textContent();
+      console.log('Error found:', errorText);
+    }
+    
+    // Try to wait for navigation
+    try {
+      await page.waitForURL(`${SITE_URL}/feed`, { timeout: 5000 });
+    } catch (e) {
+      console.log('Navigation timeout - checking if still on create page');
+    }
     
     // Check if we're back on feed/homepage (success) or still on create page (error)
     if (page.url() === `${SITE_URL}/feed` || page.url() === SITE_URL) {

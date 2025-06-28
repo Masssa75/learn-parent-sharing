@@ -37,18 +37,22 @@ export default function CreatePage() {
       const selectedCategory = categories.find(cat => cat.id === category)
       if (!selectedCategory) return
       
+      const postData = {
+        title,
+        description,
+        category: selectedCategory.name,
+        ageRanges: selectedAges,
+        linkUrl: link
+      }
+      
+      console.log('Sending post data:', postData)
+      
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          title,
-          description,
-          category: selectedCategory.name,
-          ageRanges: selectedAges,
-          linkUrl: link
-        }),
+        body: JSON.stringify(postData),
       })
       
       if (!response.ok) {
@@ -59,7 +63,8 @@ export default function CreatePage() {
           return
         }
         console.error('Error creating post:', error)
-        alert('Failed to create post. Please try again.')
+        console.error('Full error details:', JSON.stringify(error, null, 2))
+        alert(`Failed to create post: ${error.error || 'Unknown error'}`)
         return
       }
       
