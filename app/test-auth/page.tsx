@@ -29,9 +29,9 @@ export default function TestAuthPage() {
       const data = await response.json()
       
       if (response.ok) {
-        setStatus(`Success! Logged in as ${data.user.username}. Redirecting to feed...`)
+        setStatus(`Success! Logged in as ${data.user.username}. Redirecting to home...`)
         setTimeout(() => {
-          router.push('/feed')
+          router.push('/')
         }, 2000)
       } else {
         setStatus(`Error: ${data.error}`)

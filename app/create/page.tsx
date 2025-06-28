@@ -207,7 +207,7 @@ export default function CreatePage() {
       
       const data = await response.json()
       console.log('Post created successfully:', data)
-      router.push('/feed')
+      router.push('/')
     } catch (error) {
       console.error('Error submitting post:', error)
       alert('Failed to create post. Please try again.')
