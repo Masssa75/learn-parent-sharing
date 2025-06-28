@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import YouTubePlayer from './YouTubePlayer'
+import { YouTubePlayer } from './YouTubePlayer'
 
 interface User {
   id: string
@@ -277,7 +277,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
               {/* YouTube Video */}
               {post.youtubeVideoId && (
                 <div className="mb-6">
-                  <YouTubePlayer videoId={post.youtubeVideoId} />
+                  <YouTubePlayer url={`https://www.youtube.com/watch?v=${post.youtubeVideoId}`} title={post.title} />
                 </div>
               )}
               
