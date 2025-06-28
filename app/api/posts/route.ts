@@ -132,8 +132,8 @@ export async function POST(request: NextRequest) {
     
     console.log('Category found:', categoryData.id)
 
-    // Create the post using admin client (bypasses RLS)
-    const { data: post, error: postError } = await supabaseAdmin
+    // Create the post using regular client (RLS now allows it)
+    const { data: post, error: postError } = await supabase
       .from('posts')
       .insert({
         user_id: userId,
