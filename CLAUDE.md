@@ -133,6 +133,25 @@ npm run start   # Test production build
 netlify deploy --prod  # Deploy to Netlify
 ```
 
+## Important: Deployment Workflow
+When making changes to the codebase:
+1. **Always commit and push changes**: After implementing features, commit with descriptive messages and push to GitHub
+2. **Wait for build completion**: Monitor the Netlify deployment (usually 1-2 minutes)
+3. **Test with Playwright**: Once deployed, run Playwright tests to verify the changes work in production
+4. **Never leave changes unpushed**: All code modifications should be deployed and tested
+
+Example workflow:
+```bash
+# After making changes
+git add -A
+git commit -m "Descriptive commit message"
+git push origin main
+
+# Wait for Netlify deployment to complete
+# Then test with Playwright
+npx playwright test --headed
+```
+
 ## Important Implementation Details
 1. **User Avatar Display**:
    - Homepage now shows user's Telegram photo or first initial
