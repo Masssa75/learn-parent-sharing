@@ -144,7 +144,19 @@ export async function POST(request: NextRequest) {
 
     if (postError) {
       console.error('Error creating post:', postError)
-      return NextResponse.json({ error: 'Failed to create post' }, { status: 500 })
+      console.error('Post data attempted:', {
+        user_id: userId,
+        title,
+        description,
+        category_id: categoryData.id,
+        age_ranges: ageRanges,
+        link_url: linkUrl
+      })
+      return NextResponse.json({ 
+        error: 'Failed to create post',
+        details: postError.message,
+        hint: postError.hint || 'Check if user exists in database'
+      }, { status: 500 })
     }
 
     return NextResponse.json({ success: true, post }, { status: 201 })

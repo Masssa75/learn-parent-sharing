@@ -64,7 +64,7 @@ export default function CreatePage() {
         }
         console.error('Error creating post:', error)
         console.error('Full error details:', JSON.stringify(error, null, 2))
-        alert(`Failed to create post: ${error.error || 'Unknown error'}`)
+        alert(`Failed to create post: ${error.error || 'Unknown error'}${error.details ? `\n\nDetails: ${error.details}` : ''}${error.hint ? `\n\nHint: ${error.hint}` : ''}`)
         return
       }
       
