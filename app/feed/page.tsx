@@ -171,15 +171,18 @@ export default function FeedPage() {
               className="w-12 h-12 bg-brand-yellow rounded-avatar flex items-center justify-center overflow-hidden"
             >
               {user?.photoUrl ? (
-                <img 
-                  src={user.photoUrl} 
-                  alt={user.displayName}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none'
-                    e.currentTarget.nextElementSibling?.classList.remove('hidden')
-                  }}
-                />
+                <>
+                  <img 
+                    src={user.photoUrl} 
+                    alt={user.displayName}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                      const span = e.currentTarget.parentElement?.querySelector('span');
+                      if (span) span.classList.remove('hidden');
+                    }}
+                  />
+                </>
               ) : null}
               <span className={`${user?.photoUrl ? 'hidden' : ''} ${!user?.photoUrl && user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'}`}>
                 {user?.firstName ? user.firstName.charAt(0).toUpperCase() : '👤'}
