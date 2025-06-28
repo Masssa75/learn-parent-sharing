@@ -61,23 +61,22 @@ export async function POST(request: NextRequest) {
 
     // Create session data for the test user
     const sessionData = {
-      user: {
-        id: testUser.id,
-        telegram_id: testUser.telegram_id,
-        username: testUser.telegram_username || 'devtest',
-        first_name: testUser.first_name || 'Dev',
-        last_name: testUser.last_name || 'Test',
-        photo_url: testUser.photo_url || null
-      },
-      createdAt: new Date().toISOString()
+      userId: testUser.id,
+      telegramId: testUser.telegram_id,
+      createdAt: Date.now()
     }
 
-    const sessionToken = JSON.stringify(sessionData)
+    // Encode session as base64 (matching what auth/check expects)
+    const sessionToken = Buffer.from(JSON.stringify(sessionData)).toString('base64')
 
     // Set session cookie
     const response = NextResponse.json({ 
       success: true, 
-      user: sessionData.user,
+      user: {
+        id: testUser.id,
+        username: testUser.telegram_username || 'devtest',
+        displayName: `${testUser.first_name || 'Dev'} ${testUser.last_name || 'Test'}`.trim()
+      },
       message: 'Dev user logged in successfully' 
     })
 
