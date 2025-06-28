@@ -55,19 +55,34 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   const router = useRouter()
 
   useEffect(() => {
+    let mounted = true
+    
+    const handleFocus = () => {
+      if (mounted) {
+        checkAuth()
+      }
+    }
+    
     checkAuth()
     fetchPosts()
     
     // Check auth when window gets focus
-    window.addEventListener('focus', checkAuth)
-    return () => window.removeEventListener('focus', checkAuth)
+    window.addEventListener('focus', handleFocus)
+    
+    return () => {
+      mounted = false
+      window.removeEventListener('focus', handleFocus)
+    }
   }, [])
 
   const checkAuth = async () => {
     try {
       const response = await fetch('/api/auth/check')
+      if (!response.ok) {
+        throw new Error(`Auth check failed: ${response.status}`)
+      }
       const data = await response.json()
-      setIsAuthenticated(data.authenticated)
+      setIsAuthenticated(data.authenticated === true)
       if (data.authenticated && data.user) {
         setUser(data.user)
       } else {
@@ -90,12 +105,19 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   const fetchPosts = async () => {
     try {
       const response = await fetch('/api/posts')
-      if (response.ok) {
-        const data = await response.json()
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.status}`)
+      }
+      const data = await response.json()
+      if (Array.isArray(data)) {
         setPosts(data)
+      } else {
+        console.error('Invalid posts data received:', data)
+        setPosts([])
       }
     } catch (error) {
       console.error('Error fetching posts:', error)
+      setPosts([])
     } finally {
       setLoading(false)
     }
@@ -103,11 +125,23 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
 
   const handleSignOut = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      const response = await fetch('/api/auth/logout', { method: 'POST' })
+      if (!response.ok) {
+        throw new Error(`Logout failed: ${response.status}`)
+      }
+      setUser(null)
+      setIsAuthenticated(false)
+      setShowProfileMenu(false)
       router.push('/')
-      window.location.reload()
+      // Small delay before reload to ensure state updates
+      setTimeout(() => window.location.reload(), 100)
     } catch (error) {
       console.error('Sign out failed:', error)
+      // Force logout on client side even if server fails
+      setUser(null)
+      setIsAuthenticated(false)
+      setShowProfileMenu(false)
+      router.push('/')
     }
   }
 
@@ -139,8 +173,11 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   }
 
   const filteredPosts = selectedCategory === 'ALL' 
-    ? posts 
-    : posts.filter(post => post.categories?.name?.toUpperCase() === selectedCategory)
+    ? (posts || [])
+    : (posts || []).filter(post => {
+        const categoryName = post.categories?.name
+        return categoryName && categoryName.toUpperCase() === selectedCategory
+      })
 
   return (
     <div className="min-h-screen bg-dark-bg">
@@ -168,9 +205,19 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                     alt={user.displayName}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.style.display = 'none'
-                      const span = e.currentTarget.parentElement?.querySelector('span')
-                      if (span) span.classList.remove('hidden')
+                      try {
+                        const img = e.currentTarget as HTMLImageElement
+                        if (img) {
+                          img.style.display = 'none'
+                          const parent = img.parentElement
+                          if (parent) {
+                            const span = parent.querySelector('span')
+                            if (span) span.classList.remove('hidden')
+                          }
+                        }
+                      } catch (error) {
+                        console.error('Error handling image load failure:', error)
+                      }
                     }}
                   />
                 ) : null}

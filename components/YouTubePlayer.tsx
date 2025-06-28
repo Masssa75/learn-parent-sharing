@@ -20,6 +20,7 @@ export function YouTubePlayer({ url, title }: YouTubePlayerProps) {
         src={getYouTubeEmbedUrl(videoId)}
         title={title || 'YouTube video player'}
         frameBorder="0"
+        referrerPolicy="strict-origin-when-cross-origin"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
         allowFullScreen
         className="absolute inset-0 w-full h-full"

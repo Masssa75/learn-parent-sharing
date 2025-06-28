@@ -566,3 +566,88 @@ The other Claude instance made major improvements:
 - The app now has working content submission
 - Test users exist: `devtest` and `admintest`
 - Real posts are being created and displayed
+
+## 📅 Session Summary: YouTube Embedding & AI Voice Input (June 28, 2025 - Evening)
+
+### 🎯 Major Features Implemented
+
+#### 1. YouTube Video Embedding ✅
+- **Smart URL Detection**: Automatically detects YouTube links in the link input field
+- **Preview in Create Page**: Shows video thumbnail with title and channel info before posting
+- **Embedded Player in Feed**: Full YouTube player embedded in feed posts
+- **Graceful Fallbacks**: Regular links show as clickable cards with external link icon
+- **Created Files**:
+  - `/utils/youtube.ts` - YouTube URL parsing utilities
+  - `/components/YouTubePreview.tsx` - Preview component for create page
+  - `/components/YouTubePlayer.tsx` - Embedded player for feed
+
+#### 2. New Submission Form Design ✅
+- **Implemented Bold Typography Design**: From `bold-typography-regular-case-fixed.html` mockup
+- **Write/Speak Toggle**: Two modes for content creation
+- **Link Input First**: Moved to top with link icon as per design
+- **Clean Form Layout**: Black backgrounds, subtle borders, proper spacing
+- **Voice Mode Interface**: Microphone button with recording states
+- **Add Photo Placeholder**: Dashed border button (ready for future implementation)
+
+#### 3. AI-Powered Voice Input (Default Mode) ✅
+- **Voice Mode is Default**: "Speak with AI" is the primary submission method
+- **Workflow**:
+  1. User pastes a link (required)
+  2. Taps microphone to record their experience
+  3. AI (Gemini) processes the transcript
+  4. Generates optimized title & description
+  5. Auto-detects category and suggests age range
+- **Visual Feedback**: Recording animation, processing dots, AI results display
+- **Created Files**:
+  - `/app/api/ai/gemini/route.ts` - Gemini AI integration endpoint
+- **Environment Variable**: `GEMINI_API_KEY` (manually added to Netlify)
+
+### 🔧 Technical Implementation Details
+
+#### Speech Recognition
+```typescript
+// Browser's Web Speech API
+const SpeechRecognition = window.webkitSpeechRecognition
+recognition.continuous = true
+recognition.interimResults = true
+```
+
+#### Gemini AI Integration
+- Endpoint: `/api/ai/gemini`
+- Generates titles (max 60 chars) and descriptions (max 200 chars)
+- Auto-categorizes based on link type
+- Suggests age ranges from context
+
+#### YouTube URL Patterns Supported
+- `youtube.com/watch?v=VIDEO_ID`
+- `youtu.be/VIDEO_ID`
+- `youtube.com/embed/VIDEO_ID`
+
+### 🚀 Deployment Notes
+- All features deployed and tested on production
+- Gemini API key added to Netlify environment variables
+- YouTube oEmbed API used for video metadata
+
+### 🐛 Known Limitations
+- Speech recognition requires Chrome/Chromium browsers
+- Microphone permissions must be granted
+- CORS may block some YouTube oEmbed requests (fallback to basic thumbnail)
+
+### 📊 Session Stats
+- **Files Created**: 8
+- **Files Modified**: 4
+- **Tests Written**: 3
+- **Features Shipped**: 3 major features
+
+### 🎨 UI/UX Improvements
+- Voice-first approach reduces friction for content creation
+- YouTube previews enhance visual appeal
+- AI-generated content maintains quality while saving time
+- Clean, modern form design matches overall app aesthetic
+
+### 🔍 Testing Results
+- Mock posts successfully removed from homepage
+- Empty state message shows when no posts exist
+- YouTube embedding works in both create and feed pages
+- Voice AI interface properly shows link input and microphone
+- Form design matches mockup specifications
