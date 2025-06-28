@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface Post {
   id: string
@@ -69,10 +70,58 @@ const mockPosts: Post[] = [
 
 const categories = ['All', 'Apps', 'Toys', 'Books', 'Activities', 'Tips']
 
+interface User {
+  id: string
+  telegramId: number
+  username?: string
+  firstName: string
+  lastName?: string
+  photoUrl?: string
+  displayName: string
+}
+
 export default function FeedPage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [posts, setPosts] = useState(mockPosts)
+  const [user, setUser] = useState<User | null>(null)
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
   const router = useRouter()
+  
+  useEffect(() => {
+    // Check if user is authenticated and get user data
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/check')
+        const data = await response.json()
+        if (data.authenticated && data.user) {
+          setUser(data.user)
+        } else {
+          // Redirect to home if not authenticated
+          router.push('/')
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+        router.push('/')
+      }
+    }
+    
+    checkAuth()
+  }, [])
+  
+  // Close profile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      if (!target.closest('.profile-menu-container')) {
+        setShowProfileMenu(false)
+      }
+    }
+    
+    if (showProfileMenu) {
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
+    }
+  }, [showProfileMenu])
   
   const handleLike = (postId: string) => {
     setPosts(posts.map(post => {
@@ -99,11 +148,63 @@ export default function FeedPage() {
     }))
   }
   
+  const handleSignOut = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      router.push('/')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+  
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Header */}
       <div className="sticky top-0 bg-dark-bg z-10 px-4 pt-4 pb-2">
-        <h1 className="text-3xl font-bold text-white mb-4">Discover</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-3xl font-bold text-white">Discover</h1>
+          
+          {/* Profile Button */}
+          <div className="relative profile-menu-container">
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="w-12 h-12 bg-brand-yellow rounded-avatar flex items-center justify-center overflow-hidden"
+            >
+              {user?.photoUrl ? (
+                <img 
+                  src={user.photoUrl} 
+                  alt={user.displayName}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                  }}
+                />
+              ) : null}
+              <span className={`text-xl ${user?.photoUrl ? 'hidden' : ''} ${!user?.photoUrl && user?.firstName ? 'text-black font-semibold' : ''}`}>
+                {user?.firstName ? user.firstName.charAt(0).toUpperCase() : '👤'}
+              </span>
+            </button>
+            
+            {/* Profile Dropdown Menu */}
+            {showProfileMenu && (
+              <div className="absolute right-0 top-14 bg-dark-surface rounded-xl shadow-lg py-2 w-48">
+                <div className="px-4 py-2 border-b border-dark-border">
+                  <p className="text-text-primary font-medium">{user?.displayName}</p>
+                  {user?.username && (
+                    <p className="text-text-secondary text-sm">@{user.username}</p>
+                  )}
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full text-left px-4 py-2 text-text-primary hover:bg-dark-border transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
         
         {/* Search Bar */}
         <div className="bg-dark-surface rounded-xl px-4 py-3 mb-4">
