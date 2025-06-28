@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       user: {
         id: testUser.id,
         telegram_id: testUser.telegram_id,
-        username: testUser.username || 'devtest',
+        username: testUser.telegram_username || 'devtest',
         first_name: testUser.first_name || 'Dev',
         last_name: testUser.last_name || 'Test',
         photo_url: testUser.photo_url || null
