@@ -36,18 +36,7 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
   
-  /* Typography utilities */
-  .text-display {
-    @apply text-display font-bold;
-  }
-  
-  .text-title-lg {
-    @apply text-title-lg font-bold;
-  }
-  
-  .text-title {
-    @apply text-title font-semibold;
-  }
+  /* Typography utilities - removed due to circular dependency */
   
   /* Button transitions */
   .btn-transition {

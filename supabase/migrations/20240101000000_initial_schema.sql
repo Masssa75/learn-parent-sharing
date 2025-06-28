@@ -1,5 +1,8 @@
 -- Learn Parent Sharing Platform Database Schema
 
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- Users table (Telegram auth)
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -53,7 +56,7 @@ CREATE TABLE IF NOT EXISTS age_ranges (
 -- Insert default age ranges
 INSERT INTO age_ranges (range, min_age, max_age) VALUES
   ('0-2', 0, 2),
-  ('3-5', 3, 5),
+  ('3-4', 3, 4),
   ('5-7', 5, 7),
   ('8-10', 8, 10),
   ('11-13', 11, 13),
@@ -113,7 +116,7 @@ CREATE TABLE IF NOT EXISTS telegram_connections (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create indexes
+-- Indexes for performance
 CREATE INDEX idx_posts_user_id ON posts(user_id);
 CREATE INDEX idx_posts_category_id ON posts(category_id);
 CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
@@ -122,37 +125,37 @@ CREATE INDEX idx_comments_user_id ON comments(user_id);
 CREATE INDEX idx_likes_post_id ON likes(post_id);
 CREATE INDEX idx_saved_posts_user_id ON saved_posts(user_id);
 
--- Create updated_at trigger function
+-- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
+    NEW.updated_at = NOW();
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Apply updated_at triggers
+-- Create triggers for updated_at
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_posts_updated_at BEFORE UPDATE ON posts
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_comments_updated_at BEFORE UPDATE ON comments
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_telegram_connections_updated_at BEFORE UPDATE ON telegram_connections
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Function to increment likes count
 CREATE OR REPLACE FUNCTION increment_likes_count()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE posts SET likes_count = likes_count + 1 WHERE id = NEW.post_id;
-  RETURN NEW;
+    UPDATE posts SET likes_count = likes_count + 1 WHERE id = NEW.post_id;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -160,24 +163,24 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION decrement_likes_count()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE posts SET likes_count = likes_count - 1 WHERE id = OLD.post_id;
-  RETURN OLD;
+    UPDATE posts SET likes_count = likes_count - 1 WHERE id = OLD.post_id;
+    RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
 
--- Triggers for likes count
+-- Create triggers for likes count
 CREATE TRIGGER increment_likes AFTER INSERT ON likes
-  FOR EACH ROW EXECUTE FUNCTION increment_likes_count();
+    FOR EACH ROW EXECUTE FUNCTION increment_likes_count();
 
 CREATE TRIGGER decrement_likes AFTER DELETE ON likes
-  FOR EACH ROW EXECUTE FUNCTION decrement_likes_count();
+    FOR EACH ROW EXECUTE FUNCTION decrement_likes_count();
 
 -- Function to increment comments count
 CREATE OR REPLACE FUNCTION increment_comments_count()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE posts SET comments_count = comments_count + 1 WHERE id = NEW.post_id;
-  RETURN NEW;
+    UPDATE posts SET comments_count = comments_count + 1 WHERE id = NEW.post_id;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -185,19 +188,19 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION decrement_comments_count()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE posts SET comments_count = comments_count - 1 WHERE id = OLD.post_id;
-  RETURN OLD;
+    UPDATE posts SET comments_count = comments_count - 1 WHERE id = OLD.post_id;
+    RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
 
--- Triggers for comments count
+-- Create triggers for comments count
 CREATE TRIGGER increment_comments AFTER INSERT ON comments
-  FOR EACH ROW EXECUTE FUNCTION increment_comments_count();
+    FOR EACH ROW EXECUTE FUNCTION increment_comments_count();
 
 CREATE TRIGGER decrement_comments AFTER DELETE ON comments
-  FOR EACH ROW EXECUTE FUNCTION decrement_comments_count();
+    FOR EACH ROW EXECUTE FUNCTION decrement_comments_count();
 
--- Row Level Security
+-- Enable Row Level Security
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
@@ -206,4 +209,4 @@ ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE saved_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE telegram_connections ENABLE ROW LEVEL SECURITY;
 
--- Policies will be added after authentication is set up
+-- RLS Policies will be added based on your specific requirements
