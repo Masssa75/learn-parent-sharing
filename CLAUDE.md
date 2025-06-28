@@ -221,7 +221,10 @@ npx playwright test --headed
 
 ## Known Issues 🐛
 1. **RLS on Posts Table**: Currently using service role key to bypass RLS for post creation
-   - Need to apply RLS fix via Supabase dashboard (SQL provided in scripts/fix-posts-rls.js)
+   - SQL fix generated in `rls-fix.sql` and `scripts/apply-rls-direct.js`
+   - Cannot apply via CLI due to migration conflicts
+   - Manual application needed at: https://supabase.com/dashboard/project/yvzinotrjggncbwflxok/sql/new
+   - Current workaround (service role key) is functioning well
 2. **Feed Display**: Posts are created but may not show immediately in feed
    - Posts exist in database (verified with scripts/check-all-posts.js)
    - May need to check feed component logic or caching
