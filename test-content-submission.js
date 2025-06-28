@@ -132,6 +132,10 @@ async function testContentSubmission() {
     await page.screenshot({ path: 'error-screenshot.png' });
     console.log('📸 Screenshot saved as error-screenshot.png');
   } finally {
+    // Take final screenshot of feed
+    await page.screenshot({ path: 'final-feed.png' });
+    console.log('📸 Final feed screenshot saved as final-feed.png');
+    
     // Keep browser open for 5 seconds to see the result
     await page.waitForTimeout(5000);
     await browser.close();
