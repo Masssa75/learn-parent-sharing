@@ -83,9 +83,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get user data from session
-    const sessionData = JSON.parse(sessionCookie.value)
-    const userId = sessionData.user.id
+    // Get user data from session (decode from base64)
+    const sessionData = JSON.parse(
+      Buffer.from(sessionCookie.value, 'base64').toString()
+    )
+    const userId = sessionData.userId
 
     // Get the post data from request body
     const body = await request.json()

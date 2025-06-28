@@ -54,11 +54,13 @@ async function testContentSubmission() {
     await page.fill('input[type="url"]', testPost.url);
     await page.fill('textarea[placeholder="Tell other parents about your experience..."]', testPost.description);
     
-    // Select category - using the first select element
-    await page.selectOption('select:nth-of-type(1)', testPost.category);
+    // Select category
+    const categorySelect = await page.locator('select').first();
+    await categorySelect.selectOption(testPost.category);
     
-    // Select age range - using the second select element
-    await page.selectOption('select:nth-of-type(2)', testPost.ageRange);
+    // Select age range
+    const ageRangeSelect = await page.locator('select').nth(1);
+    await ageRangeSelect.selectOption(testPost.ageRange);
     
     console.log('✅ Form filled out\n');
     
