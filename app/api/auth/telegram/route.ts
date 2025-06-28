@@ -49,6 +49,10 @@ export async function POST(request: NextRequest) {
     console.log('Telegram auth request received:', {
       id: authData.id,
       username: authData.username,
+      firstName: authData.first_name,
+      lastName: authData.last_name,
+      photoUrl: authData.photo_url,
+      hasPhoto: !!authData.photo_url,
       timestamp: new Date().toISOString()
     })
     
