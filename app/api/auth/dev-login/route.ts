@@ -14,6 +14,19 @@ export async function POST(request: NextRequest) {
       }, { status: 403 })
     }
 
+    // Get password from request body
+    const body = await request.json().catch(() => ({}))
+    const { password } = body
+
+    // Check password
+    const DEV_PASSWORD = process.env.DEV_LOGIN_PASSWORD || 'test-learn-2025'
+    if (!password || password !== DEV_PASSWORD) {
+      return NextResponse.json({ 
+        error: 'Invalid password',
+        hint: 'Password is required for dev login' 
+      }, { status: 401 })
+    }
+
     // Create Supabase client with anon key (no service key needed)
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

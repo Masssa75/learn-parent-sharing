@@ -41,9 +41,11 @@ To enable automated testing with real database interactions, you need to create 
 
 4. **Enable Dev Login on Netlify**
    - Go to: https://app.netlify.com/sites/learn-parent-sharing-app/settings/env
-   - Add environment variable:
+   - Add environment variables:
      - Key: `ALLOW_DEV_LOGIN`
      - Value: `true`
+     - Key: `DEV_LOGIN_PASSWORD`
+     - Value: `your-secure-password` (or use default: test-learn-2025)
    - Deploy the changes
 
 ## Testing the Setup

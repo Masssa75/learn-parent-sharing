@@ -6,9 +6,15 @@ import { useRouter } from 'next/navigation'
 export default function TestAuthPage() {
   const [status, setStatus] = useState('')
   const [instructions, setInstructions] = useState<string[]>([])
+  const [password, setPassword] = useState('')
   const router = useRouter()
   
   const testDevLogin = async () => {
+    if (!password) {
+      setStatus('Error: Password is required')
+      return
+    }
+    
     setStatus('Logging in...')
     setInstructions([])
     try {
@@ -17,6 +23,7 @@ export default function TestAuthPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({ password }),
       })
       
       const data = await response.json()
@@ -47,6 +54,21 @@ export default function TestAuthPage() {
           <p className="text-gray-300 mb-4">
             This uses a real test user from the database. The test user must be created in Supabase first.
           </p>
+          
+          <div className="mb-4">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter dev password"
+              className="w-full bg-dark-bg border border-dark-border rounded-input px-4 py-3 text-text-primary placeholder-text-secondary outline-none focus:border-brand-yellow transition-colors"
+              onKeyPress={(e) => e.key === 'Enter' && testDevLogin()}
+            />
+            <p className="text-sm text-text-secondary mt-2">
+              Default: test-learn-2025 (or set DEV_LOGIN_PASSWORD env var)
+            </p>
+          </div>
+          
           <button
             onClick={testDevLogin}
             className="bg-brand-yellow text-black px-6 py-3 rounded-button font-semibold hover:scale-[1.02] transition-transform"
