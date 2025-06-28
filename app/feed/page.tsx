@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { YouTubePlayer } from '@/components/YouTubePlayer'
+import { isYouTubeUrl } from '@/utils/youtube'
 
 interface Post {
   id: string
@@ -255,10 +257,32 @@ export default function FeedPage() {
             <h2 className="text-title-lg text-text-primary mb-4">{post.title}</h2>
             <p className="text-body text-gray-300 mb-4 leading-relaxed">{post.description}</p>
             
-            {/* Post Image Placeholder */}
-            <div className="bg-dark-surface rounded-card h-64 mb-6 flex items-center justify-center overflow-hidden">
-              <span className="text-text-secondary">Content Preview</span>
-            </div>
+            {/* Post Media Content */}
+            {post.linkUrl && isYouTubeUrl(post.linkUrl) ? (
+              <div className="mb-6">
+                <YouTubePlayer url={post.linkUrl} title={post.title} />
+              </div>
+            ) : post.linkUrl ? (
+              <a 
+                href={post.linkUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block bg-dark-surface rounded-card p-4 mb-6 border border-dark-border hover:border-brand-yellow transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-secondary flex-shrink-0">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                  <span className="text-text-primary text-body truncate">{post.linkUrl}</span>
+                </div>
+              </a>
+            ) : (
+              <div className="bg-dark-surface rounded-card h-64 mb-6 flex items-center justify-center overflow-hidden">
+                <span className="text-text-secondary">Content Preview</span>
+              </div>
+            )}
             
             {/* Post Actions */}
             <div className="flex items-center gap-4">

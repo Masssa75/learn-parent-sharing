@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { YouTubePreview } from '@/components/YouTubePreview'
+import { isYouTubeUrl } from '@/utils/youtube'
 
 const categories = [
   { id: 'app', name: 'Apps & Software', emoji: '📱' },
@@ -167,13 +169,20 @@ export default function CreatePage() {
         
         {/* Link URL */}
         <div>
-          <input
-            type="url"
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-            placeholder="Link to product, app store, or website (optional)"
-            className="w-full bg-dark-bg border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-secondary outline-none focus:border-brand-yellow transition-colors"
-          />
+          {link && isYouTubeUrl(link) ? (
+            <YouTubePreview 
+              url={link} 
+              onRemove={() => setLink('')} 
+            />
+          ) : (
+            <input
+              type="url"
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              placeholder="Link to product, app store, or website (optional)"
+              className="w-full bg-dark-bg border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-secondary outline-none focus:border-brand-yellow transition-colors"
+            />
+          )}
         </div>
         
         {/* Form Actions */}
