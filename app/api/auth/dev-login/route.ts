@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
           '2. Navigate to Table Editor > users',
           '3. Insert a new row with:',
           `   - telegram_id: ${TEST_TELEGRAM_ID}`,
-          '   - username: devtest',
+          '   - telegram_username: devtest',
           '   - first_name: Dev',
           '   - last_name: Test',
           '   - photo_url: null (optional)',
