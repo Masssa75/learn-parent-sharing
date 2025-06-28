@@ -9,6 +9,10 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export async function GET() {
   try {
+    // Log environment variables (without exposing sensitive data)
+    console.log('Supabase URL:', supabaseUrl ? 'Set' : 'Not set')
+    console.log('Supabase Anon Key:', supabaseAnonKey ? 'Set' : 'Not set')
+    
     // Fetch posts with user and category information
     const { data: posts, error } = await supabase
       .from('posts')
@@ -31,7 +35,11 @@ export async function GET() {
 
     if (error) {
       console.error('Error fetching posts:', error)
-      return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 })
+      console.error('Error details:', JSON.stringify(error, null, 2))
+      return NextResponse.json({ 
+        error: 'Failed to fetch posts',
+        details: error.message 
+      }, { status: 500 })
     }
 
     // Transform the data to match the expected format
