@@ -191,7 +191,7 @@ npx playwright test --headed
 
 ### Test User System
 - **Dev Login URL**: https://learn-parent-sharing-app.netlify.app/test-auth
-- **Password**: test-learn-2025
+- **Password**: See DEV_LOGIN_PASSWORD in .env file
 - **Test Users**: devtest (999999999), admintest (888888888)
 
 ### Critical Workflows
@@ -231,7 +231,7 @@ The foundation is solid and ready for autonomous development! 🚀
 ### 🔑 Test User Login System
 **This is critical for autonomous testing!**
 - **URL**: https://learn-parent-sharing-app.netlify.app/test-auth
-- **Password**: `test-learn-2025`
+- **Password**: See `DEV_LOGIN_PASSWORD` in .env file
 - **Test Users Created**:
   - `devtest` - Telegram ID: 999999999, User ID: cdad4b8b-0355-414b-90ef-9769a1045b80
   - `admintest` - Telegram ID: 888888888, User ID: de2f7130-7682-4bc0-aad1-e1b83c07cb43
@@ -256,7 +256,7 @@ node scripts/check-netlify-deploy.js
 #### Test Dev Login
 ```javascript
 // test-dev-login-with-password.js
-const data = JSON.stringify({ password: 'test-learn-2025' });
+const data = JSON.stringify({ password: process.env.DEV_LOGIN_PASSWORD });
 // POST to https://learn-parent-sharing-app.netlify.app/api/auth/dev-login
 ```
 
@@ -288,7 +288,7 @@ node scripts/create-prod-test-users.js  # Creates test users in production DB
 
 3. **Environment Variables on Netlify**:
    - `ALLOW_DEV_LOGIN=true` ✅ Set
-   - `DEV_LOGIN_PASSWORD=test-learn-2025` ✅ Set
+   - `DEV_LOGIN_PASSWORD` ✅ Set (see .env file)
    - Without these, dev login won't work!
 
 ### 🐛 Common Issues & Solutions
