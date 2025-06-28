@@ -20,53 +20,7 @@ interface Post {
   saved?: boolean
 }
 
-const mockPosts: Post[] = [
-  {
-    id: '1',
-    user: {
-      name: 'Sarah Johnson',
-      avatar: '🟢'
-    },
-    timeAgo: '2 hours ago',
-    ageRange: 'Ages 5-7',
-    title: 'Amazing Math App for Kids!',
-    description: 'Just discovered Khan Academy Kids - my 6yo loves it! Free app with fun math games and rewards system.',
-    likes: 42,
-    comments: 18,
-    liked: false,
-    saved: false
-  },
-  {
-    id: '2',
-    user: {
-      name: 'Mike Chen',
-      avatar: '🔴'
-    },
-    timeAgo: '5 hours ago',
-    ageRange: 'Ages 0-2',
-    title: 'Best Teething Toy Ever',
-    description: 'Sophie the Giraffe saved our nights! Natural rubber, safe for babies. Worth every penny.',
-    likes: 28,
-    comments: 12,
-    liked: true,
-    saved: false
-  },
-  {
-    id: '3',
-    user: {
-      name: 'Lisa Park',
-      avatar: '🔵'
-    },
-    timeAgo: '8 hours ago',
-    ageRange: 'Ages 3-5',
-    title: 'Mess-Free Art Activities',
-    description: 'Window markers are a game changer! Kids can draw on windows and it wipes off easily.',
-    likes: 67,
-    comments: 23,
-    liked: false,
-    saved: true
-  }
-]
+const mockPosts: Post[] = []
 
 const categories = ['ALL', 'APPS', 'TOYS', 'TIPS']
 
@@ -226,7 +180,17 @@ export default function Home() {
       
       {/* Posts */}
       <div className="px-5 pb-20 custom-scrollbar">
-        {posts.map((post) => (
+        {posts.length === 0 ? (
+          <div className="text-center py-16">
+            <p className="text-text-secondary text-body-lg mb-4">No posts yet</p>
+            <p className="text-text-muted text-body">
+              {isAuthenticated 
+                ? "Be the first to share something amazing!"
+                : "Sign in to start sharing your discoveries"}
+            </p>
+          </div>
+        ) : (
+          posts.map((post) => (
           <div key={post.id} className="mb-8">
             {/* Post Header */}
             <div className="flex items-center gap-4 mb-5">
@@ -286,7 +250,7 @@ export default function Home() {
               </button>
             </div>
           </div>
-        ))}
+        )))}
       </div>
       
       {/* Floating Action Button or Call to Action */}
