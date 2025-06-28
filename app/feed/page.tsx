@@ -217,13 +217,13 @@ export default function FeedPage() {
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-3 rounded-button text-body font-medium btn-transition ${
+              className={`px-6 py-3 rounded-button whitespace-nowrap transition-all font-semibold text-body ${
                 selectedCategory === category
                   ? 'bg-brand-yellow text-black'
-                  : 'bg-transparent text-text-secondary border border-border-primary'
+                  : 'bg-transparent text-text-primary border border-dark-border hover:bg-white/5'
               }`}
             >
-              {category.toUpperCase()}
+              {category}
             </button>
           ))}
         </div>
