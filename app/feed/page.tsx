@@ -68,7 +68,7 @@ const mockPosts: Post[] = [
   }
 ]
 
-const categories = ['All', 'Apps', 'Toys', 'Books', 'Activities', 'Tips']
+const categories = ['ALL', 'APPS', 'TOYS', 'TIPS']
 
 interface User {
   id: string
@@ -160,9 +160,9 @@ export default function FeedPage() {
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Header */}
-      <div className="sticky top-0 bg-dark-bg z-10 px-4 pt-4 pb-2">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold text-white">Discover</h1>
+      <div className="sticky top-0 bg-dark-bg z-10 px-5 pt-6 pb-4">
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-display text-text-primary">Discover</h1>
           
           {/* Profile Button */}
           <div className="relative profile-menu-container">
@@ -181,7 +181,7 @@ export default function FeedPage() {
                   }}
                 />
               ) : null}
-              <span className={`text-xl ${user?.photoUrl ? 'hidden' : ''} ${!user?.photoUrl && user?.firstName ? 'text-black font-semibold' : ''}`}>
+              <span className={`${user?.photoUrl ? 'hidden' : ''} ${!user?.photoUrl && user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'}`}>
                 {user?.firstName ? user.firstName.charAt(0).toUpperCase() : '👤'}
               </span>
             </button>
@@ -206,28 +206,21 @@ export default function FeedPage() {
           </div>
         </div>
         
-        {/* Search Bar */}
-        <div className="bg-dark-surface rounded-xl px-4 py-3 mb-4">
-          <input
-            type="text"
-            placeholder="Search tips, toys, apps..."
-            className="w-full bg-transparent text-white placeholder-gray-500 outline-none"
-          />
-        </div>
+        <p className="text-text-secondary text-body-lg mb-6">What's working for parents today</p>
         
         {/* Categories */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
+              className={`px-6 py-3 rounded-button text-body font-medium btn-transition ${
                 selectedCategory === category
-                  ? 'bg-brand-green text-black font-medium'
-                  : 'bg-dark-surface text-gray-400'
+                  ? 'bg-brand-yellow text-black'
+                  : 'bg-transparent text-text-secondary border border-border-primary'
               }`}
             >
-              {category}
+              {category.toUpperCase()}
             </button>
           ))}
         </div>
@@ -239,7 +232,7 @@ export default function FeedPage() {
           <div key={post.id} className="bg-dark-surface rounded-2xl p-4 mb-4">
             {/* Post Header */}
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-brand-green rounded-xl flex items-center justify-center text-2xl">
+              <div className="w-12 h-12 bg-brand-yellow rounded-avatar flex items-center justify-center text-2xl">
                 {post.user.avatar}
               </div>
               <div className="flex-1">
@@ -251,37 +244,43 @@ export default function FeedPage() {
             </div>
             
             {/* Post Content */}
-            <h3 className="text-lg font-medium text-white mb-2">{post.title}</h3>
-            <p className="text-gray-400 mb-3">{post.description}</p>
+            <h3 className="text-title-lg text-text-primary mb-3">{post.title}</h3>
+            <p className="text-body text-text-secondary mb-4">{post.description}</p>
             
             {/* Post Image Placeholder */}
-            <div className="bg-dark-border rounded-xl h-48 mb-4"></div>
+            <div className="bg-dark-border rounded-card h-64 mb-6 flex items-center justify-center">
+              <span className="text-text-muted text-body">Content Preview</span>
+            </div>
             
             {/* Post Actions */}
             <div className="flex items-center gap-4 pt-3 border-t border-dark-border">
               <button
                 onClick={() => handleLike(post.id)}
                 className={`flex items-center gap-2 ${
-                  post.liked ? 'text-brand-green' : 'text-gray-400'
+                  post.liked ? 'text-text-primary' : 'text-text-secondary'
                 }`}
               >
-                <span className="text-xl">{post.liked ? '💚' : '🤍'}</span>
+                <span className="text-2xl">{post.liked ? '❤️' : '🤍'}</span>
                 <span>{post.likes}</span>
               </button>
               
-              <button className="flex items-center gap-2 text-gray-400">
-                <span className="text-xl">💬</span>
-                <span>{post.comments} comments</span>
+              <button className="flex items-center gap-2 text-text-secondary">
+                <span className="text-2xl">💬</span>
+                <span className="text-body">{post.comments}</span>
               </button>
               
               <button
                 onClick={() => handleSave(post.id)}
-                className={`ml-auto ${
-                  post.saved ? 'text-brand-green' : 'text-gray-400'
+                className={`ml-auto flex items-center gap-1 ${
+                  post.saved ? 'text-brand-yellow' : 'text-text-secondary'
                 }`}
               >
                 <span className="text-xl">{post.saved ? '⭐' : '☆'}</span>
-                <span className="ml-1">Save</span>
+                <span className="text-body">Save</span>
+              </button>
+              
+              <button className="px-4 py-1 text-text-primary text-body font-medium">
+                SHARE
               </button>
             </div>
           </div>
@@ -291,7 +290,7 @@ export default function FeedPage() {
       {/* Floating Action Button */}
       <button
         onClick={() => router.push('/create')}
-        className="fixed bottom-24 right-4 w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center shadow-lg text-black text-2xl font-light"
+        className="fixed bottom-24 right-6 w-20 h-20 bg-brand-yellow rounded-avatar flex items-center justify-center shadow-lg text-black text-4xl font-light hover:scale-105 btn-transition"
       >
         +
       </button>
@@ -299,7 +298,7 @@ export default function FeedPage() {
       {/* Bottom Navigation */}
       <div className="fixed bottom-0 left-0 right-0 bg-dark-surface border-t border-dark-border">
         <div className="flex justify-around items-center h-16 pb-safe">
-          <button className="flex flex-col items-center gap-1 text-brand-green">
+          <button className="flex flex-col items-center gap-1 text-brand-yellow">
             <div className="w-6 h-6 bg-current rounded"></div>
             <span className="text-xs">Home</span>
           </button>

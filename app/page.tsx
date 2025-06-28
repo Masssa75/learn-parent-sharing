@@ -187,7 +187,7 @@ export default function Home() {
                   }}
                 />
               ) : null}
-              <span className={`text-xl ${user?.photoUrl ? 'hidden' : ''} ${!user?.photoUrl && user?.firstName ? 'text-black font-semibold' : ''}`}>
+              <span className={`${user?.photoUrl ? 'hidden' : ''} ${!user?.photoUrl && user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'}`}>
                 {user?.firstName ? user.firstName.charAt(0).toUpperCase() : '👤'}
               </span>
               {/* Optional: Show name on hover */}
