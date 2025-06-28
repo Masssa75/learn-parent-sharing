@@ -8,9 +8,9 @@ const { chromium } = require('playwright');
   console.log('🚀 Starting full flow test...\n');
   
   try {
-    // 1. First, create a test session by calling our test login endpoint
-    console.log('1. Creating test session...');
-    const response = await page.request.post('https://learn-parent-sharing-app.netlify.app/api/auth/test-login');
+    // 1. First, create a mock session (no database required)
+    console.log('1. Creating mock session...');
+    const response = await page.request.post('https://learn-parent-sharing-app.netlify.app/api/auth/mock-login');
     
     if (response.ok()) {
       const data = await response.json();
