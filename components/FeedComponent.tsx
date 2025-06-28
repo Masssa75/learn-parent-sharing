@@ -19,23 +19,23 @@ interface Post {
   id: string
   title: string
   description?: string
-  link?: string
+  linkUrl?: string
   youtubeVideoId?: string
-  category: string
-  user_id: string
-  created_at: string
-  likes: number
-  saves: number
-  user?: {
-    telegram_username?: string
-    first_name?: string
-    last_name?: string
-    display_name?: string
-    photo_url?: string
-  }
-  categories?: {
+  category?: {
     name: string
+    emoji: string
   }
+  user?: {
+    name?: string
+    username?: string
+    avatar?: string | null
+  }
+  ageRange?: string
+  likes: number
+  comments: number
+  saved: boolean
+  liked: boolean
+  createdAt: string
 }
 
 interface FeedComponentProps {
@@ -177,7 +177,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   const filteredPosts = selectedCategory === 'ALL' 
     ? (posts || [])
     : (posts || []).filter(post => {
-        const categoryName = post.categories?.name
+        const categoryName = post.category?.name
         // Map button labels to actual category names
         const categoryMap: Record<string, string> = {
           'APPS': 'Apps & Software',
@@ -296,30 +296,30 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
               {/* Post Header */}
               <div className="flex items-center gap-4 mb-5">
                 <div className="w-12 h-12 bg-dark-surface rounded-avatar flex items-center justify-center overflow-hidden">
-                  {post.user?.photo_url ? (
+                  {post.user?.avatar ? (
                     <img 
-                      src={post.user.photo_url} 
-                      alt={post.user.display_name || 'User'}
+                      src={post.user.avatar} 
+                      alt={post.user.name || 'User'}
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <span className="text-2xl">
-                      {post.user?.first_name ? post.user.first_name.charAt(0).toUpperCase() : '👤'}
+                      {post.user?.name ? post.user.name.charAt(0).toUpperCase() : '👤'}
                     </span>
                   )}
                 </div>
                 <div className="flex-1">
                   <div className="text-body-lg font-semibold text-text-primary">
-                    {post.user?.display_name || post.user?.first_name || 'Anonymous'}
+                    {post.user?.name || 'Anonymous'}
                   </div>
                   <div className="text-meta text-text-muted flex items-center gap-2">
-                    <span>{new Date(post.created_at).toLocaleDateString()} ·</span>
+                    <span>{new Date(post.createdAt).toLocaleDateString()} ·</span>
                     <span className="flex items-center gap-1">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-secondary">
                         <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
                         <line x1="12" y1="18" x2="12" y2="18"></line>
                       </svg>
-                      <span className="text-text-secondary">{post.categories?.name || 'App'}</span>
+                      <span className="text-text-secondary">{post.category?.name || 'App'}</span>
                     </span>
                   </div>
                 </div>
@@ -339,10 +339,10 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
               )}
               
               {/* External Link */}
-              {post.link && !post.youtubeVideoId && (
+              {post.linkUrl && !post.youtubeVideoId && (
                 <div className="bg-dark-surface rounded-card p-4 mb-6">
                   <a
-                    href={post.link}
+                    href={post.linkUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 text-brand-yellow hover:underline"
@@ -350,7 +350,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                     <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
-                    <span className="truncate">{getLinkPreview(post.link)}</span>
+                    <span className="truncate">{getLinkPreview(post.linkUrl)}</span>
                   </a>
                 </div>
               )}
@@ -371,7 +371,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
                   </svg>
-                  <span>0</span>
+                  <span>{post.comments || 0}</span>
                 </button>
                 
                 <button

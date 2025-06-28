@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
+import { extractYouTubeVideoId } from '@/utils/youtube'
 
 // Create Supabase client for server-side operations
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -68,6 +69,7 @@ export async function GET() {
       saved: false,
       liked: false,
       linkUrl: post.link_url,
+      youtubeVideoId: post.youtube_video_id,
       imageUrl: post.image_url,
       createdAt: post.created_at
     })) || []
@@ -131,6 +133,13 @@ export async function POST(request: NextRequest) {
     }
     
     console.log('Category found:', categoryData.id)
+    
+    // Extract YouTube video ID if it's a YouTube URL
+    let youtubeVideoId = null
+    if (linkUrl) {
+      youtubeVideoId = extractYouTubeVideoId(linkUrl)
+      console.log('YouTube video ID extracted:', youtubeVideoId)
+    }
 
     // Create the post using regular client (RLS now allows it)
     const { data: post, error: postError } = await supabase
@@ -142,6 +151,7 @@ export async function POST(request: NextRequest) {
         category_id: categoryData.id,
         age_ranges: ageRanges,
         link_url: linkUrl || null,
+        youtube_video_id: youtubeVideoId,
         likes_count: 0,
         comments_count: 0
       })
