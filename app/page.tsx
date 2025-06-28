@@ -93,8 +93,10 @@ export default function Home() {
       try {
         const response = await fetch('/api/auth/check')
         const data = await response.json()
+        console.log('Auth check response:', data) // Debug log
         setIsAuthenticated(data.authenticated)
         if (data.authenticated && data.user) {
+          console.log('User data:', data.user) // Debug log
           setUser(data.user)
         } else {
           setUser(null)
@@ -190,8 +192,8 @@ export default function Home() {
                   />
                 </>
               ) : null}
-              <span className={`${user?.photoUrl ? 'hidden' : ''} ${!user?.photoUrl && user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'}`}>
-                {user?.firstName ? user.firstName.charAt(0).toUpperCase() : '👤'}
+              <span className={`${user?.photoUrl ? 'hidden' : 'flex items-center justify-center w-full h-full'} ${user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'}`}>
+                {user?.firstName ? user.firstName.charAt(0).toUpperCase() : (user ? 'U' : '👤')}
               </span>
               {/* Optional: Show name on hover */}
               {user?.displayName && (

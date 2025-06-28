@@ -184,8 +184,8 @@ export default function FeedPage() {
                   />
                 </>
               ) : null}
-              <span className={`${user?.photoUrl ? 'hidden' : ''} ${!user?.photoUrl && user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'}`}>
-                {user?.firstName ? user.firstName.charAt(0).toUpperCase() : '👤'}
+              <span className={`${user?.photoUrl ? 'hidden' : 'flex items-center justify-center w-full h-full'} ${user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'}`}>
+                {user?.firstName ? user.firstName.charAt(0).toUpperCase() : (user ? 'U' : '👤')}
               </span>
             </button>
             
