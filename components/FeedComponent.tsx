@@ -43,7 +43,7 @@ interface FeedComponentProps {
   protectedRoute?: boolean
 }
 
-const categories = ['ALL', 'APPS', 'TOYS', 'TIPS']
+const categories = ['ALL', 'APPS', 'TOYS', 'BOOKS', 'ACTIVITIES', 'TIPS']
 
 export default function FeedComponent({ showAuthPrompt = true, protectedRoute = false }: FeedComponentProps) {
   const [posts, setPosts] = useState<Post[]>([])
@@ -178,7 +178,15 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
     ? (posts || [])
     : (posts || []).filter(post => {
         const categoryName = post.categories?.name
-        return categoryName && categoryName.toUpperCase() === selectedCategory
+        // Map button labels to actual category names
+        const categoryMap: Record<string, string> = {
+          'APPS': 'Apps & Software',
+          'TOYS': 'Toys & Games',
+          'BOOKS': 'Books',
+          'ACTIVITIES': 'Activities',
+          'TIPS': 'Parenting Tips'
+        }
+        return categoryName && categoryName === categoryMap[selectedCategory]
       })
 
   return (

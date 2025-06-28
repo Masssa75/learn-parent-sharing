@@ -6,11 +6,12 @@ import { YouTubePreview } from '@/components/YouTubePreview'
 import { isYouTubeUrl } from '@/utils/youtube'
 
 const categories = [
-  { id: 'app', name: 'App', emoji: '📱' },
-  { id: 'toy', name: 'Toy', emoji: '🧸' },
-  { id: 'video', name: 'Video', emoji: '🎥' },
-  { id: 'website', name: 'Website', emoji: '🌐' },
-  { id: 'tip', name: 'Tip', emoji: '💡' }
+  { id: 'apps', name: 'Apps & Software', emoji: '📱' },
+  { id: 'toys', name: 'Toys & Games', emoji: '🧸' },
+  { id: 'books', name: 'Books', emoji: '📚' },
+  { id: 'activities', name: 'Activities', emoji: '🎨' },
+  { id: 'education', name: 'Educational Resources', emoji: '🎓' },
+  { id: 'tips', name: 'Parenting Tips', emoji: '💡' }
 ]
 
 const ageRanges = ['0-2', '3-5', '5-7', '6-8', '8+']
