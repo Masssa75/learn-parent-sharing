@@ -25,8 +25,9 @@ export async function GET() {
         *,
         users (
           id,
-          username,
-          full_name,
+          telegram_username,
+          first_name,
+          last_name,
           photo_url
         ),
         categories (
@@ -51,8 +52,8 @@ export async function GET() {
     const transformedPosts = posts?.map(post => ({
       id: post.id,
       user: {
-        name: post.users?.full_name || post.users?.username || 'Anonymous',
-        username: post.users?.username || 'anonymous',
+        name: post.users ? `${post.users.first_name} ${post.users.last_name || ''}`.trim() : 'Anonymous',
+        username: post.users?.telegram_username || 'anonymous',
         avatar: post.users?.photo_url || null
       },
       category: {
