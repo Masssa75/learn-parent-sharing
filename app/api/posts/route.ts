@@ -23,7 +23,7 @@ export async function GET() {
       .from('posts')
       .select(`
         *,
-        users (
+        users!posts_user_id_fkey (
           id,
           telegram_username,
           first_name,
