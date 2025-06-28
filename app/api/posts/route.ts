@@ -50,29 +50,37 @@ export async function GET() {
     }
 
     // Transform the data to match the expected format
-    const transformedPosts = posts?.map(post => ({
-      id: post.id,
-      user: {
-        name: post.users ? `${post.users.first_name} ${post.users.last_name || ''}`.trim() : 'Anonymous',
-        username: post.users?.telegram_username || 'anonymous',
-        avatar: post.users?.photo_url || null
-      },
-      category: {
-        name: post.categories?.name || 'Unknown',
-        emoji: post.categories?.emoji || '❓'
-      },
-      title: post.title,
-      description: post.description,
-      ageRange: post.age_ranges?.join(', ') || '',
-      likes: post.likes_count || 0,
-      comments: post.comments_count || 0,
-      saved: false,
-      liked: false,
-      linkUrl: post.link_url,
-      youtubeVideoId: post.youtube_video_id,
-      imageUrl: post.image_url,
-      createdAt: post.created_at
-    })) || []
+    const transformedPosts = posts?.map(post => {
+      // Extract YouTube video ID from link_url if it's a YouTube link
+      let youtubeVideoId = null;
+      if (post.link_url) {
+        youtubeVideoId = extractYouTubeVideoId(post.link_url);
+      }
+      
+      return {
+        id: post.id,
+        user: {
+          name: post.users ? `${post.users.first_name} ${post.users.last_name || ''}`.trim() : 'Anonymous',
+          username: post.users?.telegram_username || 'anonymous',
+          avatar: post.users?.photo_url || null
+        },
+        category: {
+          name: post.categories?.name || 'Unknown',
+          emoji: post.categories?.emoji || '❓'
+        },
+        title: post.title,
+        description: post.description,
+        ageRange: post.age_ranges?.join(', ') || '',
+        likes: post.likes_count || 0,
+        comments: post.comments_count || 0,
+        saved: false,
+        liked: false,
+        linkUrl: post.link_url,
+        youtubeVideoId: youtubeVideoId,
+        imageUrl: post.image_url,
+        createdAt: post.created_at
+      };
+    }) || []
 
     return NextResponse.json({ posts: transformedPosts })
   } catch (error) {
@@ -133,13 +141,6 @@ export async function POST(request: NextRequest) {
     }
     
     console.log('Category found:', categoryData.id)
-    
-    // Extract YouTube video ID if it's a YouTube URL
-    let youtubeVideoId = null
-    if (linkUrl) {
-      youtubeVideoId = extractYouTubeVideoId(linkUrl)
-      console.log('YouTube video ID extracted:', youtubeVideoId)
-    }
 
     // Create the post using regular client (RLS now allows it)
     const { data: post, error: postError } = await supabase
@@ -151,7 +152,6 @@ export async function POST(request: NextRequest) {
         category_id: categoryData.id,
         age_ranges: ageRanges,
         link_url: linkUrl || null,
-        youtube_video_id: youtubeVideoId,
         likes_count: 0,
         comments_count: 0
       })
