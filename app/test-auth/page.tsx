@@ -33,7 +33,7 @@ export default function TestAuthPage() {
         }
       }
     } catch (error) {
-      setStatus(`Error: ${error.message}`)
+      setStatus(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
   

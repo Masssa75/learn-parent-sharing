@@ -18,7 +18,7 @@ export default function DebugPage() {
       const data = await response.json()
       setAuthStatus(data)
     } catch (error) {
-      setAuthStatus({ error: error.message })
+      setAuthStatus({ error: error instanceof Error ? error.message : 'Unknown error' })
     }
   }
   
@@ -28,7 +28,7 @@ export default function DebugPage() {
       const data = await response.json()
       setPosts(data)
     } catch (error) {
-      setPosts({ error: error.message })
+      setPosts({ error: error instanceof Error ? error.message : 'Unknown error' })
     }
   }
   
@@ -52,7 +52,7 @@ export default function DebugPage() {
       const data = await response.json()
       setTestResult(`Status: ${response.status}\n${JSON.stringify(data, null, 2)}`)
     } catch (error) {
-      setTestResult(`Error: ${error.message}`)
+      setTestResult(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
   
