@@ -6,12 +6,11 @@ import { YouTubePreview } from '@/components/YouTubePreview'
 import { isYouTubeUrl } from '@/utils/youtube'
 
 const categories = [
-  { id: 'app', name: 'Apps & Software', emoji: '📱' },
-  { id: 'toy', name: 'Toys & Games', emoji: '🧸' },
-  { id: 'book', name: 'Books', emoji: '📚' },
-  { id: 'education', name: 'Educational Resources', emoji: '🎓' },
-  { id: 'activity', name: 'Activities', emoji: '🎨' },
-  { id: 'tip', name: 'Parenting Tips', emoji: '💡' }
+  { id: 'app', name: 'App', emoji: '📱' },
+  { id: 'toy', name: 'Toy', emoji: '🧸' },
+  { id: 'video', name: 'Video', emoji: '🎥' },
+  { id: 'website', name: 'Website', emoji: '🌐' },
+  { id: 'tip', name: 'Tip', emoji: '💡' }
 ]
 
 const ageRanges = ['0-2', '3-5', '5-7', '6-8', '8+']
@@ -23,6 +22,10 @@ export default function CreatePage() {
   const [category, setCategory] = useState('')
   const [selectedAges, setSelectedAges] = useState<string[]>([])
   const [link, setLink] = useState('')
+  const [inputMode, setInputMode] = useState<'manual' | 'voice'>('manual')
+  const [isRecording, setIsRecording] = useState(false)
+  const [voiceTranscript, setVoiceTranscript] = useState('')
+  const [isProcessing, setIsProcessing] = useState(false)
   
   const handleAgeToggle = (age: string) => {
     setSelectedAges(prev =>
