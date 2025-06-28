@@ -8,9 +8,13 @@ interface Post {
   id: string
   user: {
     name: string
-    avatar: string
+    username: string
+    avatar: string | null
   }
-  timeAgo: string
+  category: {
+    name: string
+    emoji: string
+  }
   ageRange: string
   title: string
   description: string
@@ -18,55 +22,11 @@ interface Post {
   comments: number
   liked?: boolean
   saved?: boolean
+  linkUrl?: string
+  imageUrl?: string
+  createdAt?: string
 }
 
-const mockPosts: Post[] = [
-  {
-    id: '1',
-    user: {
-      name: 'Sarah Johnson',
-      avatar: '🟢'
-    },
-    timeAgo: '2 hours ago',
-    ageRange: 'Ages 5-7',
-    title: 'Amazing Math App for Kids!',
-    description: 'Just discovered Khan Academy Kids - my 6yo loves it! Free app with fun math games and rewards system.',
-    likes: 42,
-    comments: 18,
-    liked: false,
-    saved: false
-  },
-  {
-    id: '2',
-    user: {
-      name: 'Mike Chen',
-      avatar: '🔴'
-    },
-    timeAgo: '5 hours ago',
-    ageRange: 'Ages 0-2',
-    title: 'Best Teething Toy Ever',
-    description: 'Sophie the Giraffe saved our nights! Natural rubber, safe for babies. Worth every penny.',
-    likes: 28,
-    comments: 12,
-    liked: true,
-    saved: false
-  },
-  {
-    id: '3',
-    user: {
-      name: 'Lisa Park',
-      avatar: '🔵'
-    },
-    timeAgo: '8 hours ago',
-    ageRange: 'Ages 3-5',
-    title: 'Mess-Free Art Activities',
-    description: 'Window markers are a game changer! Kids can draw on windows and it wipes off easily.',
-    likes: 67,
-    comments: 23,
-    liked: false,
-    saved: true
-  }
-]
 
 const categories = ['ALL', 'APPS', 'TOYS', 'TIPS']
 
@@ -82,7 +42,8 @@ interface User {
 
 export default function FeedPage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
-  const [posts, setPosts] = useState(mockPosts)
+  const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<User | null>(null)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const router = useRouter()
@@ -106,7 +67,25 @@ export default function FeedPage() {
     }
     
     checkAuth()
+    fetchPosts()
   }, [])
+  
+  const fetchPosts = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/posts')
+      if (response.ok) {
+        const data = await response.json()
+        setPosts(data.posts)
+      } else {
+        console.error('Failed to fetch posts')
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
   
   // Close profile menu when clicking outside
   useEffect(() => {
@@ -231,23 +210,42 @@ export default function FeedPage() {
       
       {/* Posts */}
       <div className="px-5 pb-20 custom-scrollbar">
-        {posts.map((post) => (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="text-text-secondary">Loading posts...</div>
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-text-secondary mb-4">No posts yet. Be the first to share!</p>
+            <button
+              onClick={() => router.push('/create')}
+              className="px-6 py-3 bg-brand-yellow text-black rounded-button font-semibold hover:scale-[1.02] btn-transition"
+            >
+              Share Something
+            </button>
+          </div>
+        ) : (
+          posts.map((post) => (
           <div key={post.id} className="mb-8">
             {/* Post Header */}
             <div className="flex items-center gap-4 mb-5">
-              <div className="w-12 h-12 bg-dark-surface rounded-avatar flex items-center justify-center text-2xl">
-                {post.user.avatar}
+              <div className="w-12 h-12 bg-dark-surface rounded-avatar flex items-center justify-center overflow-hidden">
+                {post.user.avatar ? (
+                  <img 
+                    src={post.user.avatar} 
+                    alt={post.user.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-2xl">{post.user.name.charAt(0).toUpperCase()}</span>
+                )}
               </div>
               <div className="flex-1">
                 <div className="text-body-lg font-semibold text-text-primary">{post.user.name}</div>
                 <div className="text-meta text-text-muted flex items-center gap-2">
-                  <span>{post.timeAgo} · {post.ageRange} ·</span>
+                  <span>{post.ageRange} ·</span>
                   <span className="flex items-center gap-1">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-secondary">
-                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                      <line x1="12" y1="18" x2="12" y2="18"></line>
-                    </svg>
-                    <span className="text-text-secondary">App</span>
+                    <span className="text-text-secondary">{post.category?.emoji} {post.category?.name}</span>
                   </span>
                 </div>
               </div>
@@ -291,7 +289,8 @@ export default function FeedPage() {
               </button>
             </div>
           </div>
-        ))}
+          ))
+        )}
       </div>
       
       {/* Floating Action Button */}

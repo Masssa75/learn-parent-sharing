@@ -4,11 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const categories = [
-  { id: 'app', name: 'App', emoji: '📱' },
-  { id: 'toy', name: 'Toy', emoji: '🦒' },
-  { id: 'video', name: 'Video', emoji: '🎥' },
-  { id: 'website', name: 'Website', emoji: '🌐' },
-  { id: 'tip', name: 'Tip', emoji: '💡' }
+  { id: 'app', name: 'Apps & Software', emoji: '📱' },
+  { id: 'toy', name: 'Toys & Games', emoji: '🧸' },
+  { id: 'book', name: 'Books', emoji: '📚' },
+  { id: 'education', name: 'Educational Resources', emoji: '🎓' },
+  { id: 'activity', name: 'Activities', emoji: '🎨' },
+  { id: 'tip', name: 'Parenting Tips', emoji: '💡' }
 ]
 
 const ageRanges = ['0-2', '3-5', '5-7', '6-8', '8+']
@@ -31,15 +32,44 @@ export default function CreatePage() {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Submit to API
-    console.log({
-      title,
-      description,
-      category,
-      selectedAges,
-      link
-    })
-    router.push('/feed')
+    
+    try {
+      const selectedCategory = categories.find(cat => cat.id === category)
+      if (!selectedCategory) return
+      
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title,
+          description,
+          category: selectedCategory.name,
+          ageRanges: selectedAges,
+          linkUrl: link
+        }),
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        if (response.status === 401) {
+          // User not authenticated, redirect to login
+          router.push('/login')
+          return
+        }
+        console.error('Error creating post:', error)
+        alert('Failed to create post. Please try again.')
+        return
+      }
+      
+      const data = await response.json()
+      console.log('Post created successfully:', data)
+      router.push('/feed')
+    } catch (error) {
+      console.error('Error submitting post:', error)
+      alert('Failed to create post. Please try again.')
+    }
   }
   
   return (
@@ -130,19 +160,15 @@ export default function CreatePage() {
           </div>
         </div>
         
-        {/* Media Upload */}
+        {/* Link URL */}
         <div>
-          <button
-            type="button"
-            className="w-full bg-transparent border-2 border-dashed border-dark-border rounded-input py-5 px-4 text-text-secondary hover:border-text-muted hover:text-text-muted transition-colors flex items-center justify-center gap-3"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
-            <span className="text-body font-medium">Add photo or link</span>
-          </button>
+          <input
+            type="url"
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            placeholder="Link to product, app store, or website (optional)"
+            className="w-full bg-dark-bg border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-secondary outline-none focus:border-brand-yellow transition-colors"
+          />
         </div>
         
         {/* Form Actions */}
