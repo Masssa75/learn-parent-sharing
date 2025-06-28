@@ -4,15 +4,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const categories = [
-  { id: 'apps', name: 'Apps & Software', emoji: '📱' },
-  { id: 'toys', name: 'Toys & Games', emoji: '🧸' },
-  { id: 'books', name: 'Books', emoji: '📚' },
-  { id: 'education', name: 'Educational Resources', emoji: '🎓' },
-  { id: 'activities', name: 'Activities', emoji: '🎨' },
-  { id: 'tips', name: 'Parenting Tips', emoji: '💡' }
+  { id: 'app', name: 'App', emoji: '📱' },
+  { id: 'toy', name: 'Toy', emoji: '🦒' },
+  { id: 'video', name: 'Video', emoji: '🎥' },
+  { id: 'website', name: 'Website', emoji: '🌐' },
+  { id: 'tip', name: 'Tip', emoji: '💡' }
 ]
 
-const ageRanges = ['0-2', '3-5', '5-7', '8-10', '11-13', '14+']
+const ageRanges = ['0-2', '3-5', '5-7', '6-8', '8+']
 
 export default function CreatePage() {
   const router = useRouter()
@@ -46,18 +45,21 @@ export default function CreatePage() {
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Header */}
-      <div className="sticky top-0 bg-dark-bg z-10 px-4 py-4 border-b border-dark-border">
+      <div className="sticky top-0 bg-dark-bg z-10 px-5 py-5 border-b border-dark-border">
         <div className="flex items-center justify-between">
           <button
             onClick={() => router.back()}
-            className="text-gray-400"
+            className="text-text-muted hover:text-text-primary btn-transition"
           >
-            Cancel
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
-          <h1 className="text-lg font-semibold text-white">Share a Discovery</h1>
+          <h1 className="text-title text-text-primary">Share what's working</h1>
           <button
             onClick={handleSubmit}
-            className="text-brand-green font-medium"
+            className="text-brand-yellow font-semibold hover:opacity-80 btn-transition disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!title || !category || selectedAges.length === 0}
           >
             Share
@@ -66,107 +68,99 @@ export default function CreatePage() {
       </div>
       
       {/* Form */}
-      <form onSubmit={handleSubmit} className="p-4 space-y-6">
+      <form onSubmit={handleSubmit} className="p-5 space-y-5">
         {/* Title */}
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">
-            What did you find?
-          </label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="App name, toy, book, technique..."
-            className="w-full bg-dark-surface rounded-xl px-4 py-3 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-brand-green"
+            placeholder="What made parenting easier today?"
+            className="w-full bg-dark-bg border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-secondary outline-none focus:border-brand-yellow transition-colors"
           />
-        </div>
-        
-        {/* Category */}
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">
-            Category
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setCategory(cat.id)}
-                className={`p-3 rounded-xl text-left transition-colors ${
-                  category === cat.id
-                    ? 'bg-brand-green text-black'
-                    : 'bg-dark-surface text-gray-400'
-                }`}
-              >
-                <span className="text-xl mr-2">{cat.emoji}</span>
-                <span className="text-sm">{cat.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        {/* Age Range */}
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">
-            Age Range
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {ageRanges.map((age) => (
-              <button
-                key={age}
-                type="button"
-                onClick={() => handleAgeToggle(age)}
-                className={`px-4 py-2 rounded-full text-sm transition-colors ${
-                  selectedAges.includes(age)
-                    ? 'bg-brand-green text-black'
-                    : 'bg-dark-surface text-gray-400'
-                }`}
-              >
-                {age}
-              </button>
-            ))}
-          </div>
         </div>
         
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">
-            Tell us about it
-          </label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Why do you recommend this? How has it helped your child?"
+            placeholder="Tell other parents about your experience..."
             rows={4}
-            className="w-full bg-dark-surface rounded-xl px-4 py-3 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-brand-green resize-none"
+            className="w-full bg-dark-bg border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-secondary outline-none focus:border-brand-yellow transition-colors resize-none"
           />
         </div>
         
-        {/* Link */}
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">
-            Add Link (optional)
-          </label>
-          <input
-            type="url"
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-            placeholder="https://..."
-            className="w-full bg-dark-surface rounded-xl px-4 py-3 text-white placeholder-gray-500 outline-none focus:ring-2 focus:ring-brand-green"
-          />
-        </div>
-        
-        {/* Photo Upload */}
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">
-            Add Photo (optional)
-          </label>
-          <div className="bg-dark-surface border-2 border-dashed border-dark-border rounded-xl p-8 text-center">
-            <div className="text-gray-500">
-              <div className="text-4xl mb-2">📷</div>
-              <p className="text-sm">Tap to add photo</p>
-            </div>
+        {/* Category and Age in one row */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-meta font-medium text-text-secondary mb-2">
+              Category
+            </label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full bg-dark-bg border border-dark-border rounded-input px-4 py-3 text-text-primary text-body outline-none focus:border-brand-yellow transition-colors"
+            >
+              <option value="">Select...</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.emoji} {cat.name}
+                </option>
+              ))}
+            </select>
           </div>
+        
+          <div>
+            <label className="block text-meta font-medium text-text-secondary mb-2">
+              Age Range
+            </label>
+            <select
+              value={selectedAges[0] || ''}
+              onChange={(e) => setSelectedAges(e.target.value ? [e.target.value] : [])}
+              className="w-full bg-dark-bg border border-dark-border rounded-input px-4 py-3 text-text-primary text-body outline-none focus:border-brand-yellow transition-colors"
+            >
+              <option value="">Select...</option>
+              {ageRanges.map((age) => (
+                <option key={age} value={age}>
+                  Ages {age}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        
+        {/* Media Upload */}
+        <div>
+          <button
+            type="button"
+            className="w-full bg-transparent border-2 border-dashed border-dark-border rounded-input py-5 px-4 text-text-secondary hover:border-text-muted hover:text-text-muted transition-colors flex items-center justify-center gap-3"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <span className="text-body font-medium">Add photo or link</span>
+          </button>
+        </div>
+        
+        {/* Form Actions */}
+        <div className="flex gap-4 pt-6">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="flex-1 px-6 py-3 rounded-button font-semibold text-body bg-transparent text-text-primary border border-dark-border hover:bg-white/5 btn-transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={!title || !category || selectedAges.length === 0}
+            className="flex-1 px-6 py-3 rounded-button font-semibold text-body bg-brand-yellow text-black hover:scale-[1.02] btn-transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          >
+            Share
+          </button>
         </div>
       </form>
     </div>

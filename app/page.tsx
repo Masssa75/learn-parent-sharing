@@ -68,7 +68,7 @@ const mockPosts: Post[] = [
   }
 ]
 
-const categories = ['All', 'Apps', 'Toys', 'Books', 'Activities', 'Tips']
+const categories = ['ALL', 'APPS', 'TOYS', 'TIPS']
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState('All')
@@ -142,45 +142,37 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Header */}
-      <div className="sticky top-0 bg-dark-bg z-10 px-4 pt-4 pb-2">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold text-white">Learn</h1>
+      <div className="sticky top-0 bg-dark-bg z-10 px-5 pt-6 pb-4">
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-display text-text-primary">Discover</h1>
           {!isAuthenticated ? (
             <Link 
               href="/login"
-              className="px-4 py-2 bg-brand-green text-black rounded-xl font-medium hover:opacity-90 transition"
+              className="px-6 py-3 bg-brand-yellow text-black rounded-button font-semibold hover:scale-105 btn-transition"
             >
-              Sign In
+              SIGN IN
             </Link>
           ) : (
             <Link 
               href="/feed"
-              className="w-10 h-10 bg-brand-green rounded-xl flex items-center justify-center"
+              className="w-12 h-12 bg-brand-yellow rounded-avatar flex items-center justify-center"
             >
               <span className="text-xl">👤</span>
             </Link>
           )}
         </div>
-        
-        {/* Search Bar */}
-        <div className="bg-dark-surface rounded-xl px-4 py-3 mb-4">
-          <input
-            type="text"
-            placeholder="Search tips, toys, apps..."
-            className="w-full bg-transparent text-white placeholder-gray-500 outline-none"
-          />
-        </div>
+        <p className="text-text-secondary text-body-lg mb-6">What's working for parents today</p>
         
         {/* Categories */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
           {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full whitespace-nowrap transition-colors ${
+              className={`px-6 py-3 rounded-button whitespace-nowrap transition-all font-semibold text-body ${
                 selectedCategory === category
-                  ? 'bg-brand-green text-black font-medium'
-                  : 'bg-dark-surface text-gray-400'
+                  ? 'bg-brand-yellow text-black'
+                  : 'bg-transparent text-text-primary border border-dark-border hover:bg-white/5'
               }`}
             >
               {category}
@@ -190,56 +182,64 @@ export default function Home() {
       </div>
       
       {/* Posts */}
-      <div className="px-4 pb-20">
+      <div className="px-5 pb-20 custom-scrollbar">
         {posts.map((post) => (
-          <div key={post.id} className="bg-dark-surface rounded-2xl p-4 mb-4">
+          <div key={post.id} className="mb-8">
             {/* Post Header */}
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-brand-green rounded-xl flex items-center justify-center text-2xl">
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-12 h-12 bg-dark-surface rounded-avatar flex items-center justify-center text-2xl">
                 {post.user.avatar}
               </div>
               <div className="flex-1">
-                <div className="font-medium text-white">{post.user.name}</div>
-                <div className="text-sm text-gray-400">
-                  {post.timeAgo} • {post.ageRange}
+                <div className="text-body-lg font-semibold text-text-primary">{post.user.name}</div>
+                <div className="text-meta text-text-muted flex items-center gap-2">
+                  <span>{post.timeAgo} · {post.ageRange} ·</span>
+                  <span className="flex items-center gap-1">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-secondary">
+                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                      <line x1="12" y1="18" x2="12" y2="18"></line>
+                    </svg>
+                    <span className="text-text-secondary">App</span>
+                  </span>
                 </div>
               </div>
             </div>
             
             {/* Post Content */}
-            <h3 className="text-lg font-medium text-white mb-2">{post.title}</h3>
-            <p className="text-gray-400 mb-3">{post.description}</p>
+            <h2 className="text-title-lg text-text-primary mb-4">{post.title}</h2>
+            <p className="text-body text-gray-300 mb-4 leading-relaxed">{post.description}</p>
             
             {/* Post Image Placeholder */}
-            <div className="bg-dark-border rounded-xl h-48 mb-4 flex items-center justify-center">
-              <span className="text-gray-600">Image Preview</span>
+            <div className="bg-dark-surface rounded-card h-64 mb-6 flex items-center justify-center overflow-hidden">
+              <span className="text-text-secondary">Content Preview</span>
             </div>
             
             {/* Post Actions */}
-            <div className="flex items-center gap-4 pt-3 border-t border-dark-border">
+            <div className="flex items-center gap-4">
               <button
                 onClick={() => handleLike(post.id)}
-                className={`flex items-center gap-2 transition-colors ${
-                  post.liked ? 'text-brand-green' : 'text-gray-400'
-                } hover:text-brand-green`}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-button font-semibold text-body btn-transition ${
+                  post.liked ? 'bg-brand-yellow text-black' : 'bg-transparent text-text-primary border border-dark-border hover:bg-white/5'
+                }`}
               >
-                <span className="text-xl">{post.liked ? '💚' : '🤍'}</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill={post.liked ? '#E91E63' : 'none'} stroke={post.liked ? '#E91E63' : 'currentColor'} strokeWidth="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
                 <span>{post.likes}</span>
               </button>
               
-              <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-                <span className="text-xl">💬</span>
+              <button className="flex items-center gap-2 px-5 py-2.5 rounded-button font-semibold text-body bg-transparent text-text-primary border border-dark-border hover:bg-white/5 btn-transition">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
                 <span>{post.comments}</span>
               </button>
               
               <button
                 onClick={() => handleSave(post.id)}
-                className={`ml-auto flex items-center gap-1 transition-colors ${
-                  post.saved ? 'text-brand-green' : 'text-gray-400'
-                } hover:text-brand-green`}
+                className="ml-auto text-text-primary hover:text-brand-yellow font-semibold text-body btn-transition"
               >
-                <span className="text-xl">{post.saved ? '⭐' : '☆'}</span>
-                <span>Save</span>
+                SHARE
               </button>
             </div>
           </div>
@@ -250,17 +250,17 @@ export default function Home() {
       {isAuthenticated ? (
         <button
           onClick={handleCreatePost}
-          className="fixed bottom-4 right-4 w-14 h-14 bg-brand-green rounded-2xl flex items-center justify-center shadow-lg text-black text-2xl font-light hover:scale-105 transition-transform"
+          className="fixed bottom-8 right-6 w-16 h-16 bg-brand-yellow rounded-fab flex items-center justify-center shadow-xl shadow-brand-yellow/40 text-black text-4xl font-light hover:scale-110 hover:shadow-2xl hover:shadow-brand-yellow/60 active:scale-95 btn-transition z-50"
         >
           +
         </button>
       ) : (
-        <div className="fixed bottom-4 left-4 right-4 bg-dark-surface rounded-2xl p-4 border border-brand-green/20">
-          <p className="text-white font-medium mb-2">Join the community!</p>
-          <p className="text-gray-400 text-sm mb-3">Sign in to share your discoveries and connect with other parents.</p>
+        <div className="fixed bottom-6 left-6 right-6 bg-dark-surface rounded-card p-6 border border-dark-border shadow-xl">
+          <p className="text-text-primary text-body-lg font-semibold mb-2">Join the community!</p>
+          <p className="text-text-secondary text-body mb-4">Sign in to share your discoveries and connect with other parents.</p>
           <Link 
             href="/login"
-            className="block w-full bg-brand-green text-black rounded-xl py-3 text-center font-medium hover:opacity-90 transition"
+            className="block w-full bg-brand-yellow text-black rounded-button py-3 text-center font-semibold hover:scale-[1.02] btn-transition"
           >
             Sign in with Telegram
           </Link>
