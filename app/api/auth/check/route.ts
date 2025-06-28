@@ -1,4 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
+
+// Use service role key for server-side operations
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,10 +28,31 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ authenticated: false })
       }
       
+      // Fetch user data from database
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('id, telegram_id, telegram_username, first_name, last_name, photo_url')
+        .eq('id', sessionData.userId)
+        .single()
+      
+      if (error || !user) {
+        console.error('Error fetching user data:', error)
+        return NextResponse.json({ authenticated: false })
+      }
+      
       return NextResponse.json({ 
         authenticated: true,
         userId: sessionData.userId,
-        telegramId: sessionData.telegramId
+        telegramId: sessionData.telegramId,
+        user: {
+          id: user.id,
+          telegramId: user.telegram_id,
+          username: user.telegram_username,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          photoUrl: user.photo_url,
+          displayName: user.first_name + (user.last_name ? ` ${user.last_name}` : '')
+        }
       })
     } catch (error) {
       console.error('Invalid session token:', error)

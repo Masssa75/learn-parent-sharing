@@ -70,10 +70,21 @@ const mockPosts: Post[] = [
 
 const categories = ['ALL', 'APPS', 'TOYS', 'TIPS']
 
+interface User {
+  id: string
+  telegramId: number
+  username?: string
+  firstName: string
+  lastName?: string
+  photoUrl?: string
+  displayName: string
+}
+
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [posts, setPosts] = useState(mockPosts)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
   const router = useRouter()
   
   useEffect(() => {
@@ -83,9 +94,15 @@ export default function Home() {
         const response = await fetch('/api/auth/check')
         const data = await response.json()
         setIsAuthenticated(data.authenticated)
+        if (data.authenticated && data.user) {
+          setUser(data.user)
+        } else {
+          setUser(null)
+        }
       } catch (error) {
         console.error('Auth check failed:', error)
         setIsAuthenticated(false)
+        setUser(null)
       }
     }
     
@@ -155,9 +172,30 @@ export default function Home() {
           ) : (
             <Link 
               href="/feed"
-              className="w-12 h-12 bg-brand-yellow rounded-avatar flex items-center justify-center"
+              className="w-12 h-12 bg-brand-yellow rounded-avatar flex items-center justify-center overflow-hidden relative group"
+              title={user?.displayName || 'Profile'}
             >
-              <span className="text-xl">👤</span>
+              {user?.photoUrl ? (
+                <img 
+                  src={user.photoUrl} 
+                  alt={user.displayName}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback if image fails to load
+                    e.currentTarget.style.display = 'none'
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden')
+                  }}
+                />
+              ) : null}
+              <span className={`text-xl ${user?.photoUrl ? 'hidden' : ''} ${!user?.photoUrl && user?.firstName ? 'text-black font-semibold' : ''}`}>
+                {user?.firstName ? user.firstName.charAt(0).toUpperCase() : '👤'}
+              </span>
+              {/* Optional: Show name on hover */}
+              {user?.displayName && (
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-dark-surface text-text-primary text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {user.displayName}
+                </div>
+              )}
             </Link>
           )}
         </div>
