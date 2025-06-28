@@ -86,25 +86,6 @@ export async function POST(request: NextRequest) {
     // Get user data from session
     const sessionData = JSON.parse(sessionCookie.value)
     const userId = sessionData.user.id
-    
-    // Handle mock user - skip database insert for testing
-    if (userId === 'mock-user-123') {
-      console.log('Mock user detected - simulating successful post creation')
-      return NextResponse.json({ 
-        success: true, 
-        post: {
-          id: 'mock-post-' + Date.now(),
-          title,
-          description,
-          category_id: 1,
-          age_ranges: ageRanges,
-          link_url: linkUrl,
-          user_id: userId,
-          created_at: new Date().toISOString()
-        },
-        message: 'Mock post created successfully'
-      }, { status: 201 })
-    }
 
     // Get the post data from request body
     const body = await request.json()

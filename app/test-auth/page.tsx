@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation'
 
 export default function TestAuthPage() {
   const [status, setStatus] = useState('')
+  const [instructions, setInstructions] = useState<string[]>([])
   const router = useRouter()
   
-  const testMockLogin = async () => {
+  const testDevLogin = async () => {
     setStatus('Logging in...')
+    setInstructions([])
     try {
-      const response = await fetch('/api/auth/mock-login', {
+      const response = await fetch('/api/auth/dev-login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -25,7 +27,10 @@ export default function TestAuthPage() {
           router.push('/feed')
         }, 2000)
       } else {
-        setStatus(`Error: ${JSON.stringify(data)}`)
+        setStatus(`Error: ${data.error}`)
+        if (data.instructions) {
+          setInstructions(data.instructions)
+        }
       }
     } catch (error) {
       setStatus(`Error: ${error.message}`)
@@ -38,15 +43,15 @@ export default function TestAuthPage() {
         <h1 className="text-4xl font-bold text-white mb-8">Test Authentication</h1>
         
         <div className="bg-dark-surface p-6 rounded-lg mb-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Mock Login (For Testing)</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">Dev Login (For Testing)</h2>
           <p className="text-gray-300 mb-4">
-            This creates a mock session without needing Telegram or database access.
+            This uses a real test user from the database. The test user must be created in Supabase first.
           </p>
           <button
-            onClick={testMockLogin}
+            onClick={testDevLogin}
             className="bg-brand-yellow text-black px-6 py-3 rounded-button font-semibold hover:scale-[1.02] transition-transform"
           >
-            Login as Test User
+            Login as Dev Test User
           </button>
           
           {status && (
@@ -54,16 +59,28 @@ export default function TestAuthPage() {
               <pre className="text-sm text-gray-300">{status}</pre>
             </div>
           )}
+          
+          {instructions.length > 0 && (
+            <div className="mt-4 p-4 bg-red-900/20 rounded border border-red-500/50">
+              <h3 className="text-red-400 font-semibold mb-2">Setup Instructions:</h3>
+              <ol className="list-decimal list-inside text-sm text-gray-300 space-y-1">
+                {instructions.map((instruction, i) => (
+                  <li key={i}>{instruction}</li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
         
         <div className="bg-dark-surface p-6 rounded-lg">
           <h2 className="text-xl font-semibold text-white mb-4">Instructions</h2>
           <ol className="list-decimal list-inside text-gray-300 space-y-2">
-            <li>Click "Login as Test User" above</li>
+            <li>First time: Create test user in Supabase (see instructions if login fails)</li>
+            <li>Click "Login as Dev Test User" above</li>
             <li>You'll be redirected to the feed page</li>
             <li>Navigate to /create to test post submission</li>
             <li>Fill out the form and submit</li>
-            <li>The mock user will simulate a successful post creation</li>
+            <li>Posts will be created in the real database</li>
           </ol>
         </div>
       </div>
