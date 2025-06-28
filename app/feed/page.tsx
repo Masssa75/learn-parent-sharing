@@ -230,59 +230,63 @@ export default function FeedPage() {
       </div>
       
       {/* Posts */}
-      <div className="px-4 pb-20">
+      <div className="px-5 pb-20 custom-scrollbar">
         {posts.map((post) => (
-          <div key={post.id} className="bg-dark-surface rounded-2xl p-4 mb-4">
+          <div key={post.id} className="mb-8">
             {/* Post Header */}
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-brand-yellow rounded-avatar flex items-center justify-center text-2xl">
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-12 h-12 bg-dark-surface rounded-avatar flex items-center justify-center text-2xl">
                 {post.user.avatar}
               </div>
               <div className="flex-1">
-                <div className="font-medium text-white">{post.user.name}</div>
-                <div className="text-sm text-gray-400">
-                  {post.timeAgo} • {post.ageRange}
+                <div className="text-body-lg font-semibold text-text-primary">{post.user.name}</div>
+                <div className="text-meta text-text-muted flex items-center gap-2">
+                  <span>{post.timeAgo} · {post.ageRange} ·</span>
+                  <span className="flex items-center gap-1">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-secondary">
+                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                      <line x1="12" y1="18" x2="12" y2="18"></line>
+                    </svg>
+                    <span className="text-text-secondary">App</span>
+                  </span>
                 </div>
               </div>
             </div>
             
             {/* Post Content */}
-            <h3 className="text-title-lg text-text-primary mb-3">{post.title}</h3>
-            <p className="text-body text-text-secondary mb-4">{post.description}</p>
+            <h2 className="text-title-lg text-text-primary mb-4">{post.title}</h2>
+            <p className="text-body text-gray-300 mb-4 leading-relaxed">{post.description}</p>
             
             {/* Post Image Placeholder */}
-            <div className="bg-dark-border rounded-card h-64 mb-6 flex items-center justify-center">
-              <span className="text-text-muted text-body">Content Preview</span>
+            <div className="bg-dark-surface rounded-card h-64 mb-6 flex items-center justify-center overflow-hidden">
+              <span className="text-text-secondary">Content Preview</span>
             </div>
             
             {/* Post Actions */}
-            <div className="flex items-center gap-4 pt-3 border-t border-dark-border">
+            <div className="flex items-center gap-4">
               <button
                 onClick={() => handleLike(post.id)}
-                className={`flex items-center gap-2 ${
-                  post.liked ? 'text-text-primary' : 'text-text-secondary'
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-button font-semibold text-body btn-transition ${
+                  post.liked ? 'bg-brand-yellow text-black' : 'bg-transparent text-text-primary border border-dark-border hover:bg-white/5'
                 }`}
               >
-                <span className="text-2xl">{post.liked ? '❤️' : '🤍'}</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill={post.liked ? '#E91E63' : 'none'} stroke={post.liked ? '#E91E63' : 'currentColor'} strokeWidth="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
                 <span>{post.likes}</span>
               </button>
               
-              <button className="flex items-center gap-2 text-text-secondary">
-                <span className="text-2xl">💬</span>
-                <span className="text-body">{post.comments}</span>
+              <button className="flex items-center gap-2 px-5 py-2.5 rounded-button font-semibold text-body bg-transparent text-text-primary border border-dark-border hover:bg-white/5 btn-transition">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
+                <span>{post.comments}</span>
               </button>
               
               <button
                 onClick={() => handleSave(post.id)}
-                className={`ml-auto flex items-center gap-1 ${
-                  post.saved ? 'text-brand-yellow' : 'text-text-secondary'
-                }`}
+                className="ml-auto text-text-primary hover:text-brand-yellow font-semibold text-body btn-transition"
               >
-                <span className="text-xl">{post.saved ? '⭐' : '☆'}</span>
-                <span className="text-body">Save</span>
-              </button>
-              
-              <button className="px-4 py-1 text-text-primary text-body font-medium">
                 SHARE
               </button>
             </div>
@@ -293,32 +297,10 @@ export default function FeedPage() {
       {/* Floating Action Button */}
       <button
         onClick={() => router.push('/create')}
-        className="fixed bottom-24 right-6 w-20 h-20 bg-brand-yellow rounded-avatar flex items-center justify-center shadow-lg text-black text-4xl font-light hover:scale-105 btn-transition"
+        className="fixed bottom-8 right-6 w-16 h-16 bg-brand-yellow rounded-fab flex items-center justify-center shadow-xl shadow-brand-yellow/40 text-black text-4xl font-light hover:scale-110 hover:shadow-2xl hover:shadow-brand-yellow/60 active:scale-95 btn-transition z-50"
       >
         +
       </button>
-      
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-dark-surface border-t border-dark-border">
-        <div className="flex justify-around items-center h-16 pb-safe">
-          <button className="flex flex-col items-center gap-1 text-brand-yellow">
-            <div className="w-6 h-6 bg-current rounded"></div>
-            <span className="text-xs">Home</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-gray-400">
-            <div className="w-6 h-6 bg-current rounded"></div>
-            <span className="text-xs">Search</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-gray-400">
-            <div className="w-6 h-6 bg-current rounded"></div>
-            <span className="text-xs">Saved</span>
-          </button>
-          <button className="flex flex-col items-center gap-1 text-gray-400">
-            <div className="w-6 h-6 bg-current rounded"></div>
-            <span className="text-xs">Profile</span>
-          </button>
-        </div>
-      </div>
     </div>
   )
 }
