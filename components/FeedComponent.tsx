@@ -111,6 +111,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       const data = await response.json()
       if (Array.isArray(data)) {
         setPosts(data)
+      } else if (data && Array.isArray(data.posts)) {
+        setPosts(data.posts)
       } else {
         console.error('Invalid posts data received:', data)
         setPosts([])
