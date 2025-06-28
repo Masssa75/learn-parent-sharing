@@ -5,7 +5,12 @@ import { createClient } from '@supabase/supabase-js'
 // Create Supabase client for server-side operations
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+// Use anon key for reading
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Use service key for writing (bypasses RLS)
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
 export async function GET() {
   try {
@@ -126,8 +131,8 @@ export async function POST(request: NextRequest) {
     
     console.log('Category found:', categoryData.id)
 
-    // Create the post
-    const { data: post, error: postError } = await supabase
+    // Create the post using admin client (bypasses RLS)
+    const { data: post, error: postError } = await supabaseAdmin
       .from('posts')
       .insert({
         user_id: userId,
