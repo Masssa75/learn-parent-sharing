@@ -651,3 +651,122 @@ recognition.interimResults = true
 - YouTube embedding works in both create and feed pages
 - Voice AI interface properly shows link input and microphone
 - Form design matches mockup specifications
+
+## 📅 Session Summary: Unified Feed & YouTube Embedding Fix (December 28, 2024 - Evening #2)
+
+### 🎯 Major Accomplishments
+
+#### 1. Unified App and Feed Pages ✅
+- **Problem**: Had duplicate pages (`/` and `/feed`) showing identical content
+- **Solution**: Created unified `FeedComponent` that handles both authenticated and unauthenticated states
+- **Implementation**:
+  - Extracted shared logic into `/components/FeedComponent.tsx`
+  - Main page now uses: `<FeedComponent showAuthPrompt={true} protectedRoute={false} />`
+  - `/feed` route now redirects to main page
+  - Profile dropdown fixed to show "View Profile" and "Sign Out" options
+- **Benefits**: Less code duplication, cleaner architecture, better UX
+
+#### 2. Fixed Client-Side Application Error ✅
+- **Problem**: `_.map is not a function` error causing black screen
+- **Root Cause**: API returning `{ posts: [...] }` but component expecting just `[...]`
+- **Solution**: Updated FeedComponent to handle both response formats
+- **Additional Fixes**:
+  - Added null safety checks for posts array
+  - Created ErrorBoundary component for better error handling
+  - Fixed data structure mismatches throughout component
+
+#### 3. Fixed Category Validation Error ✅
+- **Problem**: "Failed to create post: Invalid category" when posting
+- **Root Cause**: Form categories didn't match database categories
+- **Database Categories**:
+  - Apps & Software
+  - Toys & Games
+  - Books
+  - Activities
+  - Educational Resources
+  - Parenting Tips
+- **Solution**: Updated create form to use exact database category names
+
+#### 4. Implemented YouTube Video Embedding ✅
+- **Problem**: YouTube links were showing as regular links instead of embedded videos
+- **Challenge**: Database doesn't have `youtube_video_id` column
+- **Solution**: Extract YouTube video ID on API response
+  ```typescript
+  // In GET /api/posts
+  let youtubeVideoId = null;
+  if (post.link_url) {
+    youtubeVideoId = extractYouTubeVideoId(post.link_url);
+  }
+  ```
+- **Result**: YouTube videos now properly embed in feed using YouTubePlayer component
+
+#### 5. Fixed Post-Creation Redirect ✅
+- **Problem**: After creating post, users saw black screen
+- **Root Cause**: Redirecting to `/feed` which no longer exists
+- **Solution**: Updated all redirects to go to `/` (home page)
+- **Files Updated**:
+  - `/app/create/page.tsx` - Changed `router.push('/feed')` to `router.push('/')`
+  - `/app/test-auth/page.tsx` - Updated redirect after login
+
+### 🔧 Technical Details
+
+#### API Response Structure
+The API returns posts in this format:
+```javascript
+{
+  posts: [{
+    id: string,
+    user: { name, username, avatar },
+    category: { name, emoji },
+    title: string,
+    description: string,
+    linkUrl: string,
+    youtubeVideoId: string | null,
+    likes: number,
+    comments: number,
+    createdAt: string
+  }]
+}
+```
+
+#### Category Mapping
+FeedComponent maps display labels to database names:
+```typescript
+const categoryMap = {
+  'APPS': 'Apps & Software',
+  'TOYS': 'Toys & Games',
+  'BOOKS': 'Books',
+  'ACTIVITIES': 'Activities',
+  'TIPS': 'Parenting Tips'
+}
+```
+
+### 📝 Files Modified
+- `/components/FeedComponent.tsx` - Created unified feed component
+- `/app/page.tsx` - Simplified to use FeedComponent
+- `/app/feed/page.tsx` - Now redirects to home
+- `/app/create/page.tsx` - Updated categories and redirect
+- `/app/api/posts/route.ts` - Added YouTube ID extraction
+- `/components/ErrorBoundary.tsx` - Added error handling
+
+### 🧪 Testing Scripts Created
+- `test-unified-feed.js` - Tests unified feed functionality
+- `test-video-posting-v2.js` - Tests video posting with correct categories
+- `verify-youtube-embed-working.js` - Verifies YouTube embedding
+- `check-youtube-fields.js` - Checks database fields
+- `debug-posts-api.js` - Debugs post display issues
+
+### ✅ Current Status
+- App loads without errors
+- Posts can be created successfully
+- YouTube videos embed properly
+- Categories work correctly
+- Navigation flows smoothly
+- No known issues remaining
+
+### 🚀 Future Improvements
+- Add actual profile page at `/profile` route
+- Implement like/save functionality
+- Add comment system
+- Create user onboarding flow
+- Add image upload support
