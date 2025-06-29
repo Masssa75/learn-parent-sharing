@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "setup-admin": "tsx scripts/setup-admin.ts",
+    "find-telegram-id": "tsx scripts/find-my-telegram-id.ts",
+    "apply-migration": "tsx scripts/run-supabase-migration.ts"
   },
   "keywords": [],
   "author": "",
@@ -29,6 +32,7 @@
     "autoprefixer": "^10.4.21",
     "playwright": "^1.53.1",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.20.3"
   }
 }

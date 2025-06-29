@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       // Fetch user data from database
       const { data: user, error } = await supabase
         .from('users')
-        .select('id, telegram_id, telegram_username, first_name, last_name, photo_url')
+        .select('id, telegram_id, telegram_username, first_name, last_name, photo_url, is_admin')
         .eq('id', sessionData.userId)
         .single()
       
@@ -51,7 +51,8 @@ export async function GET(request: NextRequest) {
           firstName: user.first_name,
           lastName: user.last_name,
           photoUrl: user.photo_url,
-          displayName: user.first_name + (user.last_name ? ` ${user.last_name}` : '')
+          displayName: user.first_name + (user.last_name ? ` ${user.last_name}` : ''),
+          isAdmin: user.is_admin || false
         }
       })
     } catch (error) {
