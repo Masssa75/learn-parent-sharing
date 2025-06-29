@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { YouTubePlayer } from './YouTubePlayer'
-import { HardcodedPointsDisplay } from './HardcodedPointsDisplay'
+import { PointsDisplay } from './PointsDisplay'
 
 interface User {
   id: string
@@ -471,7 +471,12 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       {/* Points Display */}
       {isAuthenticated && user && (
         <div className="max-w-2xl mx-auto px-5">
-          <HardcodedPointsDisplay />
+          <PointsDisplay 
+            points={user.points || 0}
+            xp={user.totalXp || 0}
+            level={user.level || 1}
+            actionsRemaining={5}
+          />
         </div>
       )}
 

@@ -7,38 +7,49 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params
+    const userId = params.id
     
-    // Get profile data
-    const { data: profile, error } = await supabase
+    // Get user profile with points data
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('points, total_xp, level')
-      .eq('user_id', id)
+      .eq('user_id', userId)
       .single()
     
-    if (error || !profile) {
+    if (profileError || !profile) {
+      console.error('Error fetching profile:', profileError)
       return NextResponse.json({ 
-        success: false, 
-        error: 'Profile not found' 
-      }, { status: 404 })
+        points: 0, 
+        totalXp: 0, 
+        level: 1,
+        recentActions: 0 
+      })
     }
     
+    // Count recent actions for rate limiting
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+    const { count: recentActionsCount } = await supabase
+      .from('user_actions')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .gte('created_at', oneHourAgo)
+    
     return NextResponse.json({
-      success: true,
-      data: {
-        points: profile.points || 0,
-        totalXp: profile.total_xp || 0,
-        level: profile.level || 1
-      }
+      points: profile.points || 0,
+      totalXp: profile.total_xp || 0,
+      level: profile.level || 1,
+      recentActions: recentActionsCount || 0
     })
   } catch (error) {
-    console.error('Error fetching points:', error)
+    console.error('Error in points API:', error)
     return NextResponse.json({ 
-      success: false, 
-      error: 'Internal server error' 
-    }, { status: 500 })
+      points: 0, 
+      totalXp: 0, 
+      level: 1,
+      recentActions: 0 
+    })
   }
 }
