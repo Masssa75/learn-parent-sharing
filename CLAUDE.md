@@ -803,7 +803,7 @@ Note: The service role key and project credentials are stored in the .env file.
 ## 👮 Admin System Implementation (June 29, 2025)
 
 ### Overview
-Implemented a complete admin system with database-level permissions, admin dashboard, and user management interface.
+Implemented a complete admin system with database-level permissions, admin dashboard, user management interface, and post moderation capabilities.
 
 ### Database Schema
 Added via migration `20250629000000_add_admin_system.sql`:
@@ -824,23 +824,33 @@ Added via migration `20250629000000_add_admin_system.sql`:
    - Only visible when `user.isAdmin === true`
    - Appears between "View Profile" and "Sign Out"
 
-3. **Test Auth System**
+3. **Post Deletion** (NEW)
+   - Admin users see a red "DELETE" button on every post
+   - Confirmation dialog: "Are you sure you want to delete this post?"
+   - DELETE endpoint at `/api/posts/[id]` with admin-only access
+   - Posts removed immediately from UI after deletion
+   - Non-admin users cannot see or access delete functionality
+
+4. **Test Auth System**
    - Updated `/test-auth` to support multiple test users
    - Three test user buttons: devtest, admintest, admindev
    - Modified `/api/auth/dev-login` to accept `telegramId` parameter
+   - **Important**: Must enter password "test-learn-2025" before clicking login buttons
 
 ### Current Admin Users
 - Marc (@cyrator007) - Platform owner
-- devtest (999999999) - Test admin account
+- admintest (888888888) - Test admin account ✅
 - admindev (777777777) - Admin developer account
 
 ### Key Files
 - `/app/api/admin/users/route.ts` - Admin API endpoints
 - `/app/admin/page.tsx` - Admin dashboard UI
+- `/app/api/posts/[id]/route.ts` - Post deletion endpoint (admin-only)
 - `/app/api/auth/check/route.ts` - Returns `isAdmin` in user object
-- `/components/FeedComponent.tsx` - Shows admin link for admin users
+- `/components/FeedComponent.tsx` - Shows admin link and delete buttons for admin users
 - `/scripts/setup-admin.ts` - Makes users admin via Telegram ID
 - `/scripts/make-current-user-admin.js` - Finds and promotes real users
+- `/scripts/check-admintest-user.js` - Verifies/fixes admintest admin status
 
 ### How to Make Someone Admin
 ```bash
@@ -853,15 +863,28 @@ node make-current-user-admin.js
 
 # Method 3: Via Admin Dashboard
 Login as admin → /admin → Click "Make Admin" button
+
+# Method 4: Check/fix test user admin status
+node scripts/check-admintest-user.js
 ```
 
-### TypeScript Fix
-Fixed build error in `/app/api/auth/dev-login/route.ts`:
+### TypeScript Fixes
+1. Fixed build error in `/app/api/auth/dev-login/route.ts`:
 ```typescript
 const userInfo: Record<number, { username: string; firstName: string; lastName: string }> = {
   999999999: { username: 'devtest', firstName: 'Dev', lastName: 'Test' },
   // ...
 }
+```
+
+2. Fixed Next.js 15 async params in `/app/api/posts/[id]/route.ts`:
+```typescript
+// Before (error)
+{ params }: { params: { id: string } }
+
+// After (fixed)
+{ params }: { params: Promise<{ id: string }> }
+// Then: const { id } = await params
 ```
 
 ## 📅 Session Summary: UI Improvements & Profile Photos (June 29, 2025)
@@ -963,3 +986,50 @@ The span was conditionally hidden at render time based on `photoUrl` existence, 
 {user?.photoUrl && <img className="absolute inset-0" />}
 <span className="flex">
 ```
+
+## 📅 Session Summary: Admin Post Deletion (June 29, 2025 - Afternoon)
+
+### 🎯 What Was Implemented
+Added the ability for admin users to delete posts directly from the feed.
+
+### ✨ Features Added
+1. **Delete Button UI**
+   - Red "DELETE" button appears on each post for admin users only
+   - Positioned next to the SHARE button
+   - Only visible when `user.isAdmin === true`
+
+2. **Delete API Endpoint**
+   - Created `/api/posts/[id]/route.ts` with DELETE method
+   - Verifies user authentication via session cookie
+   - Checks `is_admin` status before allowing deletion
+   - Returns 403 Forbidden if user is not admin
+
+3. **Confirmation Dialog**
+   - Browser's native confirm dialog: "Are you sure you want to delete this post?"
+   - Prevents accidental deletions
+
+4. **Immediate UI Update**
+   - Post removed from feed instantly after successful deletion
+   - No page reload required
+
+### 🔧 Technical Implementation Details
+- **Frontend**: Added `handleDelete` function in `FeedComponent.tsx`
+- **Backend**: Admin-only DELETE endpoint with proper authorization
+- **TypeScript Fix**: Updated route handler for Next.js 15's async params API
+
+### 🧪 Testing
+Created comprehensive test scripts:
+- `test-admin-delete-with-password.js` - Full E2E test with password authentication
+- `check-admintest-user.js` - Verifies and fixes admin status for test users
+
+### 📝 Important Notes
+- The `admintest` user (888888888) was not initially an admin - fixed during testing
+- Test auth requires password: "test-learn-2025"
+- Only admins can see and use delete buttons
+- Deleted posts are permanently removed from database
+
+### ✅ Current Status
+- Feature fully implemented and deployed
+- Tested successfully with admintest user
+- 11 posts reduced to 10 after test deletion
+- No known issues
