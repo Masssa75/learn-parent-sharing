@@ -29,6 +29,7 @@ export default function CreatePage() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [recognition, setRecognition] = useState<any>(null)
   const [interimTranscript, setInterimTranscript] = useState('')
+  const [isManualStop, setIsManualStop] = useState(false)
   const [aiProcessedData, setAiProcessedData] = useState<{
     title: string
     description: string
@@ -80,16 +81,27 @@ export default function CreatePage() {
           console.error('Speech recognition error:', event.error)
           if (event.error === 'not-allowed') {
             alert('Microphone access was denied. Please allow microphone access and try again.')
+            setIsRecording(false)
           } else if (event.error === 'no-speech') {
             // Ignore no-speech errors, they're common
+            return
+          } else if (event.error === 'network') {
+            // Network errors are common, don't stop recording
+            console.log('Network error, but continuing recording')
+            return
+          } else if (event.error === 'aborted') {
+            // This is expected when we manually stop
+            return
           } else {
             alert(`Speech recognition error: ${event.error}`)
+            setIsRecording(false)
           }
-          setIsRecording(false)
         }
         
         recognitionInstance.onend = () => {
-          setIsRecording(false)
+          // Don't automatically set isRecording to false
+          // Let the toggle function handle it
+          console.log('Recognition ended')
         }
         
         setRecognition(recognitionInstance)
@@ -105,11 +117,18 @@ export default function CreatePage() {
     }
     
     if (isRecording) {
+      // Stop recording
+      setIsManualStop(true)
       recognition.stop()
       setIsRecording(false)
-      if (voiceTranscript) {
-        processWithAI()
-      }
+      
+      // Process after a short delay to ensure transcript is finalized
+      setTimeout(() => {
+        setIsManualStop(false)
+        if (voiceTranscript) {
+          processWithAI()
+        }
+      }, 100)
     } else {
       try {
         // Request microphone permission first
@@ -117,6 +136,7 @@ export default function CreatePage() {
         
         setVoiceTranscript('')
         setInterimTranscript('')
+        setIsManualStop(false)
         recognition.start()
         setIsRecording(true)
       } catch (error) {
