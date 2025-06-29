@@ -59,6 +59,7 @@ export async function GET() {
       
       return {
         id: post.id,
+        userId: post.user_id,
         user: {
           name: post.users ? `${post.users.first_name} ${post.users.last_name || ''}`.trim() : 'Anonymous',
           username: post.users?.telegram_username || 'anonymous',

@@ -31,6 +31,7 @@ interface Post {
     username?: string
     avatar?: string | null
   }
+  userId?: string
   ageRange?: string
   likes: number
   comments: number
@@ -53,6 +54,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [editingPostId, setEditingPostId] = useState<string | null>(null)
+  const [editFormData, setEditFormData] = useState<{ title: string; description: string; linkUrl: string }>({ title: '', description: '', linkUrl: '' })
   const router = useRouter()
 
   useEffect(() => {
@@ -185,6 +188,57 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
     } catch (error) {
       console.error('Error deleting post:', error)
       alert('Failed to delete post. Please try again.')
+    }
+  }
+
+  const handleEdit = (post: Post) => {
+    setEditingPostId(post.id)
+    setEditFormData({
+      title: post.title,
+      description: post.description || '',
+      linkUrl: post.linkUrl || ''
+    })
+  }
+
+  const handleCancelEdit = () => {
+    setEditingPostId(null)
+    setEditFormData({ title: '', description: '', linkUrl: '' })
+  }
+
+  const handleSaveEdit = async (postId: string) => {
+    try {
+      const response = await fetch(`/api/posts/${postId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editFormData),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to update post')
+      }
+
+      // Update the post in local state
+      setPosts(posts.map(post => {
+        if (post.id === postId) {
+          return {
+            ...post,
+            title: editFormData.title,
+            description: editFormData.description,
+            linkUrl: editFormData.linkUrl
+          }
+        }
+        return post
+      }))
+
+      // Clear edit mode
+      setEditingPostId(null)
+      setEditFormData({ title: '', description: '', linkUrl: '' })
+    } catch (error) {
+      console.error('Error updating post:', error)
+      alert(error instanceof Error ? error.message : 'Failed to update post. Please try again.')
     }
   }
 
@@ -366,9 +420,37 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
               </div>
               
               {/* Post Content */}
-              <h2 className="text-title-lg text-text-primary mb-4">{post.title}</h2>
-              {post.description && (
-                <p className="text-body text-gray-300 mb-4 leading-relaxed">{post.description}</p>
+              {editingPostId === post.id ? (
+                <div className="mb-4">
+                  <input
+                    type="text"
+                    value={editFormData.title}
+                    onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
+                    className="w-full px-4 py-3 bg-dark-surface border border-dark-border rounded-input text-text-primary mb-3 focus:outline-none focus:border-brand-yellow"
+                    placeholder="Title"
+                  />
+                  <textarea
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                    className="w-full px-4 py-3 bg-dark-surface border border-dark-border rounded-input text-text-primary mb-3 focus:outline-none focus:border-brand-yellow resize-none"
+                    placeholder="Description"
+                    rows={3}
+                  />
+                  <input
+                    type="text"
+                    value={editFormData.linkUrl}
+                    onChange={(e) => setEditFormData({ ...editFormData, linkUrl: e.target.value })}
+                    className="w-full px-4 py-3 bg-dark-surface border border-dark-border rounded-input text-text-primary focus:outline-none focus:border-brand-yellow"
+                    placeholder="Link URL (optional)"
+                  />
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-title-lg text-text-primary mb-4">{post.title}</h2>
+                  {post.description && (
+                    <p className="text-body text-gray-300 mb-4 leading-relaxed">{post.description}</p>
+                  )}
+                </>
               )}
               
               {/* YouTube Video */}
@@ -397,37 +479,66 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
               
               {/* Post Actions */}
               <div className="flex items-center gap-4">
-                <button
-                  onClick={() => handleLike(post.id)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-button font-semibold text-body bg-transparent text-text-primary border border-dark-border hover:bg-white/5 btn-transition"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                  </svg>
-                  <span>{post.likes || 0}</span>
-                </button>
-                
-                <button className="flex items-center gap-2 px-5 py-2.5 rounded-button font-semibold text-body bg-transparent text-text-primary border border-dark-border hover:bg-white/5 btn-transition">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-                  </svg>
-                  <span>{post.comments || 0}</span>
-                </button>
-                
-                <button
-                  onClick={() => handleSave(post.id)}
-                  className="ml-auto text-text-primary hover:text-brand-yellow font-semibold text-body btn-transition"
-                >
-                  SHARE
-                </button>
-                
-                {user?.isAdmin && (
-                  <button
-                    onClick={() => handleDelete(post.id)}
-                    className="text-red-500 hover:text-red-400 font-semibold text-body btn-transition"
-                  >
-                    DELETE
-                  </button>
+                {editingPostId === post.id ? (
+                  <>
+                    <button
+                      onClick={() => handleSaveEdit(post.id)}
+                      className="px-5 py-2.5 bg-brand-yellow text-black rounded-button font-semibold hover:scale-105 btn-transition"
+                    >
+                      SAVE
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="px-5 py-2.5 bg-transparent text-text-primary border border-dark-border rounded-button font-semibold hover:bg-white/5 btn-transition"
+                    >
+                      CANCEL
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handleLike(post.id)}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-button font-semibold text-body bg-transparent text-text-primary border border-dark-border hover:bg-white/5 btn-transition"
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                      </svg>
+                      <span>{post.likes || 0}</span>
+                    </button>
+                    
+                    <button className="flex items-center gap-2 px-5 py-2.5 rounded-button font-semibold text-body bg-transparent text-text-primary border border-dark-border hover:bg-white/5 btn-transition">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                      </svg>
+                      <span>{post.comments || 0}</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleSave(post.id)}
+                      className="ml-auto text-text-primary hover:text-brand-yellow font-semibold text-body btn-transition"
+                    >
+                      SHARE
+                    </button>
+                    
+                    {/* Show edit button if user owns the post */}
+                    {user && post.userId === user.id && (
+                      <button
+                        onClick={() => handleEdit(post)}
+                        className="text-brand-yellow hover:text-yellow-400 font-semibold text-body btn-transition"
+                      >
+                        EDIT
+                      </button>
+                    )}
+                    
+                    {user?.isAdmin && (
+                      <button
+                        onClick={() => handleDelete(post.id)}
+                        className="text-red-500 hover:text-red-400 font-semibold text-body btn-transition"
+                      >
+                        DELETE
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
