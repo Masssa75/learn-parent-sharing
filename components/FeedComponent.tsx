@@ -176,8 +176,47 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       router.push('/login')
       return
     }
-    // TODO: Implement like functionality
-    console.log('Like post:', postId)
+    
+    try {
+      const response = await fetch('/api/actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionType: 'add_to_profile',
+          targetType: 'post',
+          targetId: postId
+        })
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        if (response.status === 429) {
+          alert(`Rate limit exceeded. Please wait before taking more actions.`)
+        } else {
+          throw new Error(error.message || 'Failed to like post')
+        }
+        return
+      }
+      
+      const result = await response.json()
+      
+      // Update user points in state
+      if (result.user && user) {
+        setUser({
+          ...user,
+          points: result.user.points,
+          totalXp: result.user.total_xp,
+          level: result.user.level
+        })
+      }
+      
+      // Update the post's liked state
+      setPosts(posts.map(post => 
+        post.id === postId ? { ...post, liked: true, likes: post.likes + 1 } : post
+      ))
+    } catch (error) {
+      console.error('Error liking post:', error)
+    }
   }
 
   const handleSave = async (postId: string) => {
@@ -185,8 +224,47 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       router.push('/login')
       return
     }
-    // TODO: Implement save functionality
-    console.log('Save post:', postId)
+    
+    try {
+      const response = await fetch('/api/actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionType: 'add_to_watchlist',
+          targetType: 'post',
+          targetId: postId
+        })
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        if (response.status === 429) {
+          alert(`Rate limit exceeded. Please wait before taking more actions.`)
+        } else {
+          throw new Error(error.message || 'Failed to save post')
+        }
+        return
+      }
+      
+      const result = await response.json()
+      
+      // Update user points in state
+      if (result.user && user) {
+        setUser({
+          ...user,
+          points: result.user.points,
+          totalXp: result.user.total_xp,
+          level: result.user.level
+        })
+      }
+      
+      // Update the post's saved state
+      setPosts(posts.map(post => 
+        post.id === postId ? { ...post, saved: true } : post
+      ))
+    } catch (error) {
+      console.error('Error saving post:', error)
+    }
   }
 
   const handleDelete = async (postId: string) => {
