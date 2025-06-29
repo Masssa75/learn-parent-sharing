@@ -12,7 +12,19 @@ async function testAdminDelete() {
     
     console.log('2. Logging in as admintest...');
     await page.click('button:has-text("Login as admintest")');
-    await page.waitForURL('https://learn-parent-sharing-app.netlify.app/', { timeout: 10000 });
+    
+    // Wait for navigation or timeout
+    try {
+      await page.waitForURL('https://learn-parent-sharing-app.netlify.app/', { timeout: 5000 });
+    } catch (e) {
+      console.log('Navigation timeout - checking if already on home page...');
+      const currentUrl = page.url();
+      if (currentUrl.includes('learn-parent-sharing-app.netlify.app') && !currentUrl.includes('test-auth')) {
+        console.log('Already navigated to home page');
+      } else {
+        throw e;
+      }
+    }
     
     console.log('3. Checking if user is logged in and admin...');
     await page.waitForTimeout(2000);

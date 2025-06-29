@@ -9,9 +9,12 @@ const supabase = createClient(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Await params in Next.js 15
+    const { id } = await params
+    
     // Check if user is authenticated
     const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')
@@ -49,7 +52,7 @@ export async function DELETE(
     const { error: deleteError } = await supabase
       .from('posts')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (deleteError) {
       console.error('Error deleting post:', deleteError)
