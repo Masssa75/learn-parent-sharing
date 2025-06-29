@@ -32,12 +32,11 @@ export async function POST(request: NextRequest) {
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'dall-e-3',
+        model: 'gpt-image-1',  // Using gpt-image-1 as specified
         prompt: imagePrompt,
         n: 1,
-        size: '1024x1024',
-        quality: 'standard',
-        style: 'vivid'
+        size: '1024x1024'
+        // Note: quality and style parameters might not be supported by gpt-image-1
       })
     })
 
