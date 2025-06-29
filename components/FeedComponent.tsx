@@ -389,47 +389,6 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
         ) : (
           filteredPosts.map((post) => (
             <div key={post.id} className="mb-8">
-              {/* Post Header */}
-              <div className="flex items-center gap-4 mb-5">
-                <div className="w-12 h-12 bg-dark-surface rounded-avatar flex items-center justify-center overflow-hidden relative">
-                  {post.user?.avatar && (
-                    <img 
-                      src={post.user.avatar} 
-                      alt={post.user.name || 'User'}
-                      className="w-full h-full object-cover absolute inset-0"
-                      onError={(e) => {
-                        const img = e.currentTarget as HTMLImageElement
-                        img.style.display = 'none'
-                      }}
-                      onLoad={(e) => {
-                        const img = e.currentTarget as HTMLImageElement
-                        if (img.naturalWidth === 0 || img.naturalHeight === 0) {
-                          img.style.display = 'none'
-                        }
-                      }}
-                    />
-                  )}
-                  <span className="text-2xl flex items-center justify-center w-full h-full">
-                    {post.user?.name ? post.user.name.charAt(0).toUpperCase() : '👤'}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <div className="text-body-lg font-semibold text-text-primary">
-                    {post.user?.name || 'Anonymous'}
-                  </div>
-                  <div className="text-meta text-text-muted flex items-center gap-2">
-                    <span>{new Date(post.createdAt).toLocaleDateString()} ·</span>
-                    <span className="flex items-center gap-1">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-secondary">
-                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                        <line x1="12" y1="18" x2="12" y2="18"></line>
-                      </svg>
-                      <span className="text-text-secondary">{post.category?.name || 'App'}</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
               {/* Post Content */}
               {editingPostId === post.id ? (
                 <div className="mb-4">
@@ -501,6 +460,15 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                   </a>
                 </div>
               )}
+              
+              {/* Minimal metadata line */}
+              <div className="flex items-center gap-2 text-sm text-text-muted mb-4">
+                <span>{post.user?.name || 'Anonymous'}</span>
+                <span>·</span>
+                <span>{post.category?.name || 'App'}</span>
+                <span>·</span>
+                <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+              </div>
               
               {/* Post Actions */}
               <div className="flex items-center gap-4">
