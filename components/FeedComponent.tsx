@@ -22,6 +22,7 @@ interface Post {
   description?: string
   linkUrl?: string
   youtubeVideoId?: string
+  imageUrl?: string
   category?: {
     name: string
     emoji: string
@@ -455,6 +456,17 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
               {post.youtubeVideoId && (
                 <div className="mb-6">
                   <YouTubePlayer url={`https://www.youtube.com/watch?v=${post.youtubeVideoId}`} title={post.title} />
+                </div>
+              )}
+              
+              {/* Post Image */}
+              {post.imageUrl && (
+                <div className="mb-6">
+                  <img 
+                    src={post.imageUrl} 
+                    alt={post.title}
+                    className="w-full rounded-card border border-dark-border"
+                  />
                 </div>
               )}
               

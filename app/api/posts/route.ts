@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
 
     // Get the post data from request body
     const body = await request.json()
-    const { title, description, category, ageRanges, linkUrl } = body
+    const { title, description, category, ageRanges, linkUrl, imageUrl } = body
     
     console.log('Post data received:', { title, category, ageRanges: ageRanges?.length })
 
@@ -154,6 +154,7 @@ export async function POST(request: NextRequest) {
         category_id: categoryData.id,
         age_ranges: ageRanges,
         link_url: linkUrl || null,
+        image_url: imageUrl || null,
         likes_count: 0,
         comments_count: 0
       })
