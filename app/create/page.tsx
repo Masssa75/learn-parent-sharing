@@ -30,6 +30,7 @@ export default function CreatePage() {
   const [recognition, setRecognition] = useState<any>(null)
   const [imageUrl, setImageUrl] = useState('')
   const [isGeneratingImage, setIsGeneratingImage] = useState(false)
+  const [selectedImageStyle, setSelectedImageStyle] = useState<string>('photorealistic')
   const [interimTranscript, setInterimTranscript] = useState('')
   const [isManualStop, setIsManualStop] = useState(false)
   const [aiProcessedData, setAiProcessedData] = useState<{
@@ -220,7 +221,8 @@ export default function CreatePage() {
         },
         body: JSON.stringify({
           title,
-          prompt: description
+          prompt: description,
+          style: selectedImageStyle
         })
       })
       
@@ -411,6 +413,70 @@ export default function CreatePage() {
           {/* AI Image Generation */}
           <div className="space-y-3">
             {!imageUrl && (
+              <>
+                {/* Image Style Selector */}
+                <div className="space-y-2">
+                  <label className="text-text-secondary text-sm">Choose image style:</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedImageStyle('photorealistic')}
+                      className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
+                        selectedImageStyle === 'photorealistic'
+                          ? 'bg-brand-yellow text-black border-brand-yellow'
+                          : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
+                      }`}
+                    >
+                      📷 Photorealistic
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedImageStyle('watercolor')}
+                      className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
+                        selectedImageStyle === 'watercolor'
+                          ? 'bg-brand-yellow text-black border-brand-yellow'
+                          : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
+                      }`}
+                    >
+                      🎨 Watercolor
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedImageStyle('minimalist')}
+                      className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
+                        selectedImageStyle === 'minimalist'
+                          ? 'bg-brand-yellow text-black border-brand-yellow'
+                          : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
+                      }`}
+                    >
+                      ⚪ Minimalist
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedImageStyle('sketch')}
+                      className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
+                        selectedImageStyle === 'sketch'
+                          ? 'bg-brand-yellow text-black border-brand-yellow'
+                          : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
+                      }`}
+                    >
+                      ✏️ Pencil Sketch
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedImageStyle('cartoon')}
+                      className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
+                        selectedImageStyle === 'cartoon'
+                          ? 'bg-brand-yellow text-black border-brand-yellow'
+                          : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
+                      }`}
+                    >
+                      🎭 Cartoon
+                    </button>
+                  </div>
+                </div>
+
+                {/* Generate Button */}
               <button
                 type="button"
                 onClick={generateImage}
@@ -433,6 +499,7 @@ export default function CreatePage() {
                   </>
                 )}
               </button>
+              </>
             )}
             
             {imageUrl && (

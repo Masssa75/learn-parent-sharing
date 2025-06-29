@@ -9,7 +9,7 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt, title } = await request.json()
+    const { prompt, title, style = 'cartoon' } = await request.json()
 
     // Check if OpenAI API key is configured
     const apiKey = process.env.OPENAI_API_KEY
@@ -20,8 +20,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create a focused prompt for OpenAI
-    const imagePrompt = `Create a clear, helpful illustration for this parenting tip: "${title}". ${prompt}. Style: Clean, modern, family-friendly illustration with soft colors. Show the technique or concept clearly and safely.`
+    // Define style-specific prompts
+    const stylePrompts: Record<string, string> = {
+      photorealistic: `Create a photorealistic photograph for this parenting tip: "${title}". ${prompt}. Style: Professional photography, natural lighting, realistic human subjects, authentic moments, documentary style. High detail and lifelike quality.`,
+      watercolor: `Create a soft watercolor painting for this parenting tip: "${title}". ${prompt}. Style: Gentle watercolor art, flowing colors, soft edges, pastel palette, artistic brushstrokes, dreamy and calming atmosphere.`,
+      minimalist: `Create a minimalist illustration for this parenting tip: "${title}". ${prompt}. Style: Simple geometric shapes, limited color palette (2-3 colors), clean lines, lots of white space, modern Scandinavian design aesthetic.`,
+      sketch: `Create a pencil sketch for this parenting tip: "${title}". ${prompt}. Style: Hand-drawn pencil sketch, crosshatching, detailed line work, artistic shading, sketchbook quality, black and white with subtle gray tones.`,
+      cartoon: `Create a friendly cartoon illustration for this parenting tip: "${title}". ${prompt}. Style: Cheerful cartoon characters, bright colors, rounded shapes, expressive faces, child-friendly and approachable design.`
+    }
+
+    // Use the selected style or default to cartoon
+    const imagePrompt = stylePrompts[style] || stylePrompts.cartoon
 
     console.log('Generating image with prompt:', imagePrompt)
 
@@ -31,8 +40,9 @@ export async function POST(request: NextRequest) {
       prompt: imagePrompt,
       n: 1,
       size: "1024x1024",
-      quality: "standard",
-      response_format: "b64_json"
+      quality: style === 'photorealistic' ? "hd" : "standard",
+      response_format: "b64_json",
+      style: style === 'photorealistic' || style === 'minimalist' ? "natural" : "vivid"
     }
 
     // Create an AbortController with 30 second timeout
