@@ -7,6 +7,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 export async function GET(request: NextRequest) {
+  console.log('AUTH CHECK ENDPOINT CALLED - NEW VERSION WITH POINTS')
   try {
     const sessionCookie = request.cookies.get('session')
     
