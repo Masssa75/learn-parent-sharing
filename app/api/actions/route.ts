@@ -14,6 +14,8 @@ export async function POST(request: NextRequest) {
     const sessionData = JSON.parse(Buffer.from(sessionCookie.value, 'base64').toString())
     const userId = sessionData.userId
     
+    console.log('Session data:', { userId, telegramId: sessionData.telegramId })
+    
     if (!userId) {
       return NextResponse.json({ error: 'User not found' }, { status: 401 })
     }
@@ -41,7 +43,12 @@ export async function POST(request: NextRequest) {
     
     if (profileError || !userProfile) {
       console.error('Error fetching user profile:', profileError)
-      return NextResponse.json({ error: 'User profile not found' }, { status: 404 })
+      console.error('Query details:', { userId, table: 'profiles', column: 'user_id' })
+      return NextResponse.json({ 
+        error: 'User profile not found',
+        details: profileError?.message,
+        userId
+      }, { status: 404 })
     }
     
     // Calculate points based on action type
