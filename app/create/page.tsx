@@ -217,8 +217,9 @@ export default function CreatePage() {
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Header */}
-      <div className="sticky top-0 bg-dark-bg z-10 px-5 py-5 border-b border-dark-border">
-        <div className="flex items-center justify-between">
+      <div className="sticky top-0 bg-dark-bg z-10 border-b border-dark-border">
+        <div className="max-w-2xl mx-auto px-5 py-5">
+          <div className="flex items-center justify-between">
           <h2 className="text-title text-text-primary">Share what's working</h2>
           <button
             onClick={() => router.back()}
@@ -230,10 +231,13 @@ export default function CreatePage() {
             </svg>
           </button>
         </div>
+        </div>
       </div>
       
       {/* Input Mode Toggle */}
-      <div className="flex gap-2.5 px-5 py-4 bg-black border-b border-dark-border">
+      <div className="bg-black border-b border-dark-border">
+        <div className="max-w-2xl mx-auto px-5 py-4">
+          <div className="flex gap-2.5">
         <button
           onClick={() => setInputMode('manual')}
           className={`flex-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded-input font-medium text-body transition-all ${
@@ -264,11 +268,14 @@ export default function CreatePage() {
           </svg>
           Speak with AI
         </button>
+          </div>
+        </div>
       </div>
       
       {/* Form */}
       {inputMode === 'manual' ? (
-        <form onSubmit={handleSubmit} className="p-5 space-y-5">
+        <div className="max-w-2xl mx-auto">
+          <form onSubmit={handleSubmit} className="p-5 space-y-5">
           {/* Link URL - Moved to top */}
           <div className="relative">
             {link && isYouTubeUrl(link) ? (
@@ -390,9 +397,11 @@ export default function CreatePage() {
             </button>
           </div>
         </form>
+        </div>
       ) : (
         /* Voice Input Interface */
-        <div className="p-5 space-y-5">
+        <div className="max-w-2xl mx-auto">
+          <div className="p-5 space-y-5">
           {/* Link URL Input for Voice Mode */}
           <div className="relative">
             {link && isYouTubeUrl(link) ? (
@@ -489,6 +498,7 @@ export default function CreatePage() {
               Share
             </button>
           </div>
+        </div>
         </div>
       )}
     </div>

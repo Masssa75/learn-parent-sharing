@@ -13,6 +13,7 @@ interface User {
   lastName?: string
   photoUrl?: string
   displayName: string
+  isAdmin?: boolean
 }
 
 interface Post {
@@ -244,6 +245,14 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                   >
                     View Profile
                   </Link>
+                  {user?.isAdmin && (
+                    <Link
+                      href="/admin"
+                      className="block w-full text-left px-4 py-2 text-text-primary hover:bg-white/5"
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
                   <button
                     onClick={handleSignOut}
                     className="w-full text-left px-4 py-2 text-text-primary hover:bg-white/5"
