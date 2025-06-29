@@ -217,23 +217,19 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                     alt={user.displayName}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      try {
-                        const img = e.currentTarget as HTMLImageElement
-                        if (img) {
-                          img.style.display = 'none'
-                          const parent = img.parentElement
-                          if (parent) {
-                            const span = parent.querySelector('span')
-                            if (span) span.classList.remove('hidden')
-                          }
-                        }
-                      } catch (error) {
-                        console.error('Error handling image load failure:', error)
+                      const img = e.currentTarget as HTMLImageElement
+                      img.style.display = 'none'
+                      const span = img.nextElementSibling as HTMLElement
+                      if (span) {
+                        span.style.display = 'flex'
                       }
                     }}
                   />
                 ) : null}
-                <span className={`${user?.photoUrl ? 'hidden' : 'flex items-center justify-center w-full h-full'} ${user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'}`}>
+                <span 
+                  className={`${user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'} items-center justify-center w-full h-full`}
+                  style={{ display: user?.photoUrl ? 'none' : 'flex' }}
+                >
                   {user?.firstName ? user.firstName.charAt(0).toUpperCase() : (user ? 'U' : '👤')}
                 </span>
               </button>
