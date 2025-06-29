@@ -35,7 +35,7 @@ export async function PATCH(
 
     // Get the update data from request body
     const body = await request.json()
-    const { title, description, linkUrl } = body
+    const { title, description, linkUrl, imageUrl } = body
 
     // Validate required fields
     if (!title || !description) {
@@ -75,6 +75,7 @@ export async function PATCH(
         title: toTitleCase(title),
         description,
         link_url: linkUrl || null,
+        image_url: imageUrl || null,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)

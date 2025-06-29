@@ -60,7 +60,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   const [loading, setLoading] = useState(true)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [editingPostId, setEditingPostId] = useState<string | null>(null)
-  const [editFormData, setEditFormData] = useState<{ title: string; description: string; linkUrl: string }>({ title: '', description: '', linkUrl: '' })
+  const [editFormData, setEditFormData] = useState<{ title: string; description: string; linkUrl: string; imageUrl?: string }>({ title: '', description: '', linkUrl: '' })
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false)
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set())
   const [openMenuPostId, setOpenMenuPostId] = useState<string | null>(null)
   const router = useRouter()
@@ -294,13 +295,53 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
     setEditFormData({
       title: post.title,
       description: post.description || '',
-      linkUrl: post.linkUrl || ''
+      linkUrl: post.linkUrl || '',
+      imageUrl: post.imageUrl
     })
   }
 
   const handleCancelEdit = () => {
     setEditingPostId(null)
     setEditFormData({ title: '', description: '', linkUrl: '' })
+    setIsGeneratingImage(false)
+  }
+
+  const generateImageForEdit = async () => {
+    if (!editFormData.title || !editFormData.description) {
+      alert('Please add a title and description before generating an image')
+      return
+    }
+    
+    setIsGeneratingImage(true)
+    try {
+      const response = await fetch('/api/ai/generate-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: editFormData.title,
+          prompt: editFormData.description
+        })
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to generate image')
+      }
+      
+      const data = await response.json()
+      setEditFormData({ ...editFormData, imageUrl: data.imageUrl })
+      
+      if (data.temporary) {
+        alert('Note: Generated image will expire in ~1 hour. Save your post to keep it permanently.')
+      }
+    } catch (error) {
+      console.error('Image generation error:', error)
+      alert(`Failed to generate image: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setIsGeneratingImage(false)
+    }
   }
 
   const handleSaveEdit = async (postId: string) => {
@@ -325,7 +366,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
             ...post,
             title: editFormData.title,
             description: editFormData.description,
-            linkUrl: editFormData.linkUrl
+            linkUrl: editFormData.linkUrl,
+            imageUrl: editFormData.imageUrl
           }
         }
         return post
@@ -519,9 +561,57 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                     type="text"
                     value={editFormData.linkUrl}
                     onChange={(e) => setEditFormData({ ...editFormData, linkUrl: e.target.value })}
-                    className="w-full px-4 py-3 bg-dark-surface border border-dark-border rounded-input text-text-primary focus:outline-none focus:border-brand-yellow"
+                    className="w-full px-4 py-3 bg-dark-surface border border-dark-border rounded-input text-text-primary mb-3 focus:outline-none focus:border-brand-yellow"
                     placeholder="Link URL (optional)"
                   />
+                  
+                  {/* AI Image Generation */}
+                  <div className="space-y-3">
+                    {!editFormData.imageUrl && (
+                      <button
+                        type="button"
+                        onClick={generateImageForEdit}
+                        disabled={isGeneratingImage || !editFormData.title || !editFormData.description}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-dark-surface border border-dashed border-dark-border rounded-input text-text-secondary hover:border-brand-yellow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isGeneratingImage ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-brand-yellow border-t-transparent rounded-full animate-spin"></div>
+                            <span>Generating image...</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                              <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <span>Generate AI image (optional)</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                    
+                    {editFormData.imageUrl && (
+                      <div className="relative">
+                        <img 
+                          src={editFormData.imageUrl} 
+                          alt="Generated image" 
+                          className="w-full rounded-input border border-dark-border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setEditFormData({ ...editFormData, imageUrl: undefined })}
+                          className="absolute top-2 right-2 p-1.5 bg-black/80 rounded-full hover:bg-black transition-colors"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <>
