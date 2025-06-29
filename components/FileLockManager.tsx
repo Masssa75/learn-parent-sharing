@@ -22,7 +22,7 @@ export default function FileLockManager() {
     filePath: '',
     lockedBy: '',
     description: '',
-    duration: 30
+    duration: 120 // Default to 2 hours
   })
 
   useEffect(() => {
@@ -189,16 +189,18 @@ CREATE POLICY "manage_file_locks" ON file_locks
               onChange={(e) => setNewLock({ ...newLock, description: e.target.value })}
               className="px-3 py-2 border rounded"
             />
-            <select
-              value={newLock.duration}
-              onChange={(e) => setNewLock({ ...newLock, duration: parseInt(e.target.value) })}
-              className="px-3 py-2 border rounded"
-            >
-              <option value={15}>15 minutes</option>
-              <option value={30}>30 minutes</option>
-              <option value={60}>1 hour</option>
-              <option value={120}>2 hours</option>
-            </select>
+            <div className="relative">
+              <select
+                value={newLock.duration}
+                onChange={(e) => setNewLock({ ...newLock, duration: parseInt(e.target.value) })}
+                className="px-3 py-2 border rounded text-gray-400"
+              >
+                <option value={120}>2 hours (recommended)</option>
+                <option value={240}>4 hours</option>
+                <option value={480}>8 hours</option>
+              </select>
+              <div className="text-xs text-gray-500 mt-1">Just pick 2 hours - release when done</div>
+            </div>
           </div>
           <button
             onClick={createLock}
@@ -255,7 +257,8 @@ CREATE POLICY "manage_file_locks" ON file_locks
       </div>
 
       <div className="mt-6 text-sm text-gray-500">
-        <p>• Locks automatically expire after the set duration</p>
+        <p>• <strong>Lock when you start, release when you stop</strong></p>
+        <p>• Duration is just a safety timeout - always release manually when done</p>
         <p>• Files with active locks should not be edited by other instances</p>
         <p>• Page refreshes every 30 seconds to show latest locks</p>
       </div>

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         }]
       }],
       generationConfig: {
-        responseModalities: ["image"],
+        responseModalities: ["TEXT", "IMAGE"],
         candidateCount: 1
       }
     }
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000)
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview:generateContent?key=${apiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
