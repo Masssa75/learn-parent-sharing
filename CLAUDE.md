@@ -791,3 +791,67 @@ npx supabase db execute --sql "YOUR SQL HERE"
 ```
 
 Note: The service role key and project credentials are stored in the .env file.
+
+## 👮 Admin System Implementation (June 29, 2025)
+
+### Overview
+Implemented a complete admin system with database-level permissions, admin dashboard, and user management interface.
+
+### Database Schema
+Added via migration `20250629000000_add_admin_system.sql`:
+- `is_admin` column to users table
+- `admin_users` tracking table for audit trail
+- Helper functions: `make_user_admin()` and `remove_user_admin()`
+- RLS policies for admin-only access
+
+### Admin Features
+1. **Admin Dashboard** (`/admin`)
+   - View all users in a table format
+   - See admin badges for privileged users
+   - Toggle admin status with Make Admin/Remove Admin buttons
+   - Protected route - non-admins see error message
+
+2. **Admin Menu Link**
+   - Added to user dropdown menu in `FeedComponent.tsx`
+   - Only visible when `user.isAdmin === true`
+   - Appears between "View Profile" and "Sign Out"
+
+3. **Test Auth System**
+   - Updated `/test-auth` to support multiple test users
+   - Three test user buttons: devtest, admintest, admindev
+   - Modified `/api/auth/dev-login` to accept `telegramId` parameter
+
+### Current Admin Users
+- Marc (@cyrator007) - Platform owner
+- devtest (999999999) - Test admin account
+- admindev (777777777) - Admin developer account
+
+### Key Files
+- `/app/api/admin/users/route.ts` - Admin API endpoints
+- `/app/admin/page.tsx` - Admin dashboard UI
+- `/app/api/auth/check/route.ts` - Returns `isAdmin` in user object
+- `/components/FeedComponent.tsx` - Shows admin link for admin users
+- `/scripts/setup-admin.ts` - Makes users admin via Telegram ID
+- `/scripts/make-current-user-admin.js` - Finds and promotes real users
+
+### How to Make Someone Admin
+```bash
+# Method 1: By Telegram ID
+cd app
+npm run setup-admin TELEGRAM_ID
+
+# Method 2: Find and promote real users
+node make-current-user-admin.js
+
+# Method 3: Via Admin Dashboard
+Login as admin → /admin → Click "Make Admin" button
+```
+
+### TypeScript Fix
+Fixed build error in `/app/api/auth/dev-login/route.ts`:
+```typescript
+const userInfo: Record<number, { username: string; firstName: string; lastName: string }> = {
+  999999999: { username: 'devtest', firstName: 'Dev', lastName: 'Test' },
+  // ...
+}
+```
