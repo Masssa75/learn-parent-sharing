@@ -397,25 +397,14 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
         )}
       </div>
 
-      {/* Floating Action Button or Auth Prompt */}
-      {isAuthenticated ? (
+      {/* Floating Action Button */}
+      {isAuthenticated && (
         <Link
           href="/create"
           className="fixed bottom-8 right-6 w-16 h-16 bg-brand-yellow rounded-fab flex items-center justify-center shadow-xl shadow-brand-yellow/40 text-black text-4xl font-light hover:scale-110 hover:shadow-2xl hover:shadow-brand-yellow/60 active:scale-95 btn-transition z-50"
         >
           +
         </Link>
-      ) : showAuthPrompt && (
-        <div className="fixed bottom-6 left-6 right-6 bg-dark-surface rounded-card p-6 border border-dark-border shadow-xl">
-          <p className="text-text-primary text-body-lg font-semibold mb-2">Join the community!</p>
-          <p className="text-text-secondary text-body mb-4">Sign in to share your discoveries and connect with other parents.</p>
-          <Link 
-            href="/login"
-            className="block w-full bg-brand-yellow text-black rounded-button py-3 text-center font-semibold hover:scale-[1.02] btn-transition"
-          >
-            Sign in with Telegram
-          </Link>
-        </div>
       )}
     </div>
   )
