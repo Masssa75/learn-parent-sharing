@@ -219,9 +219,20 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                     onError={(e) => {
                       const img = e.currentTarget as HTMLImageElement
                       img.style.display = 'none'
-                      const span = img.nextElementSibling as HTMLElement
+                      const span = img.parentElement?.querySelector('span') as HTMLElement
                       if (span) {
                         span.style.display = 'flex'
+                      }
+                    }}
+                    onLoad={(e) => {
+                      const img = e.currentTarget as HTMLImageElement
+                      // Check if image actually loaded properly
+                      if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                        img.style.display = 'none'
+                        const span = img.parentElement?.querySelector('span') as HTMLElement
+                        if (span) {
+                          span.style.display = 'flex'
+                        }
                       }
                     }}
                   />
