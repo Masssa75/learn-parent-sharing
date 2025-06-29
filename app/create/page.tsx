@@ -23,7 +23,7 @@ export default function CreatePage() {
   const [category, setCategory] = useState('')
   const [selectedAges, setSelectedAges] = useState<string[]>([])
   const [link, setLink] = useState('')
-  const [inputMode, setInputMode] = useState<'manual' | 'voice'>('voice') // Default to voice
+  const [inputMode, setInputMode] = useState<'manual' | 'voice'>('manual') // Default to manual
   const [isRecording, setIsRecording] = useState(false)
   const [voiceTranscript, setVoiceTranscript] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
