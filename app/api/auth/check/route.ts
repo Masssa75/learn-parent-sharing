@@ -28,10 +28,23 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ authenticated: false })
       }
       
-      // Fetch user data from database
+      // Fetch user data from database with join to profiles for points data
       const { data: user, error } = await supabase
         .from('users')
-        .select('id, telegram_id, telegram_username, first_name, last_name, photo_url, is_admin')
+        .select(`
+          id, 
+          telegram_id, 
+          telegram_username, 
+          first_name, 
+          last_name, 
+          photo_url, 
+          is_admin,
+          profiles (
+            points,
+            total_xp,
+            level
+          )
+        `)
         .eq('id', sessionData.userId)
         .single()
       
@@ -52,7 +65,10 @@ export async function GET(request: NextRequest) {
           lastName: user.last_name,
           photoUrl: user.photo_url,
           displayName: user.first_name + (user.last_name ? ` ${user.last_name}` : ''),
-          isAdmin: user.is_admin || false
+          isAdmin: user.is_admin || false,
+          points: user.profiles?.points || 0,
+          totalXp: user.profiles?.total_xp || 0,
+          level: user.profiles?.level || 1
         }
       })
     } catch (error) {

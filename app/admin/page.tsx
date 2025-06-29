@@ -1,5 +1,7 @@
 'use client'
 
+import FileLockManager from '@/components/FileLockManager'
+
 import { useEffect, useState } from 'react'
 
 interface User {
@@ -25,6 +27,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
+  const [activeTab, setActiveTab] = useState('users')
 
   useEffect(() => {
     checkAuth()
@@ -115,8 +118,39 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+        <div className="mb-4">
+          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="border-b border-gray-200 mb-6">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'users'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              User Management
+            </button>
+            <button
+              onClick={() => setActiveTab('locks')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'locks'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              File Locks
+            </button>
+          </nav>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'users' ? (
+          <div className="bg-white rounded-lg shadow p-6">
           
           <div className="mb-6">
             <p className="text-gray-600">
@@ -197,6 +231,9 @@ export default function AdminPage() {
             </table>
           </div>
         </div>
+        ) : (
+          <FileLockManager />
+        )}
       </div>
     </div>
   )

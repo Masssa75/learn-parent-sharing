@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { YouTubePlayer } from './YouTubePlayer'
+import { PointsDisplay } from './PointsDisplay'
 
 interface User {
   id: string
@@ -14,6 +15,9 @@ interface User {
   photoUrl?: string
   displayName: string
   isAdmin?: boolean
+  points?: number
+  totalXp?: number
+  level?: number
 }
 
 interface Post {
@@ -385,6 +389,17 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
         </div>
         </div>
       </div>
+
+      {/* Points Display */}
+      {isAuthenticated && user && (
+        <div className="max-w-2xl mx-auto px-5 mb-6">
+          <PointsDisplay
+            points={user.points || 0}
+            xp={user.totalXp || 0}
+            level={user.level || 1}
+          />
+        </div>
+      )}
 
       {/* Posts */}
       <div className="max-w-2xl mx-auto px-5 pb-20 custom-scrollbar">
