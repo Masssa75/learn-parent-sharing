@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       .eq('user_id', userId)
       .gte('created_at', oneHourAgo)
     
-    if (recentActionsCount >= actionsPerHour) {
+    if ((recentActionsCount || 0) >= actionsPerHour) {
       return NextResponse.json({ 
         error: 'Rate limit exceeded', 
         message: `You can only perform ${actionsPerHour} actions per hour at level ${userProfile.level}`,
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
         total_xp: newTotalXp,
         level: newLevel
       },
-      remaining_actions: actionsPerHour - recentActionsCount - 1
+      remaining_actions: actionsPerHour - (recentActionsCount || 0) - 1
     })
     
   } catch (error) {
