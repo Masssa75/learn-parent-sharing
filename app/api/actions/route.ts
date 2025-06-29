@@ -99,14 +99,19 @@ export async function POST(request: NextRequest) {
         action_type: actionType,
         target_type: targetType,
         target_id: targetId,
-        points_earned: pointsEarned
+        points_earned: pointsEarned,
+        xp_earned: pointsEarned > 0 ? pointsEarned : 0
       })
       .select()
       .single()
     
     if (actionError) {
       console.error('Error creating action:', actionError)
-      return NextResponse.json({ error: 'Failed to record action' }, { status: 500 })
+      return NextResponse.json({ 
+        error: 'Failed to record action',
+        details: actionError.message,
+        hint: actionError.hint
+      }, { status: 500 })
     }
     
     // Update user's points and XP

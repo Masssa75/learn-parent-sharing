@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
   try {
     const { prompt, title } = await request.json()
 
-    // Check if Gemini API key is configured
-    const apiKey = process.env.GEMINI_API_KEY
+    // Check if OpenAI API key is configured
+    const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) {
       return NextResponse.json(
         { error: 'Image generation is not configured. Please contact support.' },
@@ -20,32 +20,30 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create a focused prompt for Imagen 3
+    // Create a focused prompt for DALL-E 3
     const imagePrompt = `Create a clear, helpful illustration for this parenting tip: "${title}". ${prompt}. Style: Clean, modern, family-friendly illustration with soft colors. Show the technique or concept clearly and safely.`
 
     console.log('Generating image with prompt:', imagePrompt)
 
-    // Use Gemini 2.0 Flash Preview model for faster image generation
+    // Use DALL-E 3 model
     const requestBody = {
-      contents: [{
-        parts: [{
-          text: imagePrompt
-        }]
-      }],
-      generationConfig: {
-        responseModalities: ["TEXT", "IMAGE"],
-        candidateCount: 1
-      }
+      model: 'dall-e-3',
+      prompt: imagePrompt,
+      n: 1,
+      size: '1024x1024',
+      quality: 'standard',
+      style: 'vivid'
     }
 
-    // Create an AbortController with 30 second timeout
+    // Create an AbortController with 45 second timeout (DALL-E can be slower)
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30000)
+    const timeoutId = setTimeout(() => controller.abort(), 45000)
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify(requestBody),
       signal: controller.signal
@@ -53,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const error = await response.json()
-      console.error('Gemini API error:', error)
+      console.error('OpenAI API error:', error)
       console.error('Request body was:', requestBody)
       
       // Provide error information without exposing sensitive details
@@ -67,22 +65,16 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json()
-    console.log('Gemini API response structure:', JSON.stringify(data, null, 2))
+    console.log('OpenAI API response received')
     
-    // Extract the base64 image from Gemini response
-    const imageData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData
-    if (!imageData || !imageData.data) {
-      console.error('No image data found. Response structure:', {
-        candidates: data.candidates?.length || 0,
-        firstCandidate: data.candidates?.[0],
-        parts: data.candidates?.[0]?.content?.parts
-      })
-      throw new Error('No image data in response')
-    }
+    // Extract the image URL from OpenAI response
+    const temporaryImageUrl = data.data[0].url
 
-    // Convert base64 to buffer
-    const buffer = Buffer.from(imageData.data, 'base64')
-    const mimeType = imageData.mimeType || 'image/png'
+    // Download the image from OpenAI
+    const imageResponse = await fetch(temporaryImageUrl)
+    const imageBlob = await imageResponse.blob()
+    const arrayBuffer = await imageBlob.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
 
     // Generate a unique filename
     const timestamp = Date.now()
@@ -112,11 +104,12 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       console.error('Failed to upload to Supabase:', uploadError)
-      // No temporary URL available with Gemini
+      // Fallback: return the temporary OpenAI URL
       return NextResponse.json({ 
-        error: 'Failed to upload image to storage',
-        details: uploadError.message
-      }, { status: 500 })
+        imageUrl: temporaryImageUrl,
+        temporary: true,
+        message: 'Using temporary URL. Image will expire in ~1 hour.'
+      })
     }
 
     // Get the public URL for the uploaded image
