@@ -495,29 +495,6 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                   <span>{post.category?.name || 'App'}</span>
                   <span>·</span>
                   <span>{new Date(post.createdAt).toLocaleDateString()}</span>
-                  {(post.likes > 0 || post.comments > 0) && (
-                    <>
-                      <span>·</span>
-                      <div className="flex items-center gap-3">
-                        {post.likes > 0 && (
-                          <span className="flex items-center gap-1">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                            </svg>
-                            {post.likes}
-                          </span>
-                        )}
-                        {post.comments > 0 && (
-                          <span className="flex items-center gap-1">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-                            </svg>
-                            {post.comments}
-                          </span>
-                        )}
-                      </div>
-                    </>
-                  )}
                 </div>
                 
                 {/* 3-dot menu */}
@@ -538,24 +515,6 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                   
                   {openMenuPostId === post.id && (
                     <div className="absolute right-0 mt-2 w-48 bg-dark-surface rounded-card shadow-lg py-2 border border-dark-border z-10">
-                      <button
-                        onClick={() => handleLike(post.id)}
-                        className="w-full text-left px-4 py-2 text-text-primary hover:bg-white/5 flex items-center gap-3"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                        </svg>
-                        Like
-                      </button>
-                      <button
-                        onClick={() => handleSave(post.id)}
-                        className="w-full text-left px-4 py-2 text-text-primary hover:bg-white/5 flex items-center gap-3"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
-                        </svg>
-                        Share
-                      </button>
                       {user && post.userId === user.id && (
                         <button
                           onClick={() => {
@@ -568,9 +527,36 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                           </svg>
-                          Edit
+                          Edit post
                         </button>
                       )}
+                      <button
+                        onClick={() => {
+                          // TODO: Copy link functionality
+                          alert('Link copied!')
+                          setOpenMenuPostId(null)
+                        }}
+                        className="w-full text-left px-4 py-2 text-text-primary hover:bg-white/5 flex items-center gap-3"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        Copy link
+                      </button>
+                      <button
+                        onClick={() => {
+                          // TODO: Report functionality
+                          setOpenMenuPostId(null)
+                        }}
+                        className="w-full text-left px-4 py-2 text-text-primary hover:bg-white/5 flex items-center gap-3"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                          <line x1="4" y1="22" x2="4" y2="15"></line>
+                        </svg>
+                        Report
+                      </button>
                       {user?.isAdmin && (
                         <>
                           <div className="border-t border-dark-border my-2"></div>
@@ -585,13 +571,50 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                               <polyline points="3 6 5 6 21 6"></polyline>
                               <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                             </svg>
-                            Delete
+                            Delete post
                           </button>
                         </>
                       )}
                     </div>
                   )}
                 </div>
+              </div>
+              
+              {/* Subtle bottom actions */}
+              <div className="flex gap-6 pt-2 border-t border-dark-border/50">
+                <button
+                  onClick={() => handleLike(post.id)}
+                  className={`flex items-center gap-2 text-sm transition-colors ${
+                    post.liked ? 'text-brand-yellow' : 'text-text-muted hover:text-text-secondary'
+                  }`}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                  </svg>
+                  <span>{post.likes > 0 ? post.likes : 'Like'}</span>
+                </button>
+                
+                <button
+                  onClick={() => {/* TODO: Implement comment */}}
+                  className="flex items-center gap-2 text-sm text-text-muted hover:text-text-secondary transition-colors"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                  </svg>
+                  <span>{post.comments > 0 ? post.comments : 'Comment'}</span>
+                </button>
+                
+                <button
+                  onClick={() => handleSave(post.id)}
+                  className="flex items-center gap-2 text-sm text-text-muted hover:text-text-secondary transition-colors"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                    <polyline points="16 6 12 2 8 6"/>
+                    <line x1="12" y1="2" x2="12" y2="15"/>
+                  </svg>
+                  <span>Share</span>
+                </button>
               </div>
               
               {/* Edit mode actions */}
