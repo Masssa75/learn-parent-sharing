@@ -457,7 +457,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                 </div>
               ) : (
                 <>
-                  <h2 className="text-title-lg text-text-primary mb-4">{post.title}</h2>
+                  <h2 className="text-4xl text-text-primary mb-4 font-semibold">{post.title}</h2>
                   {post.description && (
                     <div className="mb-4">
                       <p className={`text-body text-gray-300 leading-relaxed ${
@@ -468,9 +468,9 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                       {post.description.length > 150 && (
                         <button
                           onClick={() => togglePostExpansion(post.id)}
-                          className="text-brand-yellow hover:text-yellow-400 text-body font-semibold mt-1"
+                          className="text-text-muted hover:text-text-secondary text-sm mt-1"
                         >
-                          {expandedPosts.has(post.id) ? 'Show less' : 'Show more'}
+                          {expandedPosts.has(post.id) ? 'Show less' : 'Read more'}
                         </button>
                       )}
                     </div>
