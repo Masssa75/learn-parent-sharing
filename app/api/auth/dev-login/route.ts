@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       .single()
     
     if (error || !testUser) {
-      const userInfo = {
+      const userInfo: Record<number, { username: string; firstName: string; lastName: string }> = {
         999999999: { username: 'devtest', firstName: 'Dev', lastName: 'Test' },
         888888888: { username: 'admintest', firstName: 'Admin', lastName: 'Test' },
         777777777: { username: 'admindev', firstName: 'Admin', lastName: 'Developer' }
