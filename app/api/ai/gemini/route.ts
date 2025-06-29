@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { toTitleCase } from '@/utils/titleCase'
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ''
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
@@ -100,7 +101,7 @@ Make the title specific and benefit-focused. Avoid generic phrases like "Great a
       }
       
       return NextResponse.json({
-        title: parsedResponse.title || 'My parenting discovery',
+        title: toTitleCase(parsedResponse.title || 'My parenting discovery'),
         description: parsedResponse.description || transcript.substring(0, 200),
         category: categoryMap[parsedResponse.category] || 'tips',
         ageRange: parsedResponse.suggestedAge || '3-5',
@@ -110,7 +111,7 @@ Make the title specific and benefit-focused. Avoid generic phrases like "Great a
       console.error('Failed to parse AI response:', parseError)
       // Fallback response
       return NextResponse.json({
-        title: 'My parenting discovery',
+        title: toTitleCase('My parenting discovery'),
         description: transcript.substring(0, 200),
         category: linkUrl && linkUrl.includes('youtube.com') ? 'education' : 'tips',
         ageRange: '3-5',

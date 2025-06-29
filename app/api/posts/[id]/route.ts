@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
+import { toTitleCase } from '@/utils/titleCase'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -71,7 +72,7 @@ export async function PATCH(
     const { data: updatedPost, error: updateError } = await supabase
       .from('posts')
       .update({
-        title,
+        title: toTitleCase(title),
         description,
         link_url: linkUrl || null,
         updated_at: new Date().toISOString()

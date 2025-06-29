@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { extractYouTubeVideoId } from '@/utils/youtube'
+import { toTitleCase } from '@/utils/titleCase'
 
 // Create Supabase client for server-side operations
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -148,7 +149,7 @@ export async function POST(request: NextRequest) {
       .from('posts')
       .insert({
         user_id: userId,
-        title,
+        title: toTitleCase(title),
         description,
         category_id: categoryData.id,
         age_ranges: ageRanges,
