@@ -20,10 +20,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create a focused prompt for DALL-E 3
+    // Create a focused prompt for gpt-image-1
     const imagePrompt = `Create a clear, helpful illustration for this parenting tip: "${title}". ${prompt}. Style: Clean, modern, family-friendly illustration with soft colors. Show the technique or concept clearly and safely.`
 
     console.log('Generating image with prompt:', imagePrompt)
+
+    // Try with gpt-image-1 model
+    let requestBody: any = {
+      model: 'gpt-image-1',
+      prompt: imagePrompt,
+      n: 1
+    }
+
+    // Add size if supported by the model
+    if (requestBody.model === 'dall-e-3' || requestBody.model === 'dall-e-2') {
+      requestBody.size = '1024x1024'
+      requestBody.quality = 'standard'
+      requestBody.style = 'vivid'
+    } else {
+      // For gpt-image-1, we might need different parameters
+      // Try with just the basic parameters first
+      requestBody.size = '1024x1024' // May or may not be supported
+    }
 
     const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
@@ -31,20 +49,22 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify({
-        model: 'gpt-image-1',  // Using gpt-image-1 as specified
-        prompt: imagePrompt,
-        n: 1,
-        size: '1024x1024'
-        // Note: quality and style parameters might not be supported by gpt-image-1
-      })
+      body: JSON.stringify(requestBody)
     })
 
     if (!response.ok) {
       const error = await response.json()
       console.error('OpenAI API error:', error)
+      console.error('Request body was:', requestBody)
+      
+      // Provide more detailed error information
       return NextResponse.json(
-        { error: 'Failed to generate image' },
+        { 
+          error: error.error?.message || 'Failed to generate image',
+          details: error.error?.type || '',
+          model: requestBody.model,
+          hint: 'Check if gpt-image-1 model requires different parameters'
+        },
         { status: response.status }
       )
     }
