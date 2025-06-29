@@ -501,7 +501,7 @@ export default function CreatePage() {
                 )}
               </button>
               {isRecording && (
-                <div className="absolute inset-0 w-24 h-24 border-3 border-brand-yellow rounded-full animate-ping"></div>
+                <div className="absolute inset-0 w-24 h-24 border-3 border-brand-yellow rounded-full animate-ping pointer-events-none"></div>
               )}
             </div>
             <p className="text-text-muted text-body mb-2">
