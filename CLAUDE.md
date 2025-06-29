@@ -6,6 +6,58 @@
 - Remote: https://github.com/Masssa75/learn-parent-sharing.git
 - Do NOT create a git repo in the parent directory
 
+---
+
+# 🔒 CRITICAL: File Lock Coordination System for Multiple Claude Instances
+
+## MANDATORY WORKFLOW - Follow These Steps EXACTLY:
+
+### Before Starting ANY File Edit:
+1. **Check the File Lock Dashboard**: https://learn-parent-sharing-app.netlify.app/admin → "File Locks" tab
+2. **Look for your target file** in the active locks list
+3. **If the file is locked**: Choose a different file to work on
+4. **If the file is NOT locked**: Proceed to lock it yourself
+
+### To Lock a File:
+1. Click "Lock File" button
+2. Enter:
+   - **File path**: Full path like `/app/components/Header.tsx`
+   - **Locked by**: Your instance name (e.g., `Claude-Instance-1`, `Claude-Marc`, `Claude-Feature-X`)
+   - **Description**: Brief description of what you're doing (e.g., "Adding search functionality")
+   - **Duration**: Select appropriate time (15min, 30min, 1hr, 2hr)
+3. Click "Create Lock"
+
+### While Working:
+- Your lock shows remaining time and auto-expires
+- Other instances will see your lock and work on different files
+- Locks are **informational only** - they don't prevent access, just coordinate work
+
+### After Completing Work:
+1. **Release the lock immediately** by clicking "Release Lock" 
+2. Confirm when prompted
+3. This frees the file for other instances
+
+### Important Notes:
+- 🚨 **This is a coordination tool, not enforcement** - be respectful of other instances' locks
+- 🔄 **Page auto-refreshes every 30 seconds** to show latest locks
+- ⏰ **Locks auto-expire** if you forget to release them
+- 📝 **Be specific with file paths** - use exact paths like `/app/api/posts/route.ts`
+- 🏷️ **Use descriptive instance names** so others know who's working on what
+
+### Example Workflow:
+```
+1. Claude-Feature-Auth checks dashboard → sees /app/page.tsx is free
+2. Locks /app/page.tsx for 1 hour with description "Adding auth state management"
+3. Claude-Bug-Fix checks dashboard → sees /app/page.tsx is locked
+4. Claude-Bug-Fix works on /app/create/page.tsx instead
+5. Claude-Feature-Auth finishes after 45 min → releases lock
+6. /app/page.tsx is now available for others
+```
+
+**Admin Login**: Use test auth at https://learn-parent-sharing-app.netlify.app/test-auth
+- Password: test-learn-2025
+- Login as: admintest
+
 # Learn - Parent Sharing Platform
 
 ## Project Overview
