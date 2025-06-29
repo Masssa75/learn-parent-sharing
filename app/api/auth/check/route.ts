@@ -66,9 +66,9 @@ export async function GET(request: NextRequest) {
           photoUrl: user.photo_url,
           displayName: user.first_name + (user.last_name ? ` ${user.last_name}` : ''),
           isAdmin: user.is_admin || false,
-          points: user.profiles?.points || 0,
-          totalXp: user.profiles?.total_xp || 0,
-          level: user.profiles?.level || 1
+          points: user.profiles ? (user.profiles[0]?.points || user.profiles.points || 0) : 0,
+          totalXp: user.profiles ? (user.profiles[0]?.total_xp || user.profiles.total_xp || 0) : 0,
+          level: user.profiles ? (user.profiles[0]?.level || user.profiles.level || 1) : 1
         }
       })
     } catch (error) {
