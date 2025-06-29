@@ -53,6 +53,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ authenticated: false })
       }
       
+      // Debug log for points data
+      console.log('User profiles data:', JSON.stringify(user.profiles, null, 2))
+      
       return NextResponse.json({ 
         authenticated: true,
         userId: sessionData.userId,
