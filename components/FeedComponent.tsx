@@ -193,8 +193,9 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   return (
     <div className="min-h-screen bg-dark-bg">
       {/* Header */}
-      <div className="sticky top-0 bg-dark-bg z-10 px-5 pt-6 pb-4">
-        <div className="flex items-center justify-between mb-2">
+      <div className="sticky top-0 bg-dark-bg z-10">
+        <div className="max-w-2xl mx-auto px-5 pt-6 pb-4">
+          <div className="flex items-center justify-between mb-2">
           <h1 className="text-display text-text-primary">Discover</h1>
           {!isAuthenticated ? (
             <Link 
@@ -282,10 +283,11 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
             </button>
           ))}
         </div>
+        </div>
       </div>
 
       {/* Posts */}
-      <div className="px-5 pb-20 custom-scrollbar">
+      <div className="max-w-2xl mx-auto px-5 pb-20 custom-scrollbar">
         {loading ? (
           <div className="text-center py-8">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-brand-yellow"></div>
