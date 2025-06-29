@@ -148,11 +148,6 @@ export default function CreatePage() {
   
   // Process with Gemini AI
   const processWithAI = async () => {
-    if (!link) {
-      alert('Please paste a link first before recording')
-      return
-    }
-    
     if (!voiceTranscript.trim()) {
       alert('No speech detected. Please try recording again.')
       return
@@ -169,7 +164,7 @@ export default function CreatePage() {
         },
         body: JSON.stringify({
           transcript: voiceTranscript,
-          linkUrl: link
+          linkUrl: link || ''
         })
       })
       

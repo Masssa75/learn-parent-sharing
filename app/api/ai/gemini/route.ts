@@ -7,8 +7,8 @@ export async function POST(request: Request) {
   try {
     const { transcript, linkUrl } = await request.json()
     
-    if (!transcript || !linkUrl) {
-      return NextResponse.json({ error: 'Missing transcript or linkUrl' }, { status: 400 })
+    if (!transcript) {
+      return NextResponse.json({ error: 'Missing transcript' }, { status: 400 })
     }
     
     if (!GEMINI_API_KEY) {
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     // Construct the prompt for Gemini
     const prompt = `You are an expert parent content curator helping to create engaging posts for a parenting community platform. 
 
-A parent wants to share: ${linkUrl}
+A parent ${linkUrl ? `wants to share: ${linkUrl}` : 'has a parenting tip or experience to share'}
 Their experience: "${transcript}"
 
 Create a compelling post that other parents will find valuable. The title should grab attention and clearly communicate the benefit. The description should expand on why this is helpful for parents.
@@ -112,7 +112,7 @@ Make the title specific and benefit-focused. Avoid generic phrases like "Great a
       return NextResponse.json({
         title: 'My parenting discovery',
         description: transcript.substring(0, 200),
-        category: linkUrl.includes('youtube.com') ? 'education' : 'tips',
+        category: linkUrl && linkUrl.includes('youtube.com') ? 'education' : 'tips',
         ageRange: '3-5',
         originalTranscript: transcript
       })
