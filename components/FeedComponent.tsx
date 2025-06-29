@@ -304,18 +304,27 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
             <div key={post.id} className="mb-8">
               {/* Post Header */}
               <div className="flex items-center gap-4 mb-5">
-                <div className="w-12 h-12 bg-dark-surface rounded-avatar flex items-center justify-center overflow-hidden">
-                  {post.user?.avatar ? (
+                <div className="w-12 h-12 bg-dark-surface rounded-avatar flex items-center justify-center overflow-hidden relative">
+                  {post.user?.avatar && (
                     <img 
                       src={post.user.avatar} 
                       alt={post.user.name || 'User'}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover absolute inset-0"
+                      onError={(e) => {
+                        const img = e.currentTarget as HTMLImageElement
+                        img.style.display = 'none'
+                      }}
+                      onLoad={(e) => {
+                        const img = e.currentTarget as HTMLImageElement
+                        if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                          img.style.display = 'none'
+                        }
+                      }}
                     />
-                  ) : (
-                    <span className="text-2xl">
-                      {post.user?.name ? post.user.name.charAt(0).toUpperCase() : '👤'}
-                    </span>
                   )}
+                  <span className="text-2xl flex items-center justify-center w-full h-full">
+                    {post.user?.name ? post.user.name.charAt(0).toUpperCase() : '👤'}
+                  </span>
                 </div>
                 <div className="flex-1">
                   <div className="text-body-lg font-semibold text-text-primary">
