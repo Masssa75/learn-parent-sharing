@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     // Get user's current profile with points info
     const { data: userProfile, error: profileError } = await supabase
       .from('profiles')
-      .select('id, user_id, points, total_xp, level')
+      .select('user_id, points, total_xp, level')
       .eq('user_id', userId)
       .single()
     
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
         total_xp: newTotalXp,
         level: newLevel
       })
-      .eq('id', userProfile.id)
+      .eq('user_id', userId)
     
     if (updateError) {
       console.error('Error updating user points:', updateError)
