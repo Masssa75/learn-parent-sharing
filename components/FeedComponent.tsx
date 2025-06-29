@@ -166,6 +166,28 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
     console.log('Save post:', postId)
   }
 
+  const handleDelete = async (postId: string) => {
+    if (!confirm('Are you sure you want to delete this post?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/posts/${postId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete post')
+      }
+
+      // Remove the post from the local state
+      setPosts(posts.filter(post => post.id !== postId))
+    } catch (error) {
+      console.error('Error deleting post:', error)
+      alert('Failed to delete post. Please try again.')
+    }
+  }
+
   const getLinkPreview = (url: string) => {
     try {
       const urlObj = new URL(url)
@@ -398,6 +420,15 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                 >
                   SHARE
                 </button>
+                
+                {user?.isAdmin && (
+                  <button
+                    onClick={() => handleDelete(post.id)}
+                    className="text-red-500 hover:text-red-400 font-semibold text-body btn-transition"
+                  >
+                    DELETE
+                  </button>
+                )}
               </div>
             </div>
           ))

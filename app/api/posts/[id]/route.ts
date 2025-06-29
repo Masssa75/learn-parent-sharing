@@ -1,0 +1,67 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    // Check if user is authenticated
+    const cookieStore = cookies()
+    const sessionCookie = cookieStore.get('session')
+    
+    if (!sessionCookie) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Parse session
+    let session
+    try {
+      const decodedSession = Buffer.from(sessionCookie.value, 'base64').toString('utf-8')
+      session = JSON.parse(decodedSession)
+    } catch (error) {
+      return NextResponse.json({ error: 'Invalid session' }, { status: 401 })
+    }
+
+    // Get user from database
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id, is_admin')
+      .eq('telegram_id', session.telegramId)
+      .single()
+
+    if (userError || !user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 401 })
+    }
+
+    // Check if user is admin
+    if (!user.is_admin) {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 })
+    }
+
+    // Delete the post
+    const { error: deleteError } = await supabase
+      .from('posts')
+      .delete()
+      .eq('id', params.id)
+
+    if (deleteError) {
+      console.error('Error deleting post:', deleteError)
+      return NextResponse.json({ error: 'Failed to delete post' }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Delete post error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
