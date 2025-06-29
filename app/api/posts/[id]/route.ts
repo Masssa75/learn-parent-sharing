@@ -13,7 +13,7 @@ export async function DELETE(
 ) {
   try {
     // Check if user is authenticated
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const sessionCookie = cookieStore.get('session')
     
     if (!sessionCookie) {
