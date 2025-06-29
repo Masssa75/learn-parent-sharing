@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) {
       return NextResponse.json(
-        { error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to environment variables.' },
+        { error: 'Image generation is not configured. Please contact support.' },
         { status: 500 }
       )
     }
@@ -25,22 +25,14 @@ export async function POST(request: NextRequest) {
 
     console.log('Generating image with prompt:', imagePrompt)
 
-    // Try with gpt-image-1 model
+    // Use DALL-E 3 model
     let requestBody: any = {
-      model: 'gpt-image-1',
+      model: 'dall-e-3',
       prompt: imagePrompt,
-      n: 1
-    }
-
-    // Add size if supported by the model
-    if (requestBody.model === 'dall-e-3' || requestBody.model === 'dall-e-2') {
-      requestBody.size = '1024x1024'
-      requestBody.quality = 'standard'
-      requestBody.style = 'vivid'
-    } else {
-      // For gpt-image-1, we might need different parameters
-      // Try with just the basic parameters first
-      requestBody.size = '1024x1024' // May or may not be supported
+      n: 1,
+      size: '1024x1024',
+      quality: 'standard',
+      style: 'vivid'
     }
 
     const response = await fetch('https://api.openai.com/v1/images/generations', {
@@ -57,13 +49,11 @@ export async function POST(request: NextRequest) {
       console.error('OpenAI API error:', error)
       console.error('Request body was:', requestBody)
       
-      // Provide more detailed error information
+      // Provide error information without exposing sensitive details
       return NextResponse.json(
         { 
           error: error.error?.message || 'Failed to generate image',
-          details: error.error?.type || '',
-          model: requestBody.model,
-          hint: 'Check if gpt-image-1 model requires different parameters'
+          details: 'Please check your configuration or try again later'
         },
         { status: response.status }
       )
