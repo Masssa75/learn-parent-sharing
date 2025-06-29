@@ -25,9 +25,9 @@ export async function POST(request: NextRequest) {
 
     console.log('Generating image with prompt:', imagePrompt)
 
-    // Use OpenAI's gpt-image-1 model for image generation
+    // Use OpenAI's DALL-E 3 model for image generation
     const requestBody = {
-      model: "gpt-image-1",
+      model: "dall-e-3",
       prompt: imagePrompt,
       n: 1,
       size: "1024x1024",

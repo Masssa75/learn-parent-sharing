@@ -18,6 +18,7 @@ interface User {
   points?: number
   totalXp?: number
   level?: number
+  actionsRemaining?: number
 }
 
 interface Post {
@@ -102,7 +103,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/check')
+      const response = await fetch('/api/auth/check-with-points')
       if (!response.ok) {
         throw new Error(`Auth check failed: ${response.status}`)
       }
@@ -207,7 +208,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
           ...user,
           points: result.user.points,
           totalXp: result.user.total_xp,
-          level: result.user.level
+          level: result.user.level,
+          actionsRemaining: result.remaining_actions
         })
       }
       
@@ -255,7 +257,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
           ...user,
           points: result.user.points,
           totalXp: result.user.total_xp,
-          level: result.user.level
+          level: result.user.level,
+          actionsRemaining: result.remaining_actions
         })
       }
       
@@ -265,6 +268,57 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       ))
     } catch (error) {
       console.error('Error saving post:', error)
+    }
+  }
+
+  const handleReport = async (postId: string) => {
+    if (!isAuthenticated) {
+      router.push('/login')
+      return
+    }
+    
+    if (!confirm('Are you sure you want to report this post? This will cost you 2 points.')) {
+      return
+    }
+    
+    try {
+      const response = await fetch('/api/actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionType: 'flag',
+          targetType: 'post',
+          targetId: postId
+        })
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        if (response.status === 429) {
+          alert(`Rate limit exceeded. Please wait before taking more actions.`)
+        } else {
+          throw new Error(error.message || 'Failed to report post')
+        }
+        return
+      }
+      
+      const result = await response.json()
+      
+      // Update user points in state (will lose 2 points)
+      if (result.user && user) {
+        setUser({
+          ...user,
+          points: result.user.points,
+          totalXp: result.user.total_xp,
+          level: result.user.level,
+          actionsRemaining: result.remaining_actions
+        })
+      }
+      
+      alert('Post reported. Thank you for helping keep the community safe.')
+    } catch (error) {
+      console.error('Error reporting post:', error)
+      alert('Failed to report post. Please try again.')
     }
   }
 
@@ -517,7 +571,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
             points={user.points || 0}
             xp={user.totalXp || 0}
             level={user.level || 1}
-            actionsRemaining={5}
+            actionsRemaining={user.actionsRemaining || 0}
           />
         </div>
       )}
@@ -759,7 +813,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                         </button>
                         <button
                           onClick={() => {
-                            // TODO: Report functionality
+                            handleReport(post.id)
                             setOpenMenuPostId(null)
                           }}
                           className="w-full text-left px-4 py-2 text-text-primary hover:bg-white/5 flex items-center gap-3"

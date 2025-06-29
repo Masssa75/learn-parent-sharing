@@ -44,11 +44,27 @@ export async function GET(request: NextRequest) {
       // Fetch profile data separately
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('points, total_xp, level, actions_this_hour')
+        .select('points, total_xp, level')
         .eq('user_id', sessionData.userId)
         .single()
       
       console.log('Profile data fetched:', profile)
+      
+      // Calculate rate limit based on user level
+      const userLevel = profile?.level || 1
+      const actionsPerHour = userLevel <= 2 ? 5 : 
+                            userLevel <= 5 ? 10 : 
+                            userLevel <= 8 ? 20 : 1000 // Unlimited for levels 9-10
+      
+      // Count recent actions from user_actions table
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+      const { count: recentActionsCount } = await supabase
+        .from('user_actions')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', sessionData.userId)
+        .gte('created_at', oneHourAgo)
+      
+      const actionsRemaining = Math.max(0, actionsPerHour - (recentActionsCount || 0))
       
       return NextResponse.json({ 
         authenticated: true,
@@ -66,7 +82,7 @@ export async function GET(request: NextRequest) {
           points: profile?.points || 0,
           totalXp: profile?.total_xp || 0,
           level: profile?.level || 1,
-          actionsRemaining: profile ? Math.max(0, 5 - (profile.actions_this_hour || 0)) : 5
+          actionsRemaining: actionsRemaining
         }
       })
     } catch (error) {
