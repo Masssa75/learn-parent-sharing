@@ -1231,6 +1231,51 @@ Successfully processed and formatted 7 parenting tips:
 - 7 example tips ready for submission
 - Voice transcript editing prompt created for future use
 
+## 📅 Session Summary: Image Generation API Investigation (June 29, 2025 - Evening)
+
+### 🔍 Problem
+- User reported "Failed to generate image" errors
+- Initial attempt to switch from OpenAI DALL-E 3 to Gemini for faster generation
+
+### 🎯 What We Learned
+1. **Gemini 2.0 Flash CANNOT generate images**
+   - Only processes/analyzes existing images
+   - This was the root cause of the failures
+   
+2. **Google's Image Generation Options**:
+   - **Imagen 3**: Google's actual image generation model
+   - Different API format than Gemini
+   - Requires different endpoint: `imagen-3.0-generate-001:predict`
+   
+3. **Speed Comparison** (when working):
+   - DALL-E 3: 20-30+ seconds, sometimes timeouts
+   - Gemini 2.0 Flash: N/A (doesn't generate images)
+   - Imagen 3: Would be faster but implementation was incorrect
+
+### 🔧 Final Solution
+- **Reverted to OpenAI DALL-E 3**
+- Increased timeout from 30s to 45s
+- Added better error logging
+- Kept temporary URL fallback
+
+### 📝 Key Files Modified
+- `/app/api/ai/generate-image/route.ts` - Reverted to DALL-E 3
+
+### ⚠️ Important Notes
+1. **Environment Variables Required**:
+   - `OPENAI_API_KEY` must be set on Netlify
+   - `GEMINI_API_KEY` can be removed (not used anymore)
+
+2. **If you want to try Gemini/Google image generation in future**:
+   - Use Imagen 3, NOT Gemini 2.0 Flash
+   - Completely different API structure needed
+   - Consider using Google's Vertex AI instead of direct API
+
+3. **Current Status**: 
+   - Image generation works with DALL-E 3
+   - 45-second timeout should prevent most failures
+   - Fallback to temporary URLs if Supabase upload fails
+
 ---
 
 # 📅 Session Summary: Crypto Tokenization System Implementation (June 29, 2025)
