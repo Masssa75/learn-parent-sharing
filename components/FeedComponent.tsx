@@ -56,6 +56,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [editingPostId, setEditingPostId] = useState<string | null>(null)
   const [editFormData, setEditFormData] = useState<{ title: string; description: string; linkUrl: string }>({ title: '', description: '', linkUrl: '' })
+  const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set())
   const router = useRouter()
 
   useEffect(() => {
@@ -249,6 +250,16 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
     } catch {
       return url
     }
+  }
+
+  const togglePostExpansion = (postId: string) => {
+    const newExpanded = new Set(expandedPosts)
+    if (newExpanded.has(postId)) {
+      newExpanded.delete(postId)
+    } else {
+      newExpanded.add(postId)
+    }
+    setExpandedPosts(newExpanded)
   }
 
   const filteredPosts = selectedCategory === 'ALL' 
@@ -448,7 +459,21 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                 <>
                   <h2 className="text-title-lg text-text-primary mb-4">{post.title}</h2>
                   {post.description && (
-                    <p className="text-body text-gray-300 mb-4 leading-relaxed">{post.description}</p>
+                    <div className="mb-4">
+                      <p className={`text-body text-gray-300 leading-relaxed ${
+                        !expandedPosts.has(post.id) ? 'line-clamp-2' : ''
+                      }`}>
+                        {post.description}
+                      </p>
+                      {post.description.length > 150 && (
+                        <button
+                          onClick={() => togglePostExpansion(post.id)}
+                          className="text-brand-yellow hover:text-yellow-400 text-body font-semibold mt-1"
+                        >
+                          {expandedPosts.has(post.id) ? 'Show less' : 'Show more'}
+                        </button>
+                      )}
+                    </div>
                   )}
                 </>
               )}
