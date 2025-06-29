@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
   try {
     const { prompt, title } = await request.json()
 
-    // Check if OpenAI API key is configured
-    const apiKey = process.env.OPENAI_API_KEY
+    // Check if Gemini API key is configured
+    const apiKey = process.env.GEMINI_API_KEY
     if (!apiKey) {
       return NextResponse.json(
         { error: 'Image generation is not configured. Please contact support.' },
@@ -20,30 +20,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create a focused prompt for DALL-E 3
+    // Create a focused prompt for Gemini
     const imagePrompt = `Create a clear, helpful illustration for this parenting tip: "${title}". ${prompt}. Style: Clean, modern, family-friendly illustration with soft colors. Show the technique or concept clearly and safely.`
 
     console.log('Generating image with prompt:', imagePrompt)
 
-    // Use DALL-E 3 model
+    // Use Gemini 2.0 Flash with image generation capability
     const requestBody = {
-      model: 'dall-e-3',
-      prompt: imagePrompt,
-      n: 1,
-      size: '1024x1024',
-      quality: 'standard',
-      style: 'vivid'
+      contents: [{
+        parts: [{
+          text: imagePrompt
+        }]
+      }],
+      generationConfig: {
+        responseModalities: ["TEXT", "IMAGE"], // Critical: Must specify IMAGE for image generation
+        candidateCount: 1
+      }
     }
 
-    // Create an AbortController with 45 second timeout (DALL-E can be slower)
+    // Create an AbortController with 30 second timeout
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 45000)
+    const timeoutId = setTimeout(() => controller.abort(), 30000)
 
-    const response = await fetch('https://api.openai.com/v1/images/generations', {
+    // Use the experimental model that supports image generation
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify(requestBody),
       signal: controller.signal
@@ -51,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const error = await response.json()
-      console.error('OpenAI API error:', error)
+      console.error('Gemini API error:', error)
       console.error('Request body was:', requestBody)
       
       // Provide error information without exposing sensitive details
@@ -65,16 +68,34 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json()
-    console.log('OpenAI API response received')
+    console.log('Gemini API response structure:', JSON.stringify(data, null, 2))
     
-    // Extract the image URL from OpenAI response
-    const temporaryImageUrl = data.data[0].url
+    // Extract the base64 image from Gemini response
+    let imageBase64: string | null = null
+    let generatedText = ""
 
-    // Download the image from OpenAI
-    const imageResponse = await fetch(temporaryImageUrl)
-    const imageBlob = await imageResponse.blob()
-    const arrayBuffer = await imageBlob.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
+    // Process all parts in the response
+    if (data.candidates?.[0]?.content?.parts) {
+      for (const part of data.candidates[0].content.parts) {
+        if (part.text) {
+          generatedText += part.text
+        } else if (part.inlineData?.data) {
+          imageBase64 = part.inlineData.data
+          console.log('Found image data in response')
+        }
+      }
+    }
+
+    if (!imageBase64) {
+      console.error('No image data found. Response structure:', {
+        candidates: data.candidates?.length || 0,
+        parts: data.candidates?.[0]?.content?.parts
+      })
+      throw new Error('No image data in response - ensure responseModalities includes IMAGE')
+    }
+
+    // Convert base64 to buffer
+    const buffer = Buffer.from(imageBase64, 'base64')
 
     // Generate a unique filename
     const timestamp = Date.now()
@@ -104,12 +125,11 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       console.error('Failed to upload to Supabase:', uploadError)
-      // Fallback: return the temporary OpenAI URL
+      // With Gemini, we don't have a temporary URL fallback
       return NextResponse.json({ 
-        imageUrl: temporaryImageUrl,
-        temporary: true,
-        message: 'Using temporary URL. Image will expire in ~1 hour.'
-      })
+        error: 'Failed to upload image to storage',
+        details: uploadError.message
+      }, { status: 500 })
     }
 
     // Get the public URL for the uploaded image

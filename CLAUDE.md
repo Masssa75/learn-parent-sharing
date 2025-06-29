@@ -1291,12 +1291,20 @@ Successfully implemented a comprehensive **crypto tokenization system** with gam
 - Created tables: user_actions, milestones, user_milestones, power_ups, user_power_ups, curation_tracking
 - Applied migration via Supabase dashboard using `fixed-migration.sql`
 - All users now have profile records with points data
+- Fixed profiles table structure (uses user_id as primary key, not id)
 
-#### 2. Points Display UI (Live\!)
+#### 2. Points Display UI (Live and Working!)
 - Created `PointsDisplay.tsx` component with animations
 - Shows: Level badge (1-10), Points counter, XP progress bar, Actions remaining
-- Currently using `HardcodedPointsDisplay.tsx` as temporary implementation
+- Real-time updates when earning points
 - Successfully deployed and visible on the live site
+
+#### 3. Actions API (Fully Functional)
+- Created `/api/actions` endpoint that awards points
+- Like button ("add_to_profile") gives 5 points
+- Save/Share button ("add_to_watchlist") gives 3 points
+- Rate limiting enforced based on user level
+- Points and XP update in real-time in the UI
 
 #### 3. Game Mechanics Architecture
 - **User Levels**: 1-10 based on XP (1000 XP per level)
@@ -1315,56 +1323,77 @@ Successfully implemented a comprehensive **crypto tokenization system** with gam
 
 #### Files Created:
 - `types/points.ts` - TypeScript interfaces for all points-related types
-- `components/PointsDisplay.tsx` - Full points display with animations
-- `components/SimplePointsDisplay.tsx` - Simplified version with API fetch
-- `components/HardcodedPointsDisplay.tsx` - Current temporary implementation
+- `components/PointsDisplay.tsx` - Full points display with animations (NOW ACTIVE)
+- `app/api/actions/route.ts` - Points earning endpoint (WORKING)
 - `app/api/users/[id]/points/route.ts` - API endpoint for fetching user points
 - `supabase/migrations/20250130_add_points_system.sql` - Database migration
 - `fixed-migration.sql` - Working migration that was applied
 
-#### Files Removed (Due to Build Errors):
-- `lib/points-system.ts` - Needs refactoring to accept Supabase client
-- `app/api/actions/route.ts` - Needs import fixes
-- `app/api/admin/file-locks/route.ts` - Had incorrect imports
+#### Testing Scripts Created:
+- `test-points-system.js` - Tests points display
+- `test-points-earning.js` - Tests earning points via UI
+- `test-api-direct.js` - Direct API testing
+- `scripts/ensure-user-profiles.js` - Ensures all users have profiles
+- `scripts/check-devtest-profile.js` - Checks specific user profile
+- `scripts/check-profiles-structure.js` - Verifies table structure
 
 ### 🐛 Issues Encountered & Resolved
 
-1. **Build Failures**: Fixed import errors that were causing deployments to fail
+1. **Build Failures**: Fixed import errors causing deployments to fail
 2. **Database Migration**: Initial migration had conflicts, created `fixed-migration.sql`
-3. **TypeScript Errors**: Fixed auth check to handle profiles data properly
-4. **Deployment Issues**: Removed problematic files to restore successful builds
+3. **TypeScript Errors**: 
+   - Fixed Next.js 15 async params: `{ params: Promise<{ id: string }> }`
+   - Handle nullable `recentActionsCount` with `|| 0`
+4. **Profile Table Structure**: 
+   - Profiles table uses `user_id` as primary key, not `id`
+   - Fixed queries to use correct column names
+5. **UUID Validation**: Target IDs must be valid UUIDs (not strings)
+6. **Missing Columns**: Added `xp_earned` to user_actions insert
 
 ### 📊 Current Status
 
-- ✅ Points display is LIVE and showing on the homepage
+- ✅ Points display is LIVE and showing real user data
 - ✅ Database has all necessary tables and data
 - ✅ API endpoint `/api/users/[id]/points` is working
+- ✅ API endpoint `/api/actions` is working and awarding points
 - ✅ Build and deployment are successful
-- ⏳ Actions system needs to be re-implemented with correct imports
-- ⏳ Real-time points updates not yet connected
+- ✅ Like/Save buttons earning points correctly
+- ✅ Real-time points updates working in UI
+- ✅ Rate limiting enforced (5 actions/hour for level 1-2)
 
-### 🚀 Next Steps for Completion
+### 🚀 Next Steps for Future Development
 
-1. **Re-implement Actions System**
-   - Fix `lib/points-system.ts` to accept Supabase client as parameter
-   - Re-create `/api/actions` endpoint with correct imports
-   - Connect Like/Save buttons to earn points
+1. **Implement Remaining Actions**
+   - **Recommend** action (7 points) - needs UI button
+   - **Flag/Report** action (-2 points) - connect existing Report button
+   - **Comment** action - decide point value and implement
+   - **Create Post** action - award points for content creation
 
-2. **Connect Real User Data**
-   - Update auth check to properly return points data
-   - Replace HardcodedPointsDisplay with real PointsDisplay component
-   - Ensure points update in real-time
+2. **Curation Rewards System**
+   - Track early supporters of content
+   - Award bonus points within 48-hour window
+   - Background job to process rewards
 
-3. **Implement Power-ups UI**
+3. **Milestone Achievements**
+   - First post created (+100 points)
+   - 10 successful curations (+500 points)
+   - Reach level 5 (+1000 points)
+   - Create achievement notification system
+
+4. **Power-ups UI**
    - Add buttons for Spotlight and Scout Badge
    - Create purchase flow with points deduction
    - Show active power-ups and expiration
 
-4. **Add Remaining Features**
+5. **Admin Features**
    - Leaderboard page showing top contributors
-   - Admin export for weekly token distributions
+   - Export tool for weekly token distributions
+   - Points analytics dashboard
+
+6. **Future Enhancements**
    - Referral system with separate points pool
-   - More visual effects and celebrations
+   - TON blockchain integration
+   - Wallet connection for token claims
 
 ### 💡 Key Design Decisions
 
@@ -1376,8 +1405,84 @@ Successfully implemented a comprehensive **crypto tokenization system** with gam
 ### 🔐 Environment Setup Notes
 
 - All test users have profile records with points data
-- `admintest` user (888888888) is Level 1 with 0 points
+- Test users and their current points:
+  - `devtest` (999999999): Level 1, 13 points
+  - `admintest` (888888888): Level 1, 0 points
+  - `admindev` (777777777): Level 1, 0 points
+
+### 📋 Actions Currently Giving Points
+
+| Action | Button Label | Points | Status |
+|--------|-------------|--------|--------|
+| add_to_profile | Like | 5 | ✅ Working |
+| add_to_watchlist | Share | 3 | ✅ Working |
+| recommend | (No UI) | 7 | ❌ Not implemented |
+| flag | Report | -2 | ❌ Not connected |
+
+### 🧪 Testing the Points System
+
+1. **Manual Testing**:
+   ```bash
+   node test-points-earning.js
+   ```
+   - Logs in as devtest
+   - Shows current points
+   - Clicks Like/Save buttons
+   - Verifies points increase
+
+2. **Direct API Testing**:
+   ```bash
+   node test-api-direct.js
+   ```
+   - Tests `/api/actions` endpoint directly
+   - Uses real post IDs
+   - Shows detailed response
+
+3. **Check User Profiles**:
+   ```bash
+   node scripts/check-devtest-profile.js
+   ```
+
+### ⚠️ Important Implementation Notes
+
+1. **Profiles Table Structure**:
+   - Primary key is `user_id`, not `id`
+   - Always use `.eq('user_id', userId)` for queries
+
+2. **Target IDs Must Be UUIDs**:
+   - Post/comment IDs must be valid UUIDs
+   - String IDs will cause "invalid input syntax" error
+
+3. **Required Fields for Actions**:
+   ```javascript
+   {
+     actionType: 'add_to_profile',  // or 'add_to_watchlist'
+     targetType: 'post',            // or 'comment'
+     targetId: 'valid-uuid-here',   // Must be real UUID
+   }
+   ```
+
+4. **Rate Limiting**:
+   - Level 1-2: 5 actions/hour
+   - Level 3-5: 10 actions/hour
+   - Level 6-8: 20 actions/hour
+   - Level 9-10: Unlimited
+
+5. **Points Update Flow**:
+   - User clicks Like/Save → API call to `/api/actions`
+   - Server validates, creates action record, updates points
+   - Response includes new points total
+   - UI updates immediately with new values
 - Database migration must be run via Supabase dashboard SQL editor
 - Points API is accessible at `/api/users/[userId]/points`
 
-The tokenization system foundation is complete and live\! The UI is showing, the database is ready, and the architecture is sound. Just needs the action handlers reconnected to make it fully functional.
+### 🎉 Session Accomplishments
+
+1. **Fixed all TypeScript errors** preventing deployment
+2. **Debugged and fixed profile table queries** (user_id vs id issue)
+3. **Connected Like/Save buttons** to points system
+4. **Verified points earning** works end-to-end
+5. **Created comprehensive test suite** for future development
+6. **Documented all technical gotchas** for next developer
+
+**The tokenization system is now FULLY FUNCTIONAL!** Users can earn points by liking and saving posts, with real-time UI updates and proper rate limiting. The foundation is complete and ready for expansion to additional features.

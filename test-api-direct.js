@@ -68,7 +68,7 @@ async function testActionsAPI() {
   const actionData = JSON.stringify({
     actionType: 'add_to_profile',
     targetType: 'post',
-    targetId: 'test-post-id'
+    targetId: '52cf556c-5cd1-4cf4-bdf6-9020f0510e3d'
   });
   
   const actionOptions = {
