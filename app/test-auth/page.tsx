@@ -9,7 +9,7 @@ export default function TestAuthPage() {
   const [password, setPassword] = useState('')
   const router = useRouter()
   
-  const testDevLogin = async () => {
+  const testDevLogin = async (telegramId: number = 999999999) => {
     if (!password) {
       setStatus('Error: Password is required')
       return
@@ -23,7 +23,7 @@ export default function TestAuthPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ password, telegramId }),
       })
       
       const data = await response.json()
@@ -69,12 +69,26 @@ export default function TestAuthPage() {
             </p>
           </div>
           
-          <button
-            onClick={testDevLogin}
-            className="bg-brand-yellow text-black px-6 py-3 rounded-button font-semibold hover:scale-[1.02] transition-transform"
-          >
-            Login as Dev Test User
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => testDevLogin(999999999)}
+              className="bg-brand-yellow text-black px-6 py-3 rounded-button font-semibold hover:scale-[1.02] transition-transform"
+            >
+              Login as devtest
+            </button>
+            <button
+              onClick={() => testDevLogin(888888888)}
+              className="bg-blue-500 text-white px-6 py-3 rounded-button font-semibold hover:scale-[1.02] transition-transform"
+            >
+              Login as admintest
+            </button>
+            <button
+              onClick={() => testDevLogin(777777777)}
+              className="bg-purple-500 text-white px-6 py-3 rounded-button font-semibold hover:scale-[1.02] transition-transform"
+            >
+              Login as admindev
+            </button>
+          </div>
           
           {status && (
             <div className="mt-4 p-4 bg-dark-bg rounded border border-dark-border">

@@ -14,9 +14,9 @@ export async function POST(request: NextRequest) {
       }, { status: 403 })
     }
 
-    // Get password from request body
+    // Get password and telegramId from request body
     const body = await request.json().catch(() => ({}))
-    const { password } = body
+    const { password, telegramId } = body
 
     // Check password
     const DEV_PASSWORD = process.env.DEV_LOGIN_PASSWORD || 'test-learn-2025'
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     // Try to fetch the pre-created test user
     // This user must be created manually in Supabase dashboard first
-    const TEST_TELEGRAM_ID = 999999999 // Using a different ID to avoid conflicts
+    const TEST_TELEGRAM_ID = telegramId || 999999999 // Allow specifying which test user
     
     const { data: testUser, error } = await supabase
       .from('users')
@@ -43,6 +43,14 @@ export async function POST(request: NextRequest) {
       .single()
     
     if (error || !testUser) {
+      const userInfo = {
+        999999999: { username: 'devtest', firstName: 'Dev', lastName: 'Test' },
+        888888888: { username: 'admintest', firstName: 'Admin', lastName: 'Test' },
+        777777777: { username: 'admindev', firstName: 'Admin', lastName: 'Developer' }
+      }
+      
+      const info = userInfo[TEST_TELEGRAM_ID] || { username: 'testuser', firstName: 'Test', lastName: 'User' }
+      
       return NextResponse.json({ 
         error: 'Test user not found',
         instructions: [
@@ -50,9 +58,9 @@ export async function POST(request: NextRequest) {
           '2. Navigate to Table Editor > users',
           '3. Insert a new row with:',
           `   - telegram_id: ${TEST_TELEGRAM_ID}`,
-          '   - telegram_username: devtest',
-          '   - first_name: Dev',
-          '   - last_name: Test',
+          `   - telegram_username: ${info.username}`,
+          `   - first_name: ${info.firstName}`,
+          `   - last_name: ${info.lastName}`,
           '   - photo_url: null (optional)',
           '4. Save and try again'
         ]

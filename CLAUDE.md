@@ -770,3 +770,24 @@ const categoryMap = {
 - Add comment system
 - Create user onboarding flow
 - Add image upload support
+
+## 🛠️ Supabase CLI Access
+
+The Supabase CLI is available via `npx` command:
+```bash
+npx supabase --version  # Returns: 2.26.9
+```
+
+To execute SQL migrations or other Supabase operations:
+```bash
+# Link to project (already done)
+npx supabase link --project-ref yvzinotrjggncbwflxok
+
+# Apply migrations
+npx supabase db push
+
+# Execute SQL directly
+npx supabase db execute --sql "YOUR SQL HERE"
+```
+
+Note: The service role key and project credentials are stored in the .env file.
