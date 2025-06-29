@@ -38,8 +38,14 @@ export default function FileLockManager() {
       if (!res.ok) throw new Error('Failed to fetch locks')
       
       const data = await res.json()
-      setLocks(data.locks)
+      setLocks(data.locks || [])
       setLoading(false)
+      setError('') // Clear any previous errors
+      
+      // Check if we need to show table creation message
+      if (data.message && data.message.includes('not created yet')) {
+        setError(data.message)
+      }
     } catch (err) {
       setError('Failed to load file locks')
       setLoading(false)
@@ -95,6 +101,56 @@ export default function FileLockManager() {
   }
 
   if (loading) return <div className="text-gray-600">Loading file locks...</div>
+  
+  if (error && error.includes('not created yet')) {
+    return (
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">File Lock Manager</h2>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-yellow-800 mb-3">{error}</p>
+          <p className="text-sm text-gray-600 mb-3">
+            To enable file locks, please execute the following SQL in your Supabase dashboard:
+          </p>
+          <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
+{`CREATE TABLE file_locks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  file_path TEXT NOT NULL UNIQUE,
+  locked_by TEXT NOT NULL,
+  locked_at TIMESTAMPTZ DEFAULT NOW(),
+  expires_at TIMESTAMPTZ NOT NULL,
+  status TEXT NOT NULL DEFAULT 'locked' CHECK (status IN ('locked', 'reserved')),
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_file_locks_path ON file_locks(file_path);
+CREATE INDEX idx_file_locks_expires ON file_locks(expires_at);
+
+ALTER TABLE file_locks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "view_file_locks" ON file_locks
+  FOR SELECT USING (true);
+
+CREATE POLICY "create_file_locks" ON file_locks
+  FOR INSERT WITH CHECK (true);
+  
+CREATE POLICY "manage_file_locks" ON file_locks
+  FOR ALL USING (true);`}
+          </pre>
+          <a 
+            href="https://supabase.com/dashboard/project/yvzinotrjggncbwflxok/sql" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-block mt-3 text-sm text-blue-600 hover:text-blue-800"
+          >
+            Open Supabase SQL Editor →
+          </a>
+        </div>
+      </div>
+    )
+  }
+  
   if (error) return <div className="text-red-600">{error}</div>
 
   return (
