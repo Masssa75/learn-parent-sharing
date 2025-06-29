@@ -1,11 +1,15 @@
-import { createClient } from '@/app/utils/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
 export async function GET() {
   try {
     const cookieStore = await cookies()
-    const supabase = await createClient()
+    
+    // Create Supabase client with service role key
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
     // Check if user is admin
     const sessionCookie = cookieStore.get('session')
@@ -61,7 +65,11 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const cookieStore = await cookies()
-    const supabase = await createClient()
+    
+    // Create Supabase client with service role key
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
     // Check authentication
     const sessionCookie = cookieStore.get('session')
@@ -135,7 +143,11 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const cookieStore = await cookies()
-    const supabase = await createClient()
+    
+    // Create Supabase client with service role key
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
     
     // Check authentication
     const sessionCookie = cookieStore.get('session')
