@@ -11,7 +11,7 @@ export function toTitleCase(str: string): string {
   ];
 
   // List of words that should remain uppercase
-  const uppercaseWords = ['AI', 'API', 'CEO', 'CTO', 'FAQ', 'HR', 'ID', 'IT', 'URL', 'USA', 'UK'];
+  const uppercaseWords = ['AI', 'API', 'CEO', 'CTO', 'FAQ', 'HR', 'ID', 'IT', 'URL', 'USA', 'UK', 'LEGO'];
 
   return str
     .split(' ')
