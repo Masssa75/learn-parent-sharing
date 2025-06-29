@@ -211,35 +211,26 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                 className="w-12 h-12 bg-brand-yellow rounded-avatar flex items-center justify-center overflow-hidden relative group"
                 title={user?.displayName || 'Profile'}
               >
-                {user?.photoUrl ? (
+                {user?.photoUrl && (
                   <img 
                     src={user.photoUrl} 
                     alt={user.displayName}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover absolute inset-0"
                     onError={(e) => {
                       const img = e.currentTarget as HTMLImageElement
                       img.style.display = 'none'
-                      const span = img.parentElement?.querySelector('span') as HTMLElement
-                      if (span) {
-                        span.style.display = 'flex'
-                      }
                     }}
                     onLoad={(e) => {
                       const img = e.currentTarget as HTMLImageElement
-                      // Check if image actually loaded properly
+                      // Hide image if it didn't load properly
                       if (img.naturalWidth === 0 || img.naturalHeight === 0) {
                         img.style.display = 'none'
-                        const span = img.parentElement?.querySelector('span') as HTMLElement
-                        if (span) {
-                          span.style.display = 'flex'
-                        }
                       }
                     }}
                   />
-                ) : null}
+                )}
                 <span 
-                  className={`${user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'} items-center justify-center w-full h-full`}
-                  style={{ display: user?.photoUrl ? 'none' : 'flex' }}
+                  className={`${user?.firstName ? 'text-black font-semibold text-2xl' : 'text-xl'} flex items-center justify-center w-full h-full`}
                 >
                   {user?.firstName ? user.firstName.charAt(0).toUpperCase() : (user ? 'U' : '👤')}
                 </span>

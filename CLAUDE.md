@@ -855,3 +855,103 @@ const userInfo: Record<number, { username: string; firstName: string; lastName: 
   // ...
 }
 ```
+
+## 📅 Session Summary: UI Improvements & Profile Photos (June 29, 2025)
+
+### 🎯 Responsive Design Implementation
+Successfully added responsive margins to center content on desktop screens:
+
+1. **Create Page** (`/create`)
+   - Wrapped all sections in `max-w-2xl mx-auto` containers
+   - Desktop: Content centered at 672px max width
+   - Mobile: Full width maintained
+
+2. **Main Feed** (`/`)
+   - Applied same responsive wrapper to header, categories, and posts
+   - Consistent layout across all pages
+   - Removed duplicate "Join the community!" login prompt at bottom
+
+### 🔍 Profile Photo Investigation
+
+#### Problem Identified:
+- Telegram photo URLs (e.g., `https://t.me/i/userpic/320/...`) are blocked by CORS
+- Browser security prevents loading these images from Telegram's servers
+- Images fail silently without triggering error handlers reliably
+
+#### Current Status:
+- Database correctly stores `photo_url` from Telegram
+- Auth system captures and saves the photo URL
+- Fallback to initials works for users without photos (devtest shows "D")
+- Users with Telegram photos show blank yellow circle due to CORS
+
+#### Attempted Fixes:
+1. Added `onError` handler to show initials when image fails
+2. Added `onLoad` handler to check for 0-dimension images
+3. Changed from class-based to inline style management
+
+#### Root Cause:
+CORS policy blocks Telegram image URLs from loading in browsers. This is a Telegram security feature, not a bug in our code.
+
+### 📋 Next Steps (To Be Implemented)
+
+#### Direct Image Storage Solution:
+Instead of storing just the URL, we should:
+1. Download the image during Telegram authentication
+2. Store it in Supabase Storage
+3. Save our own URL in the database
+4. This bypasses CORS issues completely
+
+Implementation plan:
+```typescript
+// In /api/auth/telegram/route.ts
+if (authData.photo_url) {
+  const imageData = await fetch(authData.photo_url)
+  const blob = await imageData.blob()
+  const { data: upload } = await supabase.storage
+    .from('avatars')
+    .upload(`${authData.id}.jpg`, blob)
+  // Store upload.path instead of telegram URL
+}
+```
+
+### 🧪 Testing Commands
+
+Test profile display with dev users:
+```bash
+# Login as devtest (no photo - shows "D")
+node test-dev-login-initial.js
+
+# Check user data in database
+node scripts/check-user-photo.js
+```
+
+### 📝 Key Files Modified This Session
+- `/components/FeedComponent.tsx` - Responsive margins & profile photo handling
+- `/app/create/page.tsx` - Responsive margins for create form
+- Various test scripts for debugging photo issues
+
+### 🔧 Profile Display Fix (Final Solution)
+
+#### The 3-State Problem:
+1. **No photo** (`photoUrl: null`) → Shows initial ✅
+2. **Working photo** → Shows image ✅
+3. **Broken photo** (CORS blocked) → Empty yellow ❌
+
+#### Why It Happened:
+The span was conditionally hidden at render time based on `photoUrl` existence, not image load success.
+
+#### The Fix:
+- **Always render the span** with the initial
+- Position the image absolutely on top when it loads successfully
+- If image fails, it hides itself, revealing the span underneath
+- This ensures we only have 2 visual states: image or initial
+
+```tsx
+// Old: Conditional rendering based on photoUrl existence
+{user?.photoUrl ? <img/> : null}
+<span style={{ display: user?.photoUrl ? 'none' : 'flex' }}>
+
+// New: Always show span, image covers it when successful
+{user?.photoUrl && <img className="absolute inset-0" />}
+<span className="flex">
+```
