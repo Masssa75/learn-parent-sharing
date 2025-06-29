@@ -67,10 +67,16 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json()
+    console.log('Gemini API response structure:', JSON.stringify(data, null, 2))
     
     // Extract the base64 image from Gemini response
     const imageData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData
     if (!imageData || !imageData.data) {
+      console.error('No image data found. Response structure:', {
+        candidates: data.candidates?.length || 0,
+        firstCandidate: data.candidates?.[0],
+        parts: data.candidates?.[0]?.content?.parts
+      })
       throw new Error('No image data in response')
     }
 
@@ -126,6 +132,11 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Image generation error:', error)
+    console.error('Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    })
     
     // Check if it's a timeout error
     if (error instanceof Error && error.name === 'AbortError') {
@@ -135,8 +146,13 @@ export async function POST(request: NextRequest) {
       )
     }
     
+    // Return more detailed error in development
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Failed to generate image' },
+      { 
+        error: 'Failed to generate image',
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     )
   }
