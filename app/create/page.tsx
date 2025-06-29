@@ -134,10 +134,12 @@ export default function CreatePage() {
     }
     
     if (!voiceTranscript.trim()) {
+      alert('No speech detected. Please try recording again.')
       return
     }
     
     setIsProcessing(true)
+    setAiProcessedData(null) // Clear previous data
     
     try {
       const response = await fetch('/api/ai/gemini', {
@@ -152,10 +154,16 @@ export default function CreatePage() {
       })
       
       if (!response.ok) {
-        throw new Error('Failed to process with AI')
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to process with AI')
       }
       
       const data = await response.json()
+      
+      // Ensure we have all required fields
+      if (!data.title || !data.description || !data.category || !data.ageRange) {
+        throw new Error('AI response missing required fields')
+      }
       
       setAiProcessedData({
         title: data.title,
@@ -172,7 +180,8 @@ export default function CreatePage() {
       
     } catch (error) {
       console.error('AI processing error:', error)
-      alert('Failed to process with AI. Please try again.')
+      alert(`Failed to process with AI: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`)
+      setVoiceTranscript('') // Clear transcript so user can try again
     } finally {
       setIsProcessing(false)
     }
@@ -452,24 +461,37 @@ export default function CreatePage() {
                 onClick={toggleRecording}
                 className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
                   isRecording
-                    ? 'bg-red-500 animate-pulse'
+                    ? 'bg-red-500 hover:bg-red-600'
                     : 'bg-brand-yellow hover:scale-105'
                 }`}
               >
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className={isRecording ? 'text-white' : 'text-black'}>
-                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                  <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" strokeWidth="2"></line>
-                  <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" strokeWidth="2"></line>
-                </svg>
+                {isRecording ? (
+                  // Stop icon
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                  </svg>
+                ) : (
+                  // Microphone icon
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-black">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" strokeWidth="2"></line>
+                    <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" strokeWidth="2"></line>
+                  </svg>
+                )}
               </button>
               {isRecording && (
                 <div className="absolute inset-0 w-24 h-24 border-3 border-brand-yellow rounded-full animate-ping"></div>
               )}
             </div>
-            <p className="text-text-muted text-body">
-              {isProcessing ? 'AI is processing...' : isRecording ? 'Listening...' : 'Tap to start speaking'}
+            <p className="text-text-muted text-body mb-2">
+              {isProcessing ? 'AI is processing your recording...' : isRecording ? 'Tap to stop recording' : 'Tap to start speaking'}
             </p>
+            {isRecording && (
+              <p className="text-text-secondary text-sm">
+                Speak naturally about your experience with this product
+              </p>
+            )}
             {(voiceTranscript || interimTranscript) && !isProcessing && (
               <div className="mt-4 p-3 bg-dark-surface rounded-card">
                 <p className="text-text-secondary text-sm">

@@ -16,30 +16,34 @@ export async function POST(request: Request) {
     }
     
     // Construct the prompt for Gemini
-    const prompt = `You are helping a parent share their discovery with other parents. They've provided a link to ${linkUrl} and described their experience.
+    const prompt = `You are an expert parent content curator helping to create engaging posts for a parenting community platform. 
 
-Their description: "${transcript}"
+A parent wants to share: ${linkUrl}
+Their experience: "${transcript}"
 
-Based on their description and the link they're sharing, create:
-1. A catchy, engaging title (max 60 characters) that captures the essence of why this helped them
-2. A clear, concise description (max 200 characters) that explains the benefit to other parents
+Create a compelling post that other parents will find valuable. The title should grab attention and clearly communicate the benefit. The description should expand on why this is helpful for parents.
 
-Format your response as JSON:
+IMPORTANT: Your response must be valid JSON with these exact fields:
 {
-  "title": "Your catchy title here",
-  "description": "Your clear description here",
-  "category": "app|toy|video|website|tip",
-  "suggestedAge": "0-2|3-5|5-7|6-8|8+"
+  "title": "Engaging title that highlights the key benefit (MAX 60 chars)",
+  "description": "Clear explanation of why this helps parents/kids (MAX 200 chars)",
+  "category": "Choose ONE: app|toy|video|website|tip",
+  "suggestedAge": "Choose ONE: 0-2|3-5|5-7|6-8|8+"
 }
 
-Determine the category based on the link:
-- YouTube/video links → "video"
-- App store links → "app"
-- Amazon/shopping links → "toy"
-- Other websites → "website"
-- No specific link → "tip"
+Category guidelines:
+- "app" for mobile apps, software, digital tools
+- "toy" for physical toys, games, books, products
+- "video" for YouTube videos, educational content
+- "website" for useful websites, online resources
+- "tip" for parenting advice, strategies, experiences
 
-Determine age range from their description or make a reasonable guess based on the content.`
+Title examples:
+- "Khan Academy Kids: Free Learning That Actually Works"
+- "The LEGO Set That Kept My 5yo Busy for Hours"
+- "Screen-Free Activity That Saved Our Rainy Day"
+
+Make the title specific and benefit-focused. Avoid generic phrases like "Great app" or "Nice toy".`
 
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
@@ -86,10 +90,19 @@ Determine age range from their description or make a reasonable guess based on t
       
       const parsedResponse = JSON.parse(jsonMatch[0])
       
+      // Map AI categories to our form categories
+      const categoryMap: Record<string, string> = {
+        'app': 'apps',
+        'toy': 'toys',
+        'video': 'education',
+        'website': 'apps',
+        'tip': 'tips'
+      }
+      
       return NextResponse.json({
         title: parsedResponse.title || 'My parenting discovery',
         description: parsedResponse.description || transcript.substring(0, 200),
-        category: parsedResponse.category || 'tip',
+        category: categoryMap[parsedResponse.category] || 'tips',
         ageRange: parsedResponse.suggestedAge || '3-5',
         originalTranscript: transcript
       })
@@ -99,7 +112,7 @@ Determine age range from their description or make a reasonable guess based on t
       return NextResponse.json({
         title: 'My parenting discovery',
         description: transcript.substring(0, 200),
-        category: linkUrl.includes('youtube.com') ? 'video' : 'website',
+        category: linkUrl.includes('youtube.com') ? 'education' : 'tips',
         ageRange: '3-5',
         originalTranscript: transcript
       })

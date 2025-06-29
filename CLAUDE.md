@@ -1,3 +1,11 @@
+# IMPORTANT: Git Repository Location
+
+⚠️ **THIS IS THE ACTUAL GIT REPOSITORY** ⚠️
+- You are in: `/app/` directory 
+- This is where all code changes should be made
+- Remote: https://github.com/Masssa75/learn-parent-sharing.git
+- Do NOT create a git repo in the parent directory
+
 # Learn - Parent Sharing Platform
 
 ## Project Overview
