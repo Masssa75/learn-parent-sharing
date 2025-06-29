@@ -1237,44 +1237,50 @@ Successfully processed and formatted 7 parenting tips:
 - User reported "Failed to generate image" errors
 - Initial attempt to switch from OpenAI DALL-E 3 to Gemini for faster generation
 
-### 🎯 What We Learned
-1. **Gemini 2.0 Flash CANNOT generate images**
-   - Only processes/analyzes existing images
-   - This was the root cause of the failures
+### 🎯 What We Learned (CORRECTED)
+1. **Gemini 2.0 Flash CAN generate images** (with proper configuration)
+   - Initial information was outdated
+   - Must use `responseModalities: ["TEXT", "IMAGE"]` in the request
+   - Must use experimental models like `gemini-2.0-flash-exp`
    
-2. **Google's Image Generation Options**:
-   - **Imagen 3**: Google's actual image generation model
-   - Different API format than Gemini
-   - Requires different endpoint: `imagen-3.0-generate-001:predict`
+2. **Critical Configuration for Gemini Image Generation**:
+   ```javascript
+   generationConfig: {
+     responseModalities: ["TEXT", "IMAGE"], // REQUIRED for image output
+     candidateCount: 1
+   }
+   ```
    
-3. **Speed Comparison** (when working):
-   - DALL-E 3: 20-30+ seconds, sometimes timeouts
-   - Gemini 2.0 Flash: N/A (doesn't generate images)
-   - Imagen 3: Would be faster but implementation was incorrect
+3. **Response Structure**:
+   - Images returned as base64 in `part.inlineData.data`
+   - Can include both text and image parts in response
+   - Process all parts to extract image data
 
 ### 🔧 Final Solution
-- **Reverted to OpenAI DALL-E 3**
-- Increased timeout from 30s to 45s
-- Added better error logging
-- Kept temporary URL fallback
+- **Implemented Gemini 2.0 Flash with correct configuration**
+- Model: `gemini-2.0-flash-exp`
+- Set `responseModalities` to include "IMAGE"
+- Process response parts to extract base64 image
+- 30-second timeout for faster performance
 
 ### 📝 Key Files Modified
-- `/app/api/ai/generate-image/route.ts` - Reverted to DALL-E 3
+- `/app/api/ai/generate-image/route.ts` - Updated to use Gemini correctly
 
 ### ⚠️ Important Notes
 1. **Environment Variables Required**:
-   - `OPENAI_API_KEY` must be set on Netlify
-   - `GEMINI_API_KEY` can be removed (not used anymore)
+   - `GEMINI_API_KEY` must be set on Netlify
+   - `OPENAI_API_KEY` no longer needed
 
-2. **If you want to try Gemini/Google image generation in future**:
-   - Use Imagen 3, NOT Gemini 2.0 Flash
-   - Completely different API structure needed
-   - Consider using Google's Vertex AI instead of direct API
+2. **Key Takeaways**:
+   - Always check latest documentation - AI capabilities evolve rapidly
+   - `responseModalities` is critical for multimodal output
+   - Experimental models (`-exp` suffix) often have newest features
+   - Gemini can generate both text and images in single response
 
 3. **Current Status**: 
-   - Image generation works with DALL-E 3
-   - 45-second timeout should prevent most failures
-   - Fallback to temporary URLs if Supabase upload fails
+   - Image generation uses Gemini 2.0 Flash
+   - Should be faster than DALL-E 3
+   - No temporary URL fallback (must upload to Supabase)
 
 ---
 
