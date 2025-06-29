@@ -46,50 +46,61 @@ export default function CreatePage() {
   
   // Initialize speech recognition
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition
-      const recognitionInstance = new SpeechRecognition()
+    if (typeof window !== 'undefined') {
+      // Check for webkitSpeechRecognition (Chrome) or SpeechRecognition (standard)
+      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
       
-      recognitionInstance.continuous = true
-      recognitionInstance.interimResults = true
-      recognitionInstance.lang = 'en-US'
-      
-      recognitionInstance.onresult = (event: any) => {
-        let interim = ''
-        let final = ''
+      if (SpeechRecognition) {
+        const recognitionInstance = new SpeechRecognition()
         
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript
-          if (event.results[i].isFinal) {
-            final += transcript + ' '
-          } else {
-            interim += transcript
+        recognitionInstance.continuous = true
+        recognitionInstance.interimResults = true
+        recognitionInstance.lang = 'en-US'
+        
+        recognitionInstance.onresult = (event: any) => {
+          let interim = ''
+          let final = ''
+          
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript
+            if (event.results[i].isFinal) {
+              final += transcript + ' '
+            } else {
+              interim += transcript
+            }
           }
+          
+          if (final) {
+            setVoiceTranscript(prev => prev + final)
+          }
+          setInterimTranscript(interim)
         }
         
-        if (final) {
-          setVoiceTranscript(prev => prev + final)
+        recognitionInstance.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error)
+          if (event.error === 'not-allowed') {
+            alert('Microphone access was denied. Please allow microphone access and try again.')
+          } else if (event.error === 'no-speech') {
+            // Ignore no-speech errors, they're common
+          } else {
+            alert(`Speech recognition error: ${event.error}`)
+          }
+          setIsRecording(false)
         }
-        setInterimTranscript(interim)
+        
+        recognitionInstance.onend = () => {
+          setIsRecording(false)
+        }
+        
+        setRecognition(recognitionInstance)
       }
-      
-      recognitionInstance.onerror = (event: any) => {
-        console.error('Speech recognition error:', event.error)
-        setIsRecording(false)
-      }
-      
-      recognitionInstance.onend = () => {
-        setIsRecording(false)
-      }
-      
-      setRecognition(recognitionInstance)
     }
   }, [])
   
   // Handle recording toggle
-  const toggleRecording = () => {
+  const toggleRecording = async () => {
     if (!recognition) {
-      alert('Speech recognition is not supported in your browser. Please use Chrome.')
+      alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.')
       return
     }
     
@@ -100,10 +111,18 @@ export default function CreatePage() {
         processWithAI()
       }
     } else {
-      setVoiceTranscript('')
-      setInterimTranscript('')
-      recognition.start()
-      setIsRecording(true)
+      try {
+        // Request microphone permission first
+        await navigator.mediaDevices.getUserMedia({ audio: true })
+        
+        setVoiceTranscript('')
+        setInterimTranscript('')
+        recognition.start()
+        setIsRecording(true)
+      } catch (error) {
+        console.error('Microphone access error:', error)
+        alert('Microphone access is required for voice recording. Please allow microphone access and try again.')
+      }
     }
   }
   
@@ -451,6 +470,14 @@ export default function CreatePage() {
             <p className="text-text-muted text-body">
               {isProcessing ? 'AI is processing...' : isRecording ? 'Listening...' : 'Tap to start speaking'}
             </p>
+            {(voiceTranscript || interimTranscript) && !isProcessing && (
+              <div className="mt-4 p-3 bg-dark-surface rounded-card">
+                <p className="text-text-secondary text-sm">
+                  {voiceTranscript}
+                  <span className="text-text-muted italic">{interimTranscript}</span>
+                </p>
+              </div>
+            )}
           </div>
           
           {/* AI Processing Animation */}
