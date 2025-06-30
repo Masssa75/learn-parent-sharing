@@ -23,21 +23,12 @@ export default function CreatePage() {
   const [category, setCategory] = useState('')
   const [selectedAges, setSelectedAges] = useState<string[]>([])
   const [link, setLink] = useState('')
-  const [inputMode, setInputMode] = useState<'manual' | 'voice'>('manual') // Default to manual
+  // Removed inputMode - recording is now integrated into the main form
   const [isRecording, setIsRecording] = useState(false)
-  const [voiceTranscript, setVoiceTranscript] = useState('')
-  const [isProcessing, setIsProcessing] = useState(false)
   const [recognition, setRecognition] = useState<any>(null)
   const [interimTranscript, setInterimTranscript] = useState('')
-  const [isManualStop, setIsManualStop] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [uploadingImage, setUploadingImage] = useState(false)
-  const [aiProcessedData, setAiProcessedData] = useState<{
-    title: string
-    description: string
-    category: string
-    ageRange: string
-  } | null>(null)
   const [generatedTitles, setGeneratedTitles] = useState<string[]>([])
   const [isGeneratingTitles, setIsGeneratingTitles] = useState(false)
   const [selectedTitleIndex, setSelectedTitleIndex] = useState<number | null>(null)
@@ -125,7 +116,14 @@ export default function CreatePage() {
           }
           
           if (final) {
-            setVoiceTranscript(prev => prev + final)
+            // Append to description instead of separate transcript
+            setDescription(prev => prev + (prev ? ' ' : '') + final)
+            // Auto-resize textarea
+            const textarea = document.querySelector('textarea') as HTMLTextAreaElement
+            if (textarea) {
+              textarea.style.height = 'auto'
+              textarea.style.height = textarea.scrollHeight + 'px'
+            }
           }
           setInterimTranscript(interim)
         }
@@ -171,25 +169,15 @@ export default function CreatePage() {
     
     if (isRecording) {
       // Stop recording
-      setIsManualStop(true)
       recognition.stop()
       setIsRecording(false)
-      
-      // Process after a short delay to ensure transcript is finalized
-      setTimeout(() => {
-        setIsManualStop(false)
-        if (voiceTranscript) {
-          processWithAI()
-        }
-      }, 100)
+      setInterimTranscript('')
     } else {
       try {
         // Request microphone permission first
         await navigator.mediaDevices.getUserMedia({ audio: true })
         
-        setVoiceTranscript('')
         setInterimTranscript('')
-        setIsManualStop(false)
         recognition.start()
         setIsRecording(true)
       } catch (error) {
@@ -199,70 +187,7 @@ export default function CreatePage() {
     }
   }
   
-  // Process with Gemini AI
-  const processWithAI = async () => {
-    if (!voiceTranscript.trim()) {
-      alert('No speech detected. Please try recording again.')
-      return
-    }
-    
-    setIsProcessing(true)
-    setAiProcessedData(null) // Clear previous data
-    
-    try {
-      const response = await fetch('/api/ai/gemini', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          transcript: voiceTranscript,
-          linkUrl: link || ''
-        })
-      })
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Failed to process with AI')
-      }
-      
-      const data = await response.json()
-      
-      // Ensure we have all required fields
-      if (!data.title || !data.description || !data.category || !data.ageRange) {
-        throw new Error('AI response missing required fields')
-      }
-      
-      setAiProcessedData({
-        title: data.title,
-        description: data.description,
-        category: data.category,
-        ageRange: data.ageRange
-      })
-      
-      // Set the form fields
-      setTitle(data.title)
-      setDescription(data.description)
-      setCategory(data.category)
-      setSelectedAges([data.ageRange])
-      
-    } catch (error) {
-      console.error('AI processing error:', error)
-      alert(`Failed to process with AI: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`)
-      setVoiceTranscript('') // Clear transcript so user can try again
-    } finally {
-      setIsProcessing(false)
-    }
-  }
-  
-  
-  // Handle voice submit
-  const handleVoiceSubmit = async () => {
-    if (!aiProcessedData || !link) return
-    
-    // Use the same submit logic as manual form
-    handleSubmit(new Event('submit') as any)
-  }
+  // Removed processWithAI and handleVoiceSubmit - no longer needed
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -332,46 +257,8 @@ export default function CreatePage() {
         </div>
       </div>
       
-      {/* Input Mode Toggle */}
-      <div className="bg-black border-b border-dark-border">
-        <div className="max-w-2xl mx-auto px-5 py-4">
-          <div className="flex gap-2.5">
-        <button
-          onClick={() => setInputMode('manual')}
-          className={`flex-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded-input font-medium text-body transition-all ${
-            inputMode === 'manual'
-              ? 'bg-brand-yellow text-black'
-              : 'bg-transparent text-text-secondary border border-dark-border hover:border-text-muted'
-          }`}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-          Write
-        </button>
-        <button
-          onClick={() => setInputMode('voice')}
-          className={`flex-1 flex items-center justify-center gap-2 px-5 py-2.5 rounded-input font-medium text-body transition-all ${
-            inputMode === 'voice'
-              ? 'bg-brand-yellow text-black'
-              : 'bg-transparent text-text-secondary border border-dark-border hover:border-text-muted'
-          }`}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-            <line x1="12" y1="19" x2="12" y2="23"></line>
-            <line x1="8" y1="23" x2="16" y2="23"></line>
-          </svg>
-          Speak with AI
-        </button>
-          </div>
-        </div>
-      </div>
       
       {/* Form */}
-      {inputMode === 'manual' ? (
         <div className="max-w-2xl mx-auto">
           <form onSubmit={handleSubmit} className="p-5 space-y-5">
           {/* Link URL - Moved to top */}
@@ -398,8 +285,8 @@ export default function CreatePage() {
             )}
           </div>
           
-          {/* Description - Now the primary input */}
-          <div>
+          {/* Description - Now the primary input with recording option */}
+          <div className="relative">
             <textarea
               value={description}
               onChange={(e) => {
@@ -414,10 +301,42 @@ export default function CreatePage() {
               }}
               placeholder="Describe your tip or what you learned today..."
               rows={5}
-              className="w-full bg-black border border-dark-border rounded-input px-4 py-4 text-text-primary text-lg placeholder-text-muted outline-none focus:border-brand-yellow transition-colors resize-y overflow-hidden"
+              className="w-full bg-black border border-dark-border rounded-input px-4 py-4 pr-14 text-text-primary text-lg placeholder-text-muted outline-none focus:border-brand-yellow transition-colors resize-y overflow-hidden"
               style={{ minHeight: '150px' }}
               required
             />
+            {/* Recording button inside textarea */}
+            <button
+              type="button"
+              onClick={toggleRecording}
+              className={`absolute bottom-3 right-3 p-2.5 rounded-full transition-all ${
+                isRecording
+                  ? 'bg-red-500 hover:bg-red-600 animate-pulse'
+                  : 'bg-dark-surface hover:bg-dark-border border border-dark-border'
+              }`}
+              title={isRecording ? 'Stop recording' : 'Record your tip'}
+            >
+              {isRecording ? (
+                // Stop icon
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+                  <rect x="6" y="6" width="12" height="12" rx="2" />
+                </svg>
+              ) : (
+                // Microphone icon
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-muted">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                  <line x1="12" y1="19" x2="12" y2="23"></line>
+                  <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+              )}
+            </button>
+            {/* Show interim transcript while recording */}
+            {isRecording && interimTranscript && (
+              <div className="absolute bottom-14 right-3 bg-dark-surface px-3 py-1 rounded-card text-sm text-text-muted italic max-w-xs">
+                {interimTranscript}
+              </div>
+            )}
           </div>
           
           {/* Generate Title Button and Title Selection */}
@@ -621,130 +540,6 @@ export default function CreatePage() {
           </div>
         </form>
         </div>
-      ) : (
-        /* Voice Input Interface */
-        <div className="max-w-2xl mx-auto">
-          <div className="p-5 space-y-5">
-          {/* Link URL Input for Voice Mode */}
-          <div className="relative">
-            {link && isYouTubeUrl(link) ? (
-              <YouTubePreview 
-                url={link} 
-                onRemove={() => setLink('')} 
-              />
-            ) : (
-              <div className="relative">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                </svg>
-                <input
-                  type="url"
-                  value={link}
-                  onChange={(e) => setLink(e.target.value)}
-                  placeholder="Paste link to app, video, or website"
-                  className="w-full bg-black border border-dark-border rounded-input pl-12 pr-4 py-3 text-text-primary text-body placeholder-text-muted outline-none focus:border-brand-yellow transition-colors"
-                />
-              </div>
-            )}
-          </div>
-          
-          {/* Voice Recording Interface */}
-          <div className="text-center py-10">
-            <div className="relative inline-block mb-5">
-              <button
-                onClick={toggleRecording}
-                className={`w-24 h-24 rounded-full flex items-center justify-center transition-all ${
-                  isRecording
-                    ? 'bg-red-500 hover:bg-red-600'
-                    : 'bg-brand-yellow hover:scale-105'
-                }`}
-              >
-                {isRecording ? (
-                  // Stop icon
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-white">
-                    <rect x="6" y="6" width="12" height="12" rx="2" />
-                  </svg>
-                ) : (
-                  // Microphone icon
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-black">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                    <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" strokeWidth="2"></line>
-                    <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" strokeWidth="2"></line>
-                  </svg>
-                )}
-              </button>
-              {isRecording && (
-                <div className="absolute inset-0 w-24 h-24 border-3 border-brand-yellow rounded-full animate-ping pointer-events-none"></div>
-              )}
-            </div>
-            <p className="text-text-muted text-body mb-2">
-              {isProcessing ? 'AI is processing your recording...' : isRecording ? 'Tap to stop recording' : 'Tap to start speaking'}
-            </p>
-            {isRecording && (
-              <p className="text-text-secondary text-sm">
-                Speak naturally about your experience with this product
-              </p>
-            )}
-            {(voiceTranscript || interimTranscript) && !isProcessing && (
-              <div className="mt-4 p-3 bg-dark-surface rounded-card">
-                <p className="text-text-secondary text-sm">
-                  {voiceTranscript}
-                  <span className="text-text-muted italic">{interimTranscript}</span>
-                </p>
-              </div>
-            )}
-          </div>
-          
-          {/* AI Processing Animation */}
-          {isProcessing && (
-            <div className="flex justify-center gap-2 py-4">
-              <div className="w-3 h-3 bg-brand-yellow rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-              <div className="w-3 h-3 bg-brand-yellow rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-3 h-3 bg-brand-yellow rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-            </div>
-          )}
-          
-          {/* Voice Transcript Display */}
-          {aiProcessedData && !isProcessing && (
-            <div className="bg-dark-surface rounded-card p-4 space-y-3">
-              <div>
-                <h3 className="text-brand-yellow text-body font-semibold mb-1">Title:</h3>
-                <p className="text-text-primary text-body">{aiProcessedData.title}</p>
-              </div>
-              <div>
-                <h3 className="text-brand-yellow text-body font-semibold mb-1">Description:</h3>
-                <p className="text-text-secondary text-body">{aiProcessedData.description}</p>
-              </div>
-              <div className="flex gap-4 text-sm">
-                <span className="text-text-muted">Category: <span className="text-text-secondary">{categories.find(c => c.id === aiProcessedData.category)?.name}</span></span>
-                <span className="text-text-muted">Age: <span className="text-text-secondary">{aiProcessedData.ageRange}</span></span>
-              </div>
-            </div>
-          )}
-          
-          {/* Voice Actions */}
-          <div className="flex gap-4 pt-6">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="flex-1 px-6 py-3.5 rounded-button font-semibold text-body bg-transparent text-text-primary border border-dark-border hover:bg-white/5 btn-transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleVoiceSubmit}
-              disabled={!aiProcessedData || !link}
-              className="flex-1 px-6 py-3.5 rounded-button font-semibold text-body bg-brand-yellow text-black hover:bg-[#f5e147] hover:scale-[1.02] btn-transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              Share
-            </button>
-          </div>
-        </div>
-        </div>
-      )}
     </div>
   )
 }

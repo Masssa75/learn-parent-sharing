@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gamification Overlay Design Options</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+    
+    /* Base styles matching the app */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .section-title {
+      font-size: 48px;
+      color: #F5D547;
+      margin: 40px 0 30px;
+      text-align: center;
+    }
+    
+    .option {
+      margin-bottom: 80px;
+      border: 2px solid #2A2A2A;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    
+    .option-header {
+      background: #0A0A0A;
+      padding: 20px;
+      border-bottom: 1px solid #2A2A2A;
+    }
+    
+    .option-title {
+      font-size: 28px;
+      color: #F5D547;
+      margin-bottom: 8px;
+    }
+    
+    .option-description {
+      color: #999;
+      font-size: 16px;
+    }
+    
+    /* Current App Layout */
+    .app-container {
+      background: #000;
+      min-height: 100vh;
+      position: relative;
+    }
+    
+    .header {
+      background: #000;
+      padding: 16px 20px;
+      border-bottom: 1px solid #1A1A1A;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    
+    .header-content {
+      max-width: 672px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .profile-btn {
+      width: 40px;
+      height: 40px;
+      background: #F5D547;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    
+    .main-content {
+      max-width: 672px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .search-bar {
+      background: #0A0A0A;
+      border: 1px solid #2A2A2A;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .search-input {
+      background: none;
+      border: none;
+      color: #fff;
+      flex: 1;
+      font-size: 16px;
+      outline: none;
+    }
+    
+    .categories {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+    
+    .category-btn {
+      background: #0A0A0A;
+      border: 1px solid #2A2A2A;
+      border-radius: 25px;
+      padding: 10px 20px;
+      color: #999;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .category-btn.active {
+      background: #F5D547;
+      color: #000;
+      border-color: #F5D547;
+    }
+    
+    .post {
+      background: #000;
+      border: 1px solid #2A2A2A;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    
+    .post-title {
+      font-size: 36px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    
+    .post-description {
+      color: #999;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    
+    .post-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .post-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    
+    .action-btn {
+      background: none;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    
+    .action-btn:hover {
+      color: #F5D547;
+    }
+    
+    /* Gamification Overlays */
+    
+    /* Option 1: Top Banner Points Display */
+    .points-banner {
+      background: linear-gradient(135deg, #F5D547 0%, #FFE066 100%);
+      color: #000;
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 10px rgba(245, 213, 71, 0.3);
+    }
+    
+    .points-banner-content {
+      max-width: 672px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .points-info {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    
+    .points-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .points-value {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    
+    .points-label {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    .level-badge {
+      background: #000;
+      color: #F5D547;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    
+    /* Option 2: Floating Points Widget */
+    .floating-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(10px);
+      border: 2px solid #F5D547;
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+    
+    .floating-widget:hover {
+      transform: scale(1.05);
+    }
+    
+    .widget-compact {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .widget-icon {
+      width: 48px;
+      height: 48px;
+      background: #F5D547;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .widget-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .widget-points {
+      font-size: 24px;
+      font-weight: 700;
+      color: #F5D547;
+    }
+    
+    .widget-level {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    /* Option 3: Integrated Header Points */
+    .header-with-points {
+      background: #000;
+      padding: 16px 20px;
+      border-bottom: 1px solid #1A1A1A;
+    }
+    
+    .header-top {
+      max-width: 672px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .header-points {
+      max-width: 672px;
+      margin: 0 auto;
+      display: flex;
+      gap: 20px;
+      padding: 12px;
+      background: #0A0A0A;
+      border: 1px solid #2A2A2A;
+      border-radius: 12px;
+    }
+    
+    .header-points-item {
+      flex: 1;
+      text-align: center;
+    }
+    
+    .header-points-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    .header-points-label {
+      font-size: 12px;
+      color: #666;
+      margin-top: 2px;
+    }
+    
+    .xp-bar {
+      height: 4px;
+      background: #2A2A2A;
+      border-radius: 2px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    
+    .xp-progress {
+      height: 100%;
+      background: #F5D547;
+      width: 65%;
+      transition: width 0.5s;
+    }
+    
+    /* Option 4: Side Panel Leaderboard */
+    .side-panel {
+      position: fixed;
+      right: 0;
+      top: 0;
+      height: 100vh;
+      width: 320px;
+      background: #0A0A0A;
+      border-left: 1px solid #2A2A2A;
+      padding: 24px;
+      overflow-y: auto;
+      z-index: 30;
+    }
+    
+    .panel-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #F5D547;
+    }
+    
+    .user-rank {
+      background: linear-gradient(135deg, #F5D547 0%, #FFE066 100%);
+      color: #000;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .rank-number {
+      font-size: 32px;
+      font-weight: 700;
+    }
+    
+    .rank-label {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+    
+    .leaderboard-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .leaderboard-rank {
+      width: 24px;
+      text-align: center;
+      color: #666;
+      font-weight: 600;
+    }
+    
+    .leaderboard-avatar {
+      width: 32px;
+      height: 32px;
+      background: #2A2A2A;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    
+    .leaderboard-info {
+      flex: 1;
+    }
+    
+    .leaderboard-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .leaderboard-points {
+      font-size: 12px;
+      color: #F5D547;
+    }
+    
+    /* Option 5: Achievement Popups */
+    .achievement-popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 100%);
+      border: 2px solid #F5D547;
+      border-radius: 20px;
+      padding: 20px 32px;
+      box-shadow: 0 10px 40px rgba(245, 213, 71, 0.3);
+      animation: slideDown 0.5s forwards;
+      z-index: 200;
+    }
+    
+    @keyframes slideDown {
+      to {
+        transform: translateX(-50%) translateY(0);
+      }
+    }
+    
+    .achievement-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .achievement-icon {
+      font-size: 48px;
+    }
+    
+    .achievement-text {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .achievement-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #F5D547;
+      margin-bottom: 4px;
+    }
+    
+    .achievement-desc {
+      font-size: 14px;
+      color: #999;
+    }
+    
+    /* Points animation on posts */
+    .points-earned {
+      position: absolute;
+      color: #F5D547;
+      font-weight: 700;
+      font-size: 20px;
+      pointer-events: none;
+      animation: floatUp 2s ease-out;
+    }
+    
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-60px);
+      }
+    }
+    
+    /* Token rain effect */
+    .token-rain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 500;
+    }
+    
+    .token {
+      position: absolute;
+      font-size: 32px;
+      animation: fall 3s linear;
+    }
+    
+    @keyframes fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+      }
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .side-panel {
+        display: none;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .points-banner-content {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      
+      .floating-widget {
+        bottom: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="section-title">Gamification Overlay Design Options</h1>
+    
+    <!-- Option 1: Top Banner Points Display -->
+    <div class="option">
+      <div class="option-header">
+        <h2 class="option-title">Option 1: Prominent Top Banner</h2>
+        <p class="option-description">A bold, always-visible banner showing points, XP, and level. Takes prime real estate but ensures maximum visibility.</p>
+      </div>
+      
+      <div class="app-container">
+        <!-- Points Banner -->
+        <div class="points-banner">
+          <div class="points-banner-content">
+            <div class="points-info">
+              <div class="points-item">
+                <span class="points-value">2,450</span>
+                <span class="points-label">points</span>
+              </div>
+              <div class="points-item">
+                <span class="points-value">3,200</span>
+                <span class="points-label">XP</span>
+              </div>
+              <div class="points-item">
+                <span class="points-value">18</span>
+                <span class="points-label">actions left</span>
+              </div>
+            </div>
+            <div class="level-badge">Level 4</div>
+          </div>
+        </div>
+        
+        <!-- Regular Header -->
+        <div class="header">
+          <div class="header-content">
+            <div class="logo">Learn</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+          <div class="search-bar">
+            <svg width="20" height="20" fill="none" stroke="currentColor">
+              <circle cx="8" cy="8" r="7"/>
+              <path d="m13 13 6 6"/>
+            </svg>
+            <input type="text" class="search-input" placeholder="Search for apps, toys, books...">
+          </div>
+          
+          <div class="categories">
+            <button class="category-btn active">ALL</button>
+            <button class="category-btn">APPS</button>
+            <button class="category-btn">TOYS</button>
+            <button class="category-btn">BOOKS</button>
+            <button class="category-btn">ACTIVITIES</button>
+            <button class="category-btn">TIPS</button>
+          </div>
+          
+          <div class="post">
+            <h3 class="post-title">Best Educational Apps for Toddlers</h3>
+            <p class="post-description">These apps have been game-changers for keeping my 3-year-old engaged while learning...</p>
+            <div class="post-meta">
+              <span>Sarah Chen</span>
+              <div class="post-actions">
+                <button class="action-btn">
+                  <svg width="16" height="16" fill="none" stroke="currentColor">
+                    <path d="M14 5.5a3.5 3.5 0 0 0-5-3.16A3.5 3.5 0 0 0 2 5.5c0 1.57.92 3.57 6 8.5 5.08-4.93 6-6.93 6-8.5z"/>
+                  </svg>
+                  <span>24</span>
+                </button>
+                <button class="action-btn">
+                  <svg width="16" height="16" fill="none" stroke="currentColor">
+                    <path d="M14 10a3 3 0 0 1-3 3H5l-3 3V5a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v5z"/>
+                  </svg>
+                  <span>Comment</span>
+                </button>
+                <button class="action-btn">
+                  <svg width="16" height="16" fill="none" stroke="currentColor">
+                    <path d="M4 12v8m0-8 3 3m-3-3-3 3m10-11v8m0-8 3 3m-3-3-3 3M1 2h14"/>
+                  </svg>
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Option 2: Floating Points Widget -->
+    <div class="option">
+      <div class="option-header">
+        <h2 class="option-title">Option 2: Floating Points Widget</h2>
+        <p class="option-description">A compact, always-accessible widget that floats in the corner. Non-intrusive but always visible.</p>
+      </div>
+      
+      <div class="app-container" style="height: 600px; position: relative; overflow: hidden;">
+        <!-- Regular Header -->
+        <div class="header">
+          <div class="header-content">
+            <div class="logo">Learn</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+          <div class="search-bar">
+            <svg width="20" height="20" fill="none" stroke="currentColor">
+              <circle cx="8" cy="8" r="7"/>
+              <path d="m13 13 6 6"/>
+            </svg>
+            <input type="text" class="search-input" placeholder="Search for apps, toys, books...">
+          </div>
+          
+          <div class="categories">
+            <button class="category-btn active">ALL</button>
+            <button class="category-btn">APPS</button>
+            <button class="category-btn">TOYS</button>
+            <button class="category-btn">BOOKS</button>
+          </div>
+          
+          <div class="post">
+            <h3 class="post-title">Best Educational Apps for Toddlers</h3>
+            <p class="post-description">These apps have been game-changers for keeping my 3-year-old engaged while learning...</p>
+            <div class="post-meta">
+              <span>Sarah Chen</span>
+              <div class="post-actions">
+                <button class="action-btn">
+                  <svg width="16" height="16" fill="none" stroke="currentColor">
+                    <path d="M14 5.5a3.5 3.5 0 0 0-5-3.16A3.5 3.5 0 0 0 2 5.5c0 1.57.92 3.57 6 8.5 5.08-4.93 6-6.93 6-8.5z"/>
+                  </svg>
+                  <span>24</span>
+                </button>
+                <button class="action-btn">Share</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Floating Widget -->
+        <div class="floating-widget">
+          <div class="widget-compact">
+            <div class="widget-icon">🪙</div>
+            <div class="widget-info">
+              <div class="widget-points">2,450</div>
+              <div class="widget-level">Level 4 • 18 actions left</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Option 3: Integrated Header Points -->
+    <div class="option">
+      <div class="option-header">
+        <h2 class="option-title">Option 3: Integrated Header Display</h2>
+        <p class="option-description">Points display integrated seamlessly into the header. Clean and professional look.</p>
+      </div>
+      
+      <div class="app-container">
+        <!-- Header with integrated points -->
+        <div class="header-with-points">
+          <div class="header-top">
+            <div class="logo">Learn</div>
+            <div class="profile-btn">M</div>
+          </div>
+          <div class="header-points">
+            <div class="header-points-item">
+              <div class="header-points-value">2,450</div>
+              <div class="header-points-label">Points</div>
+            </div>
+            <div class="header-points-item">
+              <div class="header-points-value">4</div>
+              <div class="header-points-label">Level</div>
+            </div>
+            <div class="header-points-item">
+              <div class="header-points-value">3,200</div>
+              <div class="header-points-label">XP</div>
+              <div class="xp-bar">
+                <div class="xp-progress"></div>
+              </div>
+            </div>
+            <div class="header-points-item">
+              <div class="header-points-value">18</div>
+              <div class="header-points-label">Actions left</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+          <div class="search-bar">
+            <svg width="20" height="20" fill="none" stroke="currentColor">
+              <circle cx="8" cy="8" r="7"/>
+              <path d="m13 13 6 6"/>
+            </svg>
+            <input type="text" class="search-input" placeholder="Search for apps, toys, books...">
+          </div>
+          
+          <div class="categories">
+            <button class="category-btn active">ALL</button>
+            <button class="category-btn">APPS</button>
+            <button class="category-btn">TOYS</button>
+            <button class="category-btn">BOOKS</button>
+          </div>
+          
+          <div class="post" style="position: relative;">
+            <h3 class="post-title">Best Educational Apps for Toddlers</h3>
+            <p class="post-description">These apps have been game-changers for keeping my 3-year-old engaged while learning...</p>
+            <div class="post-meta">
+              <span>Sarah Chen</span>
+              <div class="post-actions">
+                <button class="action-btn">
+                  <svg width="16" height="16" fill="none" stroke="currentColor">
+                    <path d="M14 5.5a3.5 3.5 0 0 0-5-3.16A3.5 3.5 0 0 0 2 5.5c0 1.57.92 3.57 6 8.5 5.08-4.93 6-6.93 6-8.5z"/>
+                  </svg>
+                  <span>24</span>
+                </button>
+                <button class="action-btn">Share</button>
+              </div>
+            </div>
+            <!-- Points animation -->
+            <span class="points-earned" style="right: 100px; top: 40px;">+5</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Option 4: Side Panel with Leaderboard -->
+    <div class="option">
+      <div class="option-header">
+        <h2 class="option-title">Option 4: Side Panel Leaderboard</h2>
+        <p class="option-description">Desktop-focused design with persistent leaderboard and detailed stats. Great for competitive users.</p>
+      </div>
+      
+      <div class="app-container" style="height: 600px; position: relative; overflow: hidden;">
+        <!-- Regular Header -->
+        <div class="header">
+          <div class="header-content">
+            <div class="logo">Learn</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        
+        <!-- Main Content (adjusted for panel) -->
+        <div class="main-content" style="margin-right: 320px;">
+          <div class="search-bar">
+            <svg width="20" height="20" fill="none" stroke="currentColor">
+              <circle cx="8" cy="8" r="7"/>
+              <path d="m13 13 6 6"/>
+            </svg>
+            <input type="text" class="search-input" placeholder="Search for apps, toys, books...">
+          </div>
+          
+          <div class="categories">
+            <button class="category-btn active">ALL</button>
+            <button class="category-btn">APPS</button>
+            <button class="category-btn">TOYS</button>
+          </div>
+          
+          <div class="post">
+            <h3 class="post-title">Best Educational Apps for Toddlers</h3>
+            <p class="post-description">These apps have been game-changers...</p>
+            <div class="post-meta">
+              <span>Sarah Chen</span>
+              <div class="post-actions">
+                <button class="action-btn">Like</button>
+                <button class="action-btn">Share</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Side Panel -->
+        <div class="side-panel">
+          <h3 class="panel-title">Leaderboard</h3>
+          
+          <div class="user-rank">
+            <div class="rank-number">#42</div>
+            <div class="rank-label">Your rank this week</div>
+          </div>
+          
+          <div class="leaderboard-item">
+            <div class="leaderboard-rank">1</div>
+            <div class="leaderboard-avatar">👑</div>
+            <div class="leaderboard-info">
+              <div class="leaderboard-name">Alex Thompson</div>
+              <div class="leaderboard-points">12,450 points</div>
+            </div>
+          </div>
+          
+          <div class="leaderboard-item">
+            <div class="leaderboard-rank">2</div>
+            <div class="leaderboard-avatar">J</div>
+            <div class="leaderboard-info">
+              <div class="leaderboard-name">Jamie Lee</div>
+              <div class="leaderboard-points">11,200 points</div>
+            </div>
+          </div>
+          
+          <div class="leaderboard-item">
+            <div class="leaderboard-rank">3</div>
+            <div class="leaderboard-avatar">S</div>
+            <div class="leaderboard-info">
+              <div class="leaderboard-name">Sam Wilson</div>
+              <div class="leaderboard-points">10,800 points</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Option 5: Achievement-Focused -->
+    <div class="option">
+      <div class="option-header">
+        <h2 class="option-title">Option 5: Achievement & Milestone Focus</h2>
+        <p class="option-description">Emphasizes achievements and milestones with celebratory animations and popups.</p>
+      </div>
+      
+      <div class="app-container" style="height: 600px; position: relative; overflow: hidden;">
+        <!-- Achievement Popup -->
+        <div class="achievement-popup">
+          <div class="achievement-content">
+            <div class="achievement-icon">🏆</div>
+            <div class="achievement-text">
+              <div class="achievement-title">Level 4 Unlocked!</div>
+              <div class="achievement-desc">You've earned 1,000 bonus points</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Regular Header with subtle points -->
+        <div class="header">
+          <div class="header-content">
+            <div class="logo">Learn</div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="color: #F5D547; font-weight: 600;">2,450 pts</span>
+              <div class="profile-btn">M</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+          <div class="search-bar">
+            <svg width="20" height="20" fill="none" stroke="currentColor">
+              <circle cx="8" cy="8" r="7"/>
+              <path d="m13 13 6 6"/>
+            </svg>
+            <input type="text" class="search-input" placeholder="Search for apps, toys, books...">
+          </div>
+          
+          <div class="categories">
+            <button class="category-btn active">ALL</button>
+            <button class="category-btn">APPS</button>
+            <button class="category-btn">TOYS</button>
+          </div>
+          
+          <div class="post">
+            <h3 class="post-title">Best Educational Apps for Toddlers</h3>
+            <p class="post-description">These apps have been game-changers for keeping my 3-year-old engaged while learning...</p>
+            <div class="post-meta">
+              <span>Sarah Chen</span>
+              <div class="post-actions">
+                <button class="action-btn">Like</button>
+                <button class="action-btn">Share</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Token Rain Effect -->
+        <div class="token-rain">
+          <div class="token" style="left: 10%; animation-delay: 0s;">🪙</div>
+          <div class="token" style="left: 30%; animation-delay: 0.5s;">🪙</div>
+          <div class="token" style="left: 50%; animation-delay: 1s;">🪙</div>
+          <div class="token" style="left: 70%; animation-delay: 0.3s;">🪙</div>
+          <div class="token" style="left: 90%; animation-delay: 0.8s;">🪙</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Recommendation -->
+    <div class="option">
+      <div class="option-header">
+        <h2 class="option-title">Recommended: Hybrid Progressive Approach</h2>
+        <p class="option-description">
+          Start with Option 3 (integrated header) for subtlety, add floating widget for mobile,
+          and layer in achievements for engagement. This provides:
+          <br><br>
+          ✓ Clean integration that doesn't disrupt current UX<br>
+          ✓ Mobile-friendly floating widget for quick access<br>
+          ✓ Achievement popups for dopamine hits<br>
+          ✓ Progressive disclosure - more features unlock with levels<br>
+          ✓ Optional leaderboard for competitive users
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
