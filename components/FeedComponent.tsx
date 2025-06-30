@@ -99,10 +99,12 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
 
   // Refetch posts when authentication status changes
   useEffect(() => {
-    if (isAuthenticated && user) {
+    // Only fetch if we have determined auth status (not still loading)
+    if (!loading && user?.id) {
+      console.log('Auth status changed, refetching posts with user:', user.id)
       fetchPosts()
     }
-  }, [isAuthenticated, user?.id])
+  }, [user?.id, loading])
 
   useEffect(() => {
     // Close menu when clicking outside
@@ -159,6 +161,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
 
   const fetchPosts = async () => {
     try {
+      console.log('Fetching posts, authenticated:', isAuthenticated, 'user:', user?.id)
       const response = await fetch('/api/posts')
       if (!response.ok) {
         throw new Error(`Failed to fetch posts: ${response.status}`)
@@ -167,6 +170,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       if (Array.isArray(data)) {
         setPosts(data)
       } else if (data && Array.isArray(data.posts)) {
+        console.log(`Received ${data.posts.length} posts, first post liked status:`, data.posts[0]?.liked)
         setPosts(data.posts)
       } else {
         console.error('Invalid posts data received:', data)
