@@ -908,7 +908,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                     
                     {openMenuPostId === post.id && (
                       <div className="absolute right-0 mt-2 w-48 bg-dark-surface rounded-card shadow-lg py-2 border border-dark-border z-10">
-                        {user && post.userId === user.id && (
+                        {user && (post.userId === user.id || user.isAdmin) && (
                           <button
                             onClick={() => {
                               handleEdit(post)
