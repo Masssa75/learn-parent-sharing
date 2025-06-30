@@ -116,6 +116,21 @@ export async function POST(request: NextRequest) {
     
     // Store the like in the likes table if it's a like action
     if (actionType === 'add_to_profile' && targetType === 'post') {
+      // First check if user has already liked this post
+      const { data: existingLike } = await supabase
+        .from('likes')
+        .select('user_id')
+        .eq('user_id', userId)
+        .eq('post_id', targetId)
+        .single()
+      
+      if (existingLike) {
+        return NextResponse.json({ 
+          error: 'Post already liked',
+          message: 'You have already liked this post'
+        }, { status: 409 })
+      }
+      
       const { error: likeError } = await supabase
         .from('likes')
         .insert({
@@ -123,7 +138,7 @@ export async function POST(request: NextRequest) {
           post_id: targetId
         })
       
-      if (likeError && likeError.code !== '23505') { // 23505 is duplicate key error
+      if (likeError) {
         console.error('Error storing like:', likeError)
         return NextResponse.json({ error: 'Failed to store like' }, { status: 500 })
       }
@@ -146,6 +161,21 @@ export async function POST(request: NextRequest) {
     
     // Store save in saved_posts table if it's a save action
     if (actionType === 'add_to_watchlist' && targetType === 'post') {
+      // First check if user has already saved this post
+      const { data: existingSave } = await supabase
+        .from('saved_posts')
+        .select('user_id')
+        .eq('user_id', userId)
+        .eq('post_id', targetId)
+        .single()
+      
+      if (existingSave) {
+        return NextResponse.json({ 
+          error: 'Post already saved',
+          message: 'You have already saved this post'
+        }, { status: 409 })
+      }
+      
       const { error: saveError } = await supabase
         .from('saved_posts')
         .insert({
@@ -153,7 +183,7 @@ export async function POST(request: NextRequest) {
           post_id: targetId
         })
       
-      if (saveError && saveError.code !== '23505') {
+      if (saveError) {
         console.error('Error storing save:', saveError)
         return NextResponse.json({ error: 'Failed to save post' }, { status: 500 })
       }

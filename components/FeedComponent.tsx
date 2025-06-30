@@ -213,6 +213,12 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
         const error = await response.json()
         if (response.status === 429) {
           alert(`Rate limit exceeded. Please wait before taking more actions.`)
+        } else if (response.status === 409) {
+          // Post already liked - update UI to reflect this
+          setPosts(posts.map(post => 
+            post.id === postId ? { ...post, liked: true } : post
+          ))
+          return
         } else {
           throw new Error(error.message || 'Failed to like post')
         }
@@ -286,6 +292,12 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
         const error = await response.json()
         if (response.status === 429) {
           alert(`Rate limit exceeded. Please wait before taking more actions.`)
+        } else if (response.status === 409) {
+          // Post already saved - update UI to reflect this
+          setPosts(posts.map(post => 
+            post.id === postId ? { ...post, saved: true } : post
+          ))
+          return
         } else {
           throw new Error(error.message || 'Failed to save post')
         }
