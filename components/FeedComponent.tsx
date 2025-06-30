@@ -74,12 +74,19 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
     
     const handleFocus = () => {
       if (mounted) {
-        checkAuth()
+        checkAuth().then(() => {
+          // Refetch posts after auth check on focus
+          fetchPosts()
+        })
       }
     }
     
-    checkAuth()
-    fetchPosts()
+    // First check auth, then fetch posts
+    checkAuth().then(() => {
+      if (mounted) {
+        fetchPosts()
+      }
+    })
     
     // Check auth when window gets focus
     window.addEventListener('focus', handleFocus)
@@ -89,6 +96,13 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       window.removeEventListener('focus', handleFocus)
     }
   }, [])
+
+  // Refetch posts when authentication status changes
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      fetchPosts()
+    }
+  }, [isAuthenticated, user?.id])
 
   useEffect(() => {
     // Close menu when clicking outside
