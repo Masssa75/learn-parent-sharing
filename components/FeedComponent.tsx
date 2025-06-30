@@ -104,6 +104,19 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
     return () => document.removeEventListener('click', handleClickOutside)
   }, [])
 
+  useEffect(() => {
+    // Auto-resize textarea when entering edit mode
+    if (editingPostId) {
+      setTimeout(() => {
+        const textarea = document.querySelector('textarea[placeholder="Description"]') as HTMLTextAreaElement
+        if (textarea) {
+          textarea.style.height = 'auto'
+          textarea.style.height = textarea.scrollHeight + 'px'
+        }
+      }, 100)
+    }
+  }, [editingPostId])
+
   const checkAuth = async () => {
     try {
       const response = await fetch('/api/auth/check-with-points')
@@ -659,10 +672,16 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                   />
                   <textarea
                     value={editFormData.description}
-                    onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
-                    className="w-full px-4 py-3 bg-dark-surface border border-dark-border rounded-input text-text-primary mb-3 focus:outline-none focus:border-brand-yellow resize-none"
+                    onChange={(e) => {
+                      setEditFormData({ ...editFormData, description: e.target.value })
+                      // Auto-resize textarea
+                      e.target.style.height = 'auto'
+                      e.target.style.height = e.target.scrollHeight + 'px'
+                    }}
+                    className="w-full px-4 py-3 bg-dark-surface border border-dark-border rounded-input text-text-primary mb-3 focus:outline-none focus:border-brand-yellow resize-y overflow-hidden"
                     placeholder="Description"
                     rows={3}
+                    style={{ minHeight: '100px' }}
                   />
                   <input
                     type="text"

@@ -403,10 +403,16 @@ export default function CreatePage() {
           <div>
             <textarea
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                setDescription(e.target.value)
+                // Auto-resize textarea
+                e.target.style.height = 'auto'
+                e.target.style.height = e.target.scrollHeight + 'px'
+              }}
               placeholder="Tell other parents about your experience..."
               rows={4}
-              className="w-full bg-black border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-muted outline-none focus:border-brand-yellow transition-colors resize-none"
+              className="w-full bg-black border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-muted outline-none focus:border-brand-yellow transition-colors resize-y overflow-hidden"
+              style={{ minHeight: '120px' }}
             />
           </div>
           
