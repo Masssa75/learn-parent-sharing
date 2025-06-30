@@ -134,7 +134,9 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/check-with-points')
+      const response = await fetch('/api/auth/check-with-points', {
+        credentials: 'include'
+      })
       if (!response.ok) {
         throw new Error(`Auth check failed: ${response.status}`)
       }
@@ -188,7 +190,10 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
 
   const handleSignOut = async () => {
     try {
-      const response = await fetch('/api/auth/logout', { method: 'POST' })
+      const response = await fetch('/api/auth/logout', { 
+        method: 'POST',
+        credentials: 'include'
+      })
       if (!response.ok) {
         throw new Error(`Logout failed: ${response.status}`)
       }
@@ -224,6 +229,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       const response = await fetch('/api/actions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           actionType: 'add_to_profile',
           targetType: 'post',
@@ -380,6 +386,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       const response = await fetch('/api/actions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           actionType: 'flag',
           targetType: 'post',
