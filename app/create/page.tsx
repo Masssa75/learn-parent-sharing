@@ -38,6 +38,9 @@ export default function CreatePage() {
     category: string
     ageRange: string
   } | null>(null)
+  const [generatedTitles, setGeneratedTitles] = useState<string[]>([])
+  const [isGeneratingTitles, setIsGeneratingTitles] = useState(false)
+  const [selectedTitleIndex, setSelectedTitleIndex] = useState<number | null>(null)
   
   const handleAgeToggle = (age: string) => {
     setSelectedAges(prev =>
@@ -395,19 +398,7 @@ export default function CreatePage() {
             )}
           </div>
           
-          {/* Title */}
-          <div>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="What made parenting easier today?"
-              className="w-full bg-black border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-muted outline-none focus:border-brand-yellow transition-colors"
-              required
-            />
-          </div>
-          
-          {/* Description */}
+          {/* Description - Now the primary input */}
           <div>
             <textarea
               value={description}
@@ -416,12 +407,108 @@ export default function CreatePage() {
                 // Auto-resize textarea
                 e.target.style.height = 'auto'
                 e.target.style.height = e.target.scrollHeight + 'px'
+                // Reset generated titles when description changes
+                setGeneratedTitles([])
+                setSelectedTitleIndex(null)
+                setTitle('')
               }}
-              placeholder="Tell other parents about your experience..."
-              rows={4}
-              className="w-full bg-black border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-muted outline-none focus:border-brand-yellow transition-colors resize-y overflow-hidden"
-              style={{ minHeight: '120px' }}
+              placeholder="Describe your tip or what you learned today..."
+              rows={5}
+              className="w-full bg-black border border-dark-border rounded-input px-4 py-4 text-text-primary text-lg placeholder-text-muted outline-none focus:border-brand-yellow transition-colors resize-y overflow-hidden"
+              style={{ minHeight: '150px' }}
+              required
             />
+          </div>
+          
+          {/* Generate Title Button and Title Selection */}
+          <div>
+            {generatedTitles.length === 0 ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!description.trim()) {
+                    alert('Please write a description first')
+                    return
+                  }
+                  
+                  setIsGeneratingTitles(true)
+                  try {
+                    const response = await fetch('/api/ai/generate-titles', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        description,
+                        linkUrl: link,
+                        category: categories.find(c => c.id === category)?.name
+                      })
+                    })
+                    
+                    if (!response.ok) {
+                      throw new Error('Failed to generate titles')
+                    }
+                    
+                    const data = await response.json()
+                    setGeneratedTitles(data.titles)
+                  } catch (error) {
+                    console.error('Error generating titles:', error)
+                    alert('Failed to generate titles. Please try again.')
+                  } finally {
+                    setIsGeneratingTitles(false)
+                  }
+                }}
+                disabled={!description.trim() || isGeneratingTitles}
+                className="w-full px-4 py-3 rounded-input font-medium text-body bg-dark-surface text-brand-yellow border border-brand-yellow hover:bg-brand-yellow hover:text-black btn-transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isGeneratingTitles ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                    Generating titles...
+                  </>
+                ) : (
+                  <>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                      <path d="M2 17l10 5 10-5"></path>
+                      <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                    Generate title for me
+                  </>
+                )}
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-text-secondary text-sm mb-2">Select your favorite title:</p>
+                {generatedTitles.map((generatedTitle, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => {
+                      setSelectedTitleIndex(index)
+                      setTitle(generatedTitle)
+                    }}
+                    className={`w-full text-left px-4 py-3 rounded-input border transition-all ${
+                      selectedTitleIndex === index
+                        ? 'border-brand-yellow bg-brand-yellow/10 text-text-primary'
+                        : 'border-dark-border bg-dark-surface text-text-secondary hover:border-text-muted hover:text-text-primary'
+                    }`}
+                  >
+                    <span className="text-text-muted mr-2">{index + 1}.</span>
+                    {generatedTitle}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGeneratedTitles([])
+                    setSelectedTitleIndex(null)
+                    setTitle('')
+                  }}
+                  className="text-text-muted hover:text-text-secondary text-sm underline"
+                >
+                  Generate new titles
+                </button>
+              </div>
+            )}
           </div>
           
           {/* Image Upload Section */}
@@ -526,7 +613,7 @@ export default function CreatePage() {
             </button>
             <button
               type="submit"
-              disabled={!title || !category || selectedAges.length === 0}
+              disabled={!title || !description || !category || selectedAges.length === 0}
               className="flex-1 px-6 py-3.5 rounded-button font-semibold text-body bg-brand-yellow text-black hover:bg-[#f5e147] hover:scale-[1.02] btn-transition disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               Share
