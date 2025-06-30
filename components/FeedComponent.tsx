@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { YouTubePlayer } from './YouTubePlayer'
@@ -66,6 +66,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   const [editImageStyle, setEditImageStyle] = useState<string>('photorealistic')
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set())
   const [openMenuPostId, setOpenMenuPostId] = useState<string | null>(null)
+  const [floatingPoints, setFloatingPoints] = useState<{ [postId: string]: { points: number, key: number } }>({})
+  const animationKeyRef = useRef(0)
   const router = useRouter()
 
   useEffect(() => {
@@ -180,6 +182,12 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       return
     }
     
+    // Check if already liked
+    const post = posts.find(p => p.id === postId)
+    if (post?.liked) {
+      return // Already liked, do nothing
+    }
+    
     try {
       const response = await fetch('/api/actions', {
         method: 'POST',
@@ -202,6 +210,24 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       }
       
       const result = await response.json()
+      
+      // Add floating animation
+      const key = animationKeyRef.current++
+      setFloatingPoints(prev => ({
+        ...prev,
+        [postId]: { points: 5, key }
+      }))
+      
+      // Remove animation after 2 seconds
+      setTimeout(() => {
+        setFloatingPoints(prev => {
+          const newState = { ...prev }
+          if (newState[postId]?.key === key) {
+            delete newState[postId]
+          }
+          return newState
+        })
+      }, 2000)
       
       // Update user points in state
       if (result.user && user) {
@@ -229,6 +255,12 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       return
     }
     
+    // Check if already saved
+    const post = posts.find(p => p.id === postId)
+    if (post?.saved) {
+      return // Already saved, do nothing
+    }
+    
     try {
       const response = await fetch('/api/actions', {
         method: 'POST',
@@ -251,6 +283,24 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       }
       
       const result = await response.json()
+      
+      // Add floating animation for save
+      const key = animationKeyRef.current++
+      setFloatingPoints(prev => ({
+        ...prev,
+        [`${postId}-save`]: { points: 3, key }
+      }))
+      
+      // Remove animation after 2 seconds
+      setTimeout(() => {
+        setFloatingPoints(prev => {
+          const newState = { ...prev }
+          if (newState[`${postId}-save`]?.key === key) {
+            delete newState[`${postId}-save`]
+          }
+          return newState
+        })
+      }, 2000)
       
       // Update user points in state
       if (result.user && user) {
@@ -800,14 +850,28 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                 <div className="flex items-center gap-5">
                   <button
                     onClick={() => handleLike(post.id)}
-                    className={`flex items-center gap-1.5 transition-colors ${
+                    className={`relative flex items-center gap-1.5 transition-colors ${
                       post.liked ? 'text-brand-yellow' : 'text-text-muted hover:text-text-secondary'
                     }`}
+                    disabled={post.liked}
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill={post.liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                     </svg>
                     <span>{post.likes > 0 ? post.likes : 'Like'}</span>
+                    
+                    {/* Floating +5 animation */}
+                    {floatingPoints[post.id] && (
+                      <span
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 text-sm font-bold text-brand-yellow animate-float-up pointer-events-none"
+                        style={{
+                          animationDuration: '2s',
+                          animationFillMode: 'forwards'
+                        }}
+                      >
+                        +{floatingPoints[post.id].points}
+                      </span>
+                    )}
                   </button>
                   
                   <button
@@ -822,7 +886,10 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                   
                   <button
                     onClick={() => handleSave(post.id)}
-                    className="flex items-center gap-1.5 text-text-muted hover:text-text-secondary transition-colors"
+                    className={`relative flex items-center gap-1.5 transition-colors ${
+                      post.saved ? 'text-brand-yellow' : 'text-text-muted hover:text-text-secondary'
+                    }`}
+                    disabled={post.saved}
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
@@ -830,6 +897,19 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                       <line x1="12" y1="2" x2="12" y2="15"/>
                     </svg>
                     <span>Share</span>
+                    
+                    {/* Floating +3 animation */}
+                    {floatingPoints[`${post.id}-save`] && (
+                      <span
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 text-sm font-bold text-brand-yellow animate-float-up pointer-events-none"
+                        style={{
+                          animationDuration: '2s',
+                          animationFillMode: 'forwards'
+                        }}
+                      >
+                        +{floatingPoints[`${post.id}-save`].points}
+                      </span>
+                    )}
                   </button>
                   
                   {/* 3-dot menu */}
