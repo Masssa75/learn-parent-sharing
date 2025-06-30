@@ -8,8 +8,12 @@ const supabaseAdmin = createClient(
 )
 
 export async function POST(request: NextRequest) {
+  let style = 'cartoon' // Define style outside try block so it's accessible in catch
+  
   try {
-    const { prompt, title, style = 'cartoon' } = await request.json()
+    const body = await request.json()
+    const { prompt, title } = body
+    style = body.style || 'cartoon'
 
     // Check if OpenAI API key is configured
     const apiKey = process.env.OPENAI_API_KEY
