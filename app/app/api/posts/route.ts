@@ -23,21 +23,14 @@ export async function GET(request: NextRequest) {
       const sessionCookie = cookieStore.get('session')
       
       if (sessionCookie) {
-        try {
-          const sessionData = JSON.parse(
-            Buffer.from(sessionCookie.value, 'base64').toString()
-          )
-          currentUserId = sessionData.userId
-          console.log('Session found, userId:', currentUserId)
-        } catch (parseError) {
-          console.error('Failed to parse session:', parseError)
-        }
-      } else {
-        console.log('No session cookie found')
+        const sessionData = JSON.parse(
+          Buffer.from(sessionCookie.value, 'base64').toString()
+        )
+        currentUserId = sessionData.userId
       }
     } catch (error) {
       // User not authenticated, continue without user-specific data
-      console.log('Error getting session:', error)
+      console.log('User not authenticated, fetching public posts')
     }
     
     // Fetch posts with user and category information
@@ -107,12 +100,6 @@ export async function GET(request: NextRequest) {
         youtubeVideoId = extractYouTubeVideoId(post.link_url);
       }
       
-      const isLiked = userLikes.has(post.id);
-      // Log the first post's like status for debugging
-      if (posts && posts.indexOf(post) === 0) {
-        console.log(`First post (${post.id}) liked status: ${isLiked}, userLikes has ${userLikes.size} items`);
-      }
-      
       return {
         id: post.id,
         userId: post.user_id,
@@ -131,7 +118,7 @@ export async function GET(request: NextRequest) {
         likes: post.likes_count || 0,
         comments: post.comments_count || 0,
         saved: userSaves.has(post.id),
-        liked: isLiked,
+        liked: userLikes.has(post.id),
         linkUrl: post.link_url,
         youtubeVideoId: youtubeVideoId,
         imageUrl: post.image_url,

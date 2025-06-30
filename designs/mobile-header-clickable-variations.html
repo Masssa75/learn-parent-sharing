@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clickable Points Display Variations</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 390px;
+      margin: 0 auto;
+    }
+    
+    .option {
+      margin-bottom: 60px;
+      border: 2px solid #2A2A2A;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .option-title {
+      background: #0A0A0A;
+      padding: 16px;
+      font-size: 18px;
+      color: #F5D547;
+      border-bottom: 1px solid #2A2A2A;
+    }
+    
+    .phone-frame {
+      background: #000;
+      padding: 0;
+      position: relative;
+      height: 180px;
+    }
+    
+    /* Base header styles */
+    .header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #000;
+      border-bottom: 1px solid #1A1A1A;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .profile-btn {
+      width: 40px;
+      height: 40px;
+      background: #F5D547;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    
+    .points-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    /* Content preview */
+    .content-preview {
+      padding: 20px;
+      opacity: 0.3;
+    }
+    
+    .section-title {
+      font-size: 36px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #F5D547;
+    }
+    
+    /* Variation 1: Mystery Box */
+    .mystery-box {
+      background: linear-gradient(135deg, rgba(245, 213, 71, 0.2), rgba(245, 213, 71, 0.05));
+      border: 1px solid rgba(245, 213, 71, 0.4);
+      border-radius: 20px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .mystery-box::before {
+      content: '?';
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: rgba(245, 213, 71, 0.5);
+      animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(-50%); }
+      50% { transform: translateY(-50%) translateY(-2px); }
+    }
+    
+    .mystery-points {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      padding-right: 16px;
+    }
+    
+    /* Variation 2: Expandable Preview */
+    .expandable-preview {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .main-points {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    .preview-dots {
+      display: flex;
+      gap: 2px;
+      margin-left: 4px;
+    }
+    
+    .dot {
+      width: 3px;
+      height: 3px;
+      background: #F5D547;
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: dot-dance 2s ease-in-out infinite;
+    }
+    
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes dot-dance {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    
+    /* Variation 3: Notification Badge */
+    .notification-style {
+      background: rgba(245, 213, 71, 0.15);
+      border: 1px solid rgba(245, 213, 71, 0.4);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .notification-dot {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 10px;
+      height: 10px;
+      background: #FF6B6B;
+      border: 2px solid #000;
+      border-radius: 50%;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    
+    /* Variation 4: Progress Teaser */
+    .progress-teaser {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 16px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    
+    .teaser-points {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .progress-hint {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: rgba(245, 213, 71, 0.2);
+    }
+    
+    .progress-fill {
+      height: 100%;
+      width: 65%;
+      background: #F5D547;
+      animation: progress-grow 3s ease-in-out infinite;
+    }
+    
+    @keyframes progress-grow {
+      0%, 100% { width: 65%; }
+      50% { width: 72%; }
+    }
+    
+    /* Variation 5: Treasure Chest */
+    .treasure-style {
+      background: linear-gradient(135deg, #2A2A2A, #1A1A1A);
+      border: 1px solid #F5D547;
+      border-radius: 20px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      position: relative;
+      box-shadow: inset 0 1px 0 rgba(245, 213, 71, 0.3);
+    }
+    
+    .chest-icon {
+      font-size: 18px;
+      animation: sparkle 3s ease-in-out infinite;
+    }
+    
+    @keyframes sparkle {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.3) drop-shadow(0 0 3px #F5D547); }
+    }
+    
+    .treasure-points {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    /* Variation 6: Unlock Hint */
+    .unlock-hint {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 16px 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    
+    .lock-icon {
+      font-size: 14px;
+      opacity: 0.6;
+      animation: wiggle 4s ease-in-out infinite;
+    }
+    
+    @keyframes wiggle {
+      0%, 90%, 100% { transform: rotate(0deg); }
+      92% { transform: rotate(-5deg); }
+      94% { transform: rotate(5deg); }
+      96% { transform: rotate(-5deg); }
+      98% { transform: rotate(5deg); }
+    }
+    
+    .unlock-points {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    /* Variation 7: Live Counter */
+    .live-counter {
+      background: rgba(245, 213, 71, 0.15);
+      border: 1px solid rgba(245, 213, 71, 0.4);
+      border-radius: 20px;
+      padding: 8px 16px;
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .counter-points {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    .live-indicator {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 6px;
+      height: 6px;
+      background: #4ADE80;
+      border-radius: 50%;
+      animation: live-pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes live-pulse {
+      0%, 100% { 
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+      }
+      50% { 
+        opacity: 0.7;
+        box-shadow: 0 0 0 4px rgba(74, 222, 128, 0);
+      }
+    }
+    
+    /* Variation 8: Swipe Hint */
+    .swipe-hint {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 16px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    
+    .swipe-points {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    .swipe-indicator {
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 2px;
+      background: rgba(245, 213, 71, 0.5);
+      border-radius: 1px;
+      animation: swipe 3s ease-in-out infinite;
+    }
+    
+    @keyframes swipe {
+      0%, 100% { width: 20px; opacity: 0.5; }
+      50% { width: 30px; opacity: 1; }
+    }
+    
+    /* Variation 9: Gift Box */
+    .gift-style {
+      background: linear-gradient(135deg, rgba(245, 213, 71, 0.2), rgba(255, 107, 107, 0.1));
+      border: 1px solid rgba(245, 213, 71, 0.4);
+      border-radius: 20px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .gift-icon {
+      font-size: 18px;
+      animation: shake 3s ease-in-out infinite;
+    }
+    
+    @keyframes shake {
+      0%, 90%, 100% { transform: rotate(0deg); }
+      92%, 96% { transform: rotate(-2deg); }
+      94%, 98% { transform: rotate(2deg); }
+    }
+    
+    .gift-points {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    /* Variation 10: Action Required */
+    .action-required {
+      background: rgba(245, 213, 71, 0.2);
+      border: 1px solid #F5D547;
+      border-radius: 20px;
+      padding: 8px 16px;
+      position: relative;
+      cursor: pointer;
+      animation: attention 4s ease-in-out infinite;
+    }
+    
+    @keyframes attention {
+      0%, 90%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(245, 213, 71, 0);
+      }
+      95% { 
+        transform: scale(1.02);
+        box-shadow: 0 0 10px rgba(245, 213, 71, 0.5);
+      }
+    }
+    
+    .action-points {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    .action-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: #F5D547;
+      animation: arrow-move 2s ease-in-out infinite;
+    }
+    
+    @keyframes arrow-move {
+      0%, 100% { transform: translateY(-50%) translateX(0); }
+      50% { transform: translateY(-50%) translateX(2px); }
+    }
+    
+    /* Description text */
+    .option-desc {
+      padding: 16px;
+      font-size: 14px;
+      color: #999;
+      background: #0A0A0A;
+      border-top: 1px solid #2A2A2A;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="section-title">Clickable Points Variations</h1>
+    
+    <!-- Variation 1: Mystery Box -->
+    <div class="option">
+      <div class="option-title">1. Mystery Rewards</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="mystery-box">
+              <span class="mystery-points">2,450</span>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Bouncing "?" hint suggests there's more to discover when clicked.
+      </div>
+    </div>
+    
+    <!-- Variation 2: Expandable Preview -->
+    <div class="option">
+      <div class="option-title">2. More to See</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="expandable-preview">
+              <span class="main-points">2,450</span>
+              <div class="preview-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+              </div>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Animated dots suggest more information available on tap.
+      </div>
+    </div>
+    
+    <!-- Variation 3: Notification Badge -->
+    <div class="option">
+      <div class="option-title">3. New Rewards Alert</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="notification-style">
+              2,450
+              <div class="notification-dot"></div>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Red notification dot creates urgency - something new to claim!
+      </div>
+    </div>
+    
+    <!-- Variation 4: Progress Teaser -->
+    <div class="option">
+      <div class="option-title">4. Progress Preview</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="progress-teaser">
+              <span class="teaser-points">2,450</span>
+              <div class="progress-hint">
+                <div class="progress-fill"></div>
+              </div>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Animated progress bar hints at levels/achievements to explore.
+      </div>
+    </div>
+    
+    <!-- Variation 5: Treasure Chest -->
+    <div class="option">
+      <div class="option-title">5. Treasure to Unlock</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="treasure-style">
+              <span class="chest-icon">💎</span>
+              <span class="treasure-points">2,450</span>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Sparkling gem icon suggests valuable rewards inside.
+      </div>
+    </div>
+    
+    <!-- Variation 6: Unlock Hint -->
+    <div class="option">
+      <div class="option-title">6. Unlockable Content</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="unlock-hint">
+              <span class="lock-icon">🔓</span>
+              <span class="unlock-points">2,450</span>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Wiggling unlock icon hints at features to access.
+      </div>
+    </div>
+    
+    <!-- Variation 7: Live Counter -->
+    <div class="option">
+      <div class="option-title">7. Live Activity</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="live-counter">
+              <span class="counter-points">2,450</span>
+              <div class="live-indicator"></div>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Green "live" indicator suggests real-time updates happening.
+      </div>
+    </div>
+    
+    <!-- Variation 8: Swipe Hint -->
+    <div class="option">
+      <div class="option-title">8. Interactive Hint</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="swipe-hint">
+              <span class="swipe-points">2,450</span>
+              <div class="swipe-indicator"></div>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Animated underline suggests swipe or tap interaction.
+      </div>
+    </div>
+    
+    <!-- Variation 9: Gift Box -->
+    <div class="option">
+      <div class="option-title">9. Rewards Waiting</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="gift-style">
+              <span class="gift-icon">🎁</span>
+              <span class="gift-points">2,450</span>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Shaking gift box creates excitement about rewards.
+      </div>
+    </div>
+    
+    <!-- Variation 10: Action Required -->
+    <div class="option">
+      <div class="option-title">10. Tap to Continue</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="action-required">
+              <span class="action-points">2,450</span>
+              <span class="action-arrow">›</span>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Subtle pulse and arrow create clear call-to-action.
+      </div>
+    </div>
+    
+  </div>
+</body>
+</html>

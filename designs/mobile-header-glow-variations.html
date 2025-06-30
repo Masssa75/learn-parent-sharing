@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Header Glow Variations</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 390px;
+      margin: 0 auto;
+    }
+    
+    .option {
+      margin-bottom: 60px;
+      border: 2px solid #2A2A2A;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .option-title {
+      background: #0A0A0A;
+      padding: 16px;
+      font-size: 18px;
+      color: #F5D547;
+      border-bottom: 1px solid #2A2A2A;
+    }
+    
+    .phone-frame {
+      background: #000;
+      padding: 0;
+      position: relative;
+      height: 180px;
+    }
+    
+    /* Base header styles */
+    .header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #000;
+      border-bottom: 1px solid #1A1A1A;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .profile-btn {
+      width: 40px;
+      height: 40px;
+      background: #F5D547;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    
+    .points-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    /* Content preview */
+    .content-preview {
+      padding: 20px;
+      opacity: 0.3;
+    }
+    
+    .section-title {
+      font-size: 36px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #F5D547;
+    }
+    
+    /* Variation 1: Original Glow with Ring */
+    .glow-ring {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      position: relative;
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(245, 213, 71, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(245, 213, 71, 0.5); }
+    }
+    
+    /* Variation 2: Subtle Pulse */
+    .pulse-pill {
+      background: rgba(245, 213, 71, 0.15);
+      border: 1px solid rgba(245, 213, 71, 0.4);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      position: relative;
+    }
+    
+    .pulse-pill::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      background: linear-gradient(135deg, transparent, rgba(245, 213, 71, 0.4), transparent);
+      border-radius: 20px;
+      opacity: 0;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+    
+    /* Variation 3: Gradient Glow */
+    .gradient-glow {
+      background: linear-gradient(135deg, rgba(245, 213, 71, 0.2), rgba(245, 213, 71, 0.05));
+      border: 1px solid transparent;
+      background-clip: padding-box;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      position: relative;
+    }
+    
+    .gradient-glow::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      bottom: -1px;
+      background: linear-gradient(135deg, #F5D547, rgba(245, 213, 71, 0.3));
+      border-radius: 20px;
+      z-index: -1;
+      opacity: 0.5;
+      animation: gradient-shift 4s ease-in-out infinite;
+    }
+    
+    @keyframes gradient-shift {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+    
+    /* Variation 4: With Level Indicator */
+    .glow-with-level {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 6px 8px 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    .glow-points-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    .level-dot {
+      width: 24px;
+      height: 24px;
+      background: rgba(245, 213, 71, 0.2);
+      border: 1px solid rgba(245, 213, 71, 0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #F5D547;
+    }
+    
+    /* Variation 5: Shimmer Effect */
+    .shimmer-pill {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .shimmer-pill::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        105deg,
+        transparent 40%,
+        rgba(245, 213, 71, 0.3) 50%,
+        transparent 60%
+      );
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) translateY(-100%); }
+      100% { transform: translateX(100%) translateY(100%); }
+    }
+    
+    /* Variation 6: Breathing Glow */
+    .breathing-glow {
+      background: rgba(245, 213, 71, 0.12);
+      border: 1px solid rgba(245, 213, 71, 0.35);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      animation: breathe 3s ease-in-out infinite;
+    }
+    
+    @keyframes breathe {
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 12px rgba(245, 213, 71, 0.3);
+      }
+      50% { 
+        transform: scale(1.02);
+        box-shadow: 0 0 18px rgba(245, 213, 71, 0.5);
+      }
+    }
+    
+    /* Variation 7: Coin Icon Glow */
+    .icon-glow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .glow-icon {
+      width: 28px;
+      height: 28px;
+      background: rgba(245, 213, 71, 0.2);
+      border: 1px solid rgba(245, 213, 71, 0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      animation: icon-glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes icon-glow {
+      0%, 100% { box-shadow: 0 0 8px rgba(245, 213, 71, 0.4); }
+      50% { box-shadow: 0 0 16px rgba(245, 213, 71, 0.6); }
+    }
+    
+    .icon-points {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    /* Variation 8: Soft Ambient */
+    .ambient-glow {
+      background: rgba(245, 213, 71, 0.08);
+      border: 1px solid rgba(245, 213, 71, 0.25);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      position: relative;
+      box-shadow: 
+        0 0 20px rgba(245, 213, 71, 0.15),
+        inset 0 0 10px rgba(245, 213, 71, 0.1);
+    }
+    
+    /* Variation 9: Progress Integrated */
+    .glow-progress {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      position: relative;
+      overflow: hidden;
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    .glow-progress::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 65%;
+      height: 2px;
+      background: #F5D547;
+      opacity: 0.5;
+    }
+    
+    /* Variation 10: Minimal Glow Dot */
+    .minimal-glow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .glow-dot {
+      width: 8px;
+      height: 8px;
+      background: #F5D547;
+      border-radius: 50%;
+      animation: dot-glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes dot-glow {
+      0%, 100% { 
+        box-shadow: 0 0 6px rgba(245, 213, 71, 0.6);
+      }
+      50% { 
+        box-shadow: 0 0 12px rgba(245, 213, 71, 0.9);
+      }
+    }
+    
+    .minimal-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    /* Description text */
+    .option-desc {
+      padding: 16px;
+      font-size: 14px;
+      color: #999;
+      background: #0A0A0A;
+      border-top: 1px solid #2A2A2A;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="section-title">Glowing Points Variations</h1>
+    
+    <!-- Variation 1: Original Glow -->
+    <div class="option">
+      <div class="option-title">1. Original Soft Glow</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="glow-ring">2,450</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        The original concept - soft pulsing glow around the points pill.
+      </div>
+    </div>
+    
+    <!-- Variation 2: Subtle Pulse -->
+    <div class="option">
+      <div class="option-title">2. Subtle Border Pulse</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="pulse-pill">2,450</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        More subtle - just the border pulses with a traveling light effect.
+      </div>
+    </div>
+    
+    <!-- Variation 3: Gradient Glow -->
+    <div class="option">
+      <div class="option-title">3. Gradient Background Glow</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="gradient-glow">2,450</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Gradient border with shifting opacity creates premium feel.
+      </div>
+    </div>
+    
+    <!-- Variation 4: With Level -->
+    <div class="option">
+      <div class="option-title">4. Glow with Level Dot</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="glow-with-level">
+              <span class="glow-points-text">2,450</span>
+              <div class="level-dot">4</div>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Combines glowing points with small level indicator (inspired by option 5).
+      </div>
+    </div>
+    
+    <!-- Variation 5: Shimmer -->
+    <div class="option">
+      <div class="option-title">5. Shimmer Effect</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="shimmer-pill">2,450</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Diagonal light sweep creates "shiny" effect every few seconds.
+      </div>
+    </div>
+    
+    <!-- Variation 6: Breathing -->
+    <div class="option">
+      <div class="option-title">6. Breathing Glow</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="breathing-glow">2,450</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Gentle "breathing" scale effect with glow. Very subtle and organic.
+      </div>
+    </div>
+    
+    <!-- Variation 7: Icon Glow -->
+    <div class="option">
+      <div class="option-title">7. Glowing Coin Icon</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="icon-glow">
+              <div class="glow-icon">🪙</div>
+              <span class="icon-points">2,450</span>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Only the coin icon glows, keeping the number clean and readable.
+      </div>
+    </div>
+    
+    <!-- Variation 8: Ambient -->
+    <div class="option">
+      <div class="option-title">8. Soft Ambient Glow</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="ambient-glow">2,450</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Static soft glow without animation. Always present but not distracting.
+      </div>
+    </div>
+    
+    <!-- Variation 9: Progress Bar -->
+    <div class="option">
+      <div class="option-title">9. Glow with Progress</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="glow-progress">2,450</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Tiny progress bar at bottom shows XP progress to next level.
+      </div>
+    </div>
+    
+    <!-- Variation 10: Minimal -->
+    <div class="option">
+      <div class="option-title">10. Minimal Glow Dot</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="minimal-glow">
+              <div class="glow-dot"></div>
+              <span class="minimal-text">2,450</span>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Just a small glowing dot indicator with clean text. Maximum subtlety.
+      </div>
+    </div>
+    
+  </div>
+</body>
+</html>

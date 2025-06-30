@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signed-Out Points Display Variations</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 390px;
+      margin: 0 auto;
+    }
+    
+    .option {
+      margin-bottom: 60px;
+      border: 2px solid #2A2A2A;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .option-title {
+      background: #0A0A0A;
+      padding: 16px;
+      font-size: 18px;
+      color: #F5D547;
+      border-bottom: 1px solid #2A2A2A;
+    }
+    
+    .phone-frame {
+      background: #000;
+      padding: 0;
+      position: relative;
+      height: 180px;
+    }
+    
+    /* Base header styles */
+    .header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #000;
+      border-bottom: 1px solid #1A1A1A;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .sign-in-btn {
+      padding: 8px 16px;
+      background: #F5D547;
+      color: #000;
+      border-radius: 20px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    
+    .points-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    /* Content preview */
+    .content-preview {
+      padding: 20px;
+      opacity: 0.3;
+    }
+    
+    .section-title {
+      font-size: 36px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #F5D547;
+    }
+    
+    /* Variation 1: Earn Points CTA */
+    .earn-cta {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      color: #F5D547;
+      cursor: pointer;
+      animation: subtle-glow 3s ease-in-out infinite;
+    }
+    
+    @keyframes subtle-glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(245, 213, 71, 0.2); }
+      50% { box-shadow: 0 0 15px rgba(245, 213, 71, 0.4); }
+    }
+    
+    /* Variation 2: Points Preview */
+    .preview-locked {
+      background: rgba(245, 213, 71, 0.05);
+      border: 1px solid rgba(245, 213, 71, 0.2);
+      border-radius: 20px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+    
+    .lock-small {
+      font-size: 12px;
+      opacity: 0.6;
+    }
+    
+    .preview-text {
+      font-size: 14px;
+      color: #999;
+    }
+    
+    /* Variation 3: Question Mark */
+    .mystery-intro {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 16px;
+      color: #F5D547;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .question-mark {
+      animation: bounce-slow 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce-slow {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+    
+    /* Variation 4: Join Community */
+    .join-badge {
+      background: linear-gradient(135deg, rgba(245, 213, 71, 0.2), rgba(245, 213, 71, 0.05));
+      border: 1px solid #F5D547;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #F5D547;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Variation 5: Token Teaser */
+    .token-teaser {
+      background: rgba(245, 213, 71, 0.08);
+      border: 1px solid rgba(245, 213, 71, 0.25);
+      border-radius: 20px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    
+    .coin-faded {
+      font-size: 16px;
+      opacity: 0.4;
+      animation: coin-spin 4s linear infinite;
+    }
+    
+    @keyframes coin-spin {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+    
+    .teaser-text {
+      font-size: 14px;
+      color: rgba(245, 213, 71, 0.7);
+    }
+    
+    /* Variation 6: Sign In for Rewards */
+    .rewards-prompt {
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      border-radius: 20px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: #FF6B6B;
+      cursor: pointer;
+      font-weight: 500;
+      animation: pulse-red 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-red {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    
+    /* Variation 7: Start Earning */
+    .start-earning {
+      background: #1A1A1A;
+      border: 1px dashed rgba(245, 213, 71, 0.4);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      color: rgba(245, 213, 71, 0.8);
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .arrow-right {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      animation: slide-right 2s ease-in-out infinite;
+    }
+    
+    @keyframes slide-right {
+      0%, 100% { transform: translateY(-50%) translateX(0); }
+      50% { transform: translateY(-50%) translateX(3px); }
+    }
+    
+    /* Variation 8: Minimalist */
+    .minimal-prompt {
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    
+    .minimal-prompt:hover {
+      color: #F5D547;
+    }
+    
+    /* Variation 9: Badge Style */
+    .intro-badge {
+      background: #0A0A0A;
+      border: 2px solid #1A1A1A;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: #666;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+    }
+    
+    .intro-badge:hover {
+      border-color: #F5D547;
+      color: #F5D547;
+    }
+    
+    /* Variation 10: No Display */
+    .no-display {
+      /* Nothing shown for signed-out users */
+    }
+    
+    /* Description text */
+    .option-desc {
+      padding: 16px;
+      font-size: 14px;
+      color: #999;
+      background: #0A0A0A;
+      border-top: 1px solid #2A2A2A;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="section-title">Signed-Out User Options</h1>
+    
+    <!-- Variation 1: Earn Points CTA -->
+    <div class="option">
+      <div class="option-title">1. Clear Call-to-Action</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="earn-cta">Earn Points</div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Direct message about earning points. Creates curiosity about the system.
+      </div>
+    </div>
+    
+    <!-- Variation 2: Locked Preview -->
+    <div class="option">
+      <div class="option-title">2. Locked Points</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="preview-locked">
+              <span class="lock-small">🔒</span>
+              <span class="preview-text">0 pts</span>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Shows they have 0 points with lock icon. Makes them want to unlock.
+      </div>
+    </div>
+    
+    <!-- Variation 3: Mystery -->
+    <div class="option">
+      <div class="option-title">3. Question Mark</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="mystery-intro">
+              <span class="question-mark">?</span>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Single question mark creates intrigue. What is this about?
+      </div>
+    </div>
+    
+    <!-- Variation 4: Join Community -->
+    <div class="option">
+      <div class="option-title">4. Community Angle</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="join-badge">Join</div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        "Join" suggests exclusive community with benefits.
+      </div>
+    </div>
+    
+    <!-- Variation 5: Token Teaser -->
+    <div class="option">
+      <div class="option-title">5. Token Preview</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="token-teaser">
+              <span class="coin-faded">🪙</span>
+              <span class="teaser-text">Sign in</span>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Faded spinning coin with "Sign in" text. Visual hint at rewards.
+      </div>
+    </div>
+    
+    <!-- Variation 6: Rewards Prompt -->
+    <div class="option">
+      <div class="option-title">6. Rewards Focus</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="rewards-prompt">Get rewards</div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Red color creates urgency. Direct promise of rewards.
+      </div>
+    </div>
+    
+    <!-- Variation 7: Start Earning -->
+    <div class="option">
+      <div class="option-title">7. Action-Oriented</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="start-earning">
+              Start earning
+              <span class="arrow-right">→</span>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Dashed border suggests "empty" state. Arrow prompts action.
+      </div>
+    </div>
+    
+    <!-- Variation 8: Minimal -->
+    <div class="option">
+      <div class="option-title">8. Subtle Text</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="minimal-prompt">earn tokens</div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Very subtle gray text. Doesn't compete but creates curiosity.
+      </div>
+    </div>
+    
+    <!-- Variation 9: Badge Style -->
+    <div class="option">
+      <div class="option-title">9. NEW Badge</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="intro-badge">NEW</div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        "NEW" badge suggests recent feature addition. Creates FOMO.
+      </div>
+    </div>
+    
+    <!-- Variation 10: Nothing -->
+    <div class="option">
+      <div class="option-title">10. Clean (No Points Display)</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="no-display"></div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        No points display at all for signed-out users. Discover it after sign in.
+      </div>
+    </div>
+    
+  </div>
+</body>
+</html>

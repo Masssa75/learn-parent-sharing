@@ -260,48 +260,70 @@ export default function CreatePage() {
       
       {/* Form */}
         <div className="max-w-2xl mx-auto">
-          <form onSubmit={handleSubmit} className="p-5 space-y-6">
-          {/* Description - Primary input with prominent styling */}
+          <form onSubmit={handleSubmit} className="p-5 space-y-5">
+          {/* Link URL - Moved to top */}
           <div className="relative">
-            <div className="bg-gradient-to-br from-brand-yellow/20 to-brand-yellow/5 p-[2px] rounded-2xl">
-              <textarea
-                value={description}
-                onChange={(e) => {
-                  setDescription(e.target.value)
-                  // Auto-resize textarea
-                  e.target.style.height = 'auto'
-                  e.target.style.height = e.target.scrollHeight + 'px'
-                  // Reset generated titles when description changes
-                  setGeneratedTitles([])
-                  setSelectedTitleIndex(null)
-                  setTitle('')
-                }}
-                placeholder="Describe your tip or what you learned today..."
-                rows={6}
-                className="w-full bg-black border-2 border-transparent rounded-2xl px-6 py-5 pr-16 text-text-primary text-xl placeholder-text-muted outline-none focus:border-brand-yellow/50 transition-all resize-y overflow-hidden shadow-xl"
-                style={{ minHeight: '180px' }}
-                required
+            {link && isYouTubeUrl(link) ? (
+              <YouTubePreview 
+                url={link} 
+                onRemove={() => setLink('')} 
               />
-            </div>
+            ) : (
+              <div className="relative">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <input
+                  type="url"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  placeholder="Paste link to app, video, or website"
+                  className="w-full bg-black border border-dark-border rounded-input pl-12 pr-4 py-3 text-text-primary text-body placeholder-text-muted outline-none focus:border-brand-yellow transition-colors"
+                />
+              </div>
+            )}
+          </div>
+          
+          {/* Description - Now the primary input with recording option */}
+          <div className="relative">
+            <textarea
+              value={description}
+              onChange={(e) => {
+                setDescription(e.target.value)
+                // Auto-resize textarea
+                e.target.style.height = 'auto'
+                e.target.style.height = e.target.scrollHeight + 'px'
+                // Reset generated titles when description changes
+                setGeneratedTitles([])
+                setSelectedTitleIndex(null)
+                setTitle('')
+              }}
+              placeholder="Describe your tip or what you learned today..."
+              rows={5}
+              className="w-full bg-black border border-dark-border rounded-input px-4 py-4 pr-14 text-text-primary text-lg placeholder-text-muted outline-none focus:border-brand-yellow transition-colors resize-y overflow-hidden"
+              style={{ minHeight: '150px' }}
+              required
+            />
             {/* Recording button inside textarea */}
             <button
               type="button"
               onClick={toggleRecording}
-              className={`absolute bottom-4 right-4 p-3 rounded-full transition-all ${
+              className={`absolute bottom-3 right-3 p-2.5 rounded-full transition-all ${
                 isRecording
-                  ? 'bg-red-500 hover:bg-red-600 animate-pulse shadow-lg'
-                  : 'bg-brand-yellow/20 hover:bg-brand-yellow/30 border border-brand-yellow/50'
+                  ? 'bg-red-500 hover:bg-red-600 animate-pulse'
+                  : 'bg-dark-surface hover:bg-dark-border border border-dark-border'
               }`}
               title={isRecording ? 'Stop recording' : 'Record your tip'}
             >
               {isRecording ? (
                 // Stop icon
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-white">
                   <rect x="6" y="6" width="12" height="12" rx="2" />
                 </svg>
               ) : (
                 // Microphone icon
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-brand-yellow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-text-muted">
                   <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
                   <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                   <line x1="12" y1="19" x2="12" y2="23"></line>
@@ -311,7 +333,7 @@ export default function CreatePage() {
             </button>
             {/* Show interim transcript while recording */}
             {isRecording && interimTranscript && (
-              <div className="absolute bottom-16 right-4 bg-dark-surface px-3 py-1 rounded-card text-sm text-text-muted italic max-w-xs shadow-lg">
+              <div className="absolute bottom-14 right-3 bg-dark-surface px-3 py-1 rounded-card text-sm text-text-muted italic max-w-xs">
                 {interimTranscript}
               </div>
             )}
@@ -404,30 +426,6 @@ export default function CreatePage() {
                 >
                   Generate new titles
                 </button>
-              </div>
-            )}
-          </div>
-          
-          {/* Link URL */}
-          <div className="relative">
-            {link && isYouTubeUrl(link) ? (
-              <YouTubePreview 
-                url={link} 
-                onRemove={() => setLink('')} 
-              />
-            ) : (
-              <div className="relative">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">
-                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                </svg>
-                <input
-                  type="url"
-                  value={link}
-                  onChange={(e) => setLink(e.target.value)}
-                  placeholder="Paste link to app, video, or website"
-                  className="w-full bg-black border border-dark-border rounded-input pl-12 pr-4 py-3 text-text-primary text-body placeholder-text-muted outline-none focus:border-brand-yellow transition-colors"
-                />
               </div>
             )}
           </div>

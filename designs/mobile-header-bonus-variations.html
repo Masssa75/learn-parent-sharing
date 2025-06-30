@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign-Up Bonus Display Variations</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 390px;
+      margin: 0 auto;
+    }
+    
+    .option {
+      margin-bottom: 60px;
+      border: 2px solid #2A2A2A;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .option-title {
+      background: #0A0A0A;
+      padding: 16px;
+      font-size: 18px;
+      color: #F5D547;
+      border-bottom: 1px solid #2A2A2A;
+    }
+    
+    .phone-frame {
+      background: #000;
+      padding: 0;
+      position: relative;
+      height: 180px;
+    }
+    
+    /* Base header styles */
+    .header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #000;
+      border-bottom: 1px solid #1A1A1A;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .sign-in-btn {
+      padding: 8px 16px;
+      background: #F5D547;
+      color: #000;
+      border-radius: 20px;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    
+    .points-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    /* Content preview */
+    .content-preview {
+      padding: 20px;
+      opacity: 0.3;
+    }
+    
+    .section-title {
+      font-size: 36px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #F5D547;
+    }
+    
+    /* Variation 1: Big Bonus */
+    .big-bonus {
+      background: linear-gradient(135deg, rgba(245, 213, 71, 0.2), rgba(245, 213, 71, 0.05));
+      border: 1px solid #F5D547;
+      border-radius: 20px;
+      padding: 8px 16px;
+      cursor: pointer;
+      position: relative;
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(245, 213, 71, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(245, 213, 71, 0.5); }
+    }
+    
+    .bonus-amount {
+      font-size: 18px;
+      font-weight: 700;
+      color: #F5D547;
+    }
+    
+    /* Variation 2: Get Started Focus */
+    .get-started-bonus {
+      background: rgba(245, 213, 71, 0.15);
+      border: 1px solid rgba(245, 213, 71, 0.4);
+      border-radius: 20px;
+      padding: 6px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      line-height: 1.2;
+    }
+    
+    .bonus-top {
+      font-size: 16px;
+      font-weight: 700;
+      color: #F5D547;
+    }
+    
+    .bonus-bottom {
+      font-size: 11px;
+      color: rgba(245, 213, 71, 0.8);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Variation 3: Gift Style */
+    .gift-bonus {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .gift-emoji {
+      font-size: 16px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+    
+    .gift-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    /* Variation 4: Free Badge */
+    .free-bonus {
+      background: linear-gradient(135deg, #FF6B6B, #F5D547);
+      border-radius: 20px;
+      padding: 8px 16px;
+      cursor: pointer;
+      position: relative;
+      color: #000;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      animation: shimmer 3s linear infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+    
+    /* Variation 5: Claim Now */
+    .claim-bonus {
+      background: rgba(245, 213, 71, 0.2);
+      border: 2px solid #F5D547;
+      border-radius: 20px;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .claim-amount {
+      font-size: 16px;
+      font-weight: 700;
+      color: #F5D547;
+    }
+    
+    .claim-arrow {
+      font-size: 12px;
+      color: #F5D547;
+      animation: arrow-pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes arrow-pulse {
+      0%, 100% { transform: translateX(0); opacity: 0.6; }
+      50% { transform: translateX(2px); opacity: 1; }
+    }
+    
+    /* Variation 6: Stack Style */
+    .stack-bonus {
+      background: #1A1A1A;
+      border: 1px solid rgba(245, 213, 71, 0.4);
+      border-radius: 20px;
+      padding: 8px 16px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stack-bonus::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(245, 213, 71, 0.3), transparent);
+      animation: sweep 3s ease-in-out infinite;
+    }
+    
+    @keyframes sweep {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+    
+    .stack-text {
+      position: relative;
+      font-size: 15px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    /* Variation 7: Notification Style */
+    .notif-bonus {
+      background: rgba(255, 107, 107, 0.15);
+      border: 1px solid rgba(255, 107, 107, 0.4);
+      border-radius: 20px;
+      padding: 8px 16px;
+      cursor: pointer;
+      position: relative;
+      font-size: 14px;
+      font-weight: 600;
+      color: #FF6B6B;
+    }
+    
+    .notif-dot {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 12px;
+      height: 12px;
+      background: #FF6B6B;
+      border: 2px solid #000;
+      border-radius: 50%;
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    
+    /* Variation 8: Token Style */
+    .token-bonus {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .token-icon {
+      width: 24px;
+      height: 24px;
+      background: rgba(245, 213, 71, 0.2);
+      border: 1px solid rgba(245, 213, 71, 0.4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      animation: coin-glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes coin-glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(245, 213, 71, 0.4); }
+      50% { box-shadow: 0 0 10px rgba(245, 213, 71, 0.6); }
+    }
+    
+    .token-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    /* Variation 9: Action Button */
+    .action-bonus {
+      background: rgba(245, 213, 71, 0.2);
+      border: 1px solid #F5D547;
+      border-radius: 20px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: #F5D547;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+    }
+    
+    .action-bonus:hover {
+      background: rgba(245, 213, 71, 0.3);
+      transform: scale(1.05);
+    }
+    
+    /* Variation 10: Minimal Plus */
+    .minimal-bonus {
+      font-size: 16px;
+      font-weight: 700;
+      color: #F5D547;
+      cursor: pointer;
+      padding: 8px 12px;
+      position: relative;
+    }
+    
+    .minimal-bonus::after {
+      content: '';
+      position: absolute;
+      bottom: 6px;
+      left: 12px;
+      right: 12px;
+      height: 2px;
+      background: rgba(245, 213, 71, 0.4);
+      animation: underline-grow 2s ease-in-out infinite;
+    }
+    
+    @keyframes underline-grow {
+      0%, 100% { transform: scaleX(0.8); opacity: 0.4; }
+      50% { transform: scaleX(1); opacity: 1; }
+    }
+    
+    /* Description text */
+    .option-desc {
+      padding: 16px;
+      font-size: 14px;
+      color: #999;
+      background: #0A0A0A;
+      border-top: 1px solid #2A2A2A;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="section-title">Sign-Up Bonus Variations</h1>
+    
+    <!-- Variation 1: Big Bonus Number -->
+    <div class="option">
+      <div class="option-title">1. Bold Bonus Amount</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="big-bonus">
+              <span class="bonus-amount">+100</span>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Big glowing +100 makes the reward crystal clear.
+      </div>
+    </div>
+    
+    <!-- Variation 2: Get Started -->
+    <div class="option">
+      <div class="option-title">2. Get Started + Bonus</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="get-started-bonus">
+              <span class="bonus-top">+100</span>
+              <span class="bonus-bottom">Get Started</span>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Stacked layout shows bonus and clear CTA.
+      </div>
+    </div>
+    
+    <!-- Variation 3: Gift Emoji -->
+    <div class="option">
+      <div class="option-title">3. Gift + 100</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="gift-bonus">
+              <span class="gift-emoji">🎁</span>
+              <span class="gift-text">+100</span>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Bouncing gift icon makes it feel like a present waiting.
+      </div>
+    </div>
+    
+    <!-- Variation 4: Free Badge -->
+    <div class="option">
+      <div class="option-title">4. FREE +100</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="free-bonus">FREE +100</div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Gradient background with "FREE" makes it irresistible.
+      </div>
+    </div>
+    
+    <!-- Variation 5: Claim Now -->
+    <div class="option">
+      <div class="option-title">5. Claim +100</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="claim-bonus">
+              <span class="claim-amount">+100</span>
+              <span class="claim-arrow">→</span>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Arrow suggests action. Bold border makes it clickable.
+      </div>
+    </div>
+    
+    <!-- Variation 6: Sweeping Effect -->
+    <div class="option">
+      <div class="option-title">6. +100 Bonus</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="stack-bonus">
+              <span class="stack-text">+100 bonus</span>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Sweeping light effect creates premium feel.
+      </div>
+    </div>
+    
+    <!-- Variation 7: Notification -->
+    <div class="option">
+      <div class="option-title">7. New User Bonus</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="notif-bonus">
+              +100 waiting
+              <div class="notif-dot"></div>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Red notification dot creates urgency. "Waiting" implies ready to claim.
+      </div>
+    </div>
+    
+    <!-- Variation 8: Token Icon -->
+    <div class="option">
+      <div class="option-title">8. Token Bonus</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="token-bonus">
+              <div class="token-icon">🪙</div>
+              <span class="token-text">+100</span>
+            </div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Glowing coin icon reinforces token/points concept.
+      </div>
+    </div>
+    
+    <!-- Variation 9: Start Now -->
+    <div class="option">
+      <div class="option-title">9. Start +100</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="action-bonus">Start +100</div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Combines action word with bonus amount. Clear and direct.
+      </div>
+    </div>
+    
+    <!-- Variation 10: Minimal -->
+    <div class="option">
+      <div class="option-title">10. Simple +100</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="points-container">
+            <div class="minimal-bonus">+100</div>
+            <div class="sign-in-btn">SIGN IN</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Clean and simple with animated underline for subtle attention.
+      </div>
+    </div>
+    
+  </div>
+</body>
+</html>
