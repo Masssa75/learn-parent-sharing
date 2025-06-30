@@ -585,20 +585,12 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
           <div className="flex items-center justify-between mb-2">
           <h1 className="text-display text-text-primary">Discover</h1>
           {!isAuthenticated ? (
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => router.push('/login')}
-                className="bg-brand-yellow/20 border border-brand-yellow text-brand-yellow rounded-button px-4 py-2 text-sm font-semibold uppercase tracking-wider hover:bg-brand-yellow/30 transition-all cursor-pointer"
-              >
-                CLAIM +100
-              </button>
-              <Link 
-                href="/login"
-                className="px-6 py-3 bg-brand-yellow text-black rounded-button font-semibold hover:scale-105 btn-transition"
-              >
-                SIGN IN
-              </Link>
-            </div>
+            <Link 
+              href="/login"
+              className="px-6 py-3 bg-brand-yellow text-black rounded-button font-semibold hover:scale-105 btn-transition"
+            >
+              SIGN IN
+            </Link>
           ) : (
             <div className="relative">
               <button 
