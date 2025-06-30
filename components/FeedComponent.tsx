@@ -162,7 +162,9 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   const fetchPosts = async () => {
     try {
       console.log('Fetching posts, authenticated:', isAuthenticated, 'user:', user?.id)
-      const response = await fetch('/api/posts')
+      const response = await fetch('/api/posts', {
+        credentials: 'include' // Ensure cookies are sent
+      })
       if (!response.ok) {
         throw new Error(`Failed to fetch posts: ${response.status}`)
       }

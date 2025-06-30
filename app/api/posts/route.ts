@@ -22,14 +22,11 @@ export async function GET(request: NextRequest) {
       const cookieStore = await cookies()
       const sessionCookie = cookieStore.get('session')
       
-      console.log('DEBUG: Session cookie exists:', !!sessionCookie)
-      
       if (sessionCookie) {
         const sessionData = JSON.parse(
           Buffer.from(sessionCookie.value, 'base64').toString()
         )
         currentUserId = sessionData.userId
-        console.log('DEBUG: Current user ID:', currentUserId)
       }
     } catch (error) {
       // User not authenticated, continue without user-specific data
@@ -71,19 +68,17 @@ export async function GET(request: NextRequest) {
     let userSaves = new Set()
     
     if (currentUserId) {
-      console.log('DEBUG: Fetching likes for user:', currentUserId)
-      
       // Fetch user's likes
       const { data: likes, error: likesError } = await supabase
         .from('likes')
         .select('post_id')
         .eq('user_id', currentUserId)
       
-      console.log('DEBUG: Likes query result:', { likesCount: likes?.length || 0, error: likesError })
-      
-      if (likes) {
+      if (likesError) {
+        console.error('Error fetching likes:', likesError)
+      } else if (likes) {
         userLikes = new Set(likes.map(like => like.post_id))
-        console.log('DEBUG: User likes set:', Array.from(userLikes))
+        console.log(`User ${currentUserId} has ${likes.length} likes`)
       }
       
       // Fetch user's saves
@@ -92,13 +87,9 @@ export async function GET(request: NextRequest) {
         .select('post_id')
         .eq('user_id', currentUserId)
       
-      console.log('DEBUG: Saves query result:', { savesCount: saves?.length || 0, error: savesError })
-      
       if (saves) {
         userSaves = new Set(saves.map(save => save.post_id))
       }
-    } else {
-      console.log('DEBUG: No user ID, skipping likes/saves fetch')
     }
 
     // Transform the data to match the expected format

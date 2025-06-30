@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Header Points Display Options</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 390px; /* iPhone 14 Pro width */
+      margin: 0 auto;
+    }
+    
+    .option {
+      margin-bottom: 60px;
+      border: 2px solid #2A2A2A;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    
+    .option-title {
+      background: #0A0A0A;
+      padding: 16px;
+      font-size: 18px;
+      color: #F5D547;
+      border-bottom: 1px solid #2A2A2A;
+    }
+    
+    .phone-frame {
+      background: #000;
+      padding: 0;
+      position: relative;
+      height: 180px;
+    }
+    
+    /* Base header styles */
+    .header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #000;
+      border-bottom: 1px solid #1A1A1A;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .profile-btn {
+      width: 40px;
+      height: 40px;
+      background: #F5D547;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    
+    /* Content preview */
+    .content-preview {
+      padding: 20px;
+      opacity: 0.3;
+    }
+    
+    .section-title {
+      font-size: 36px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #F5D547;
+    }
+    
+    /* Option 1: Simple Points Counter */
+    .simple-points {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .points-pill {
+      background: #1A1A1A;
+      border: 1px solid #2A2A2A;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+    }
+    
+    /* Option 2: Icon + Points */
+    .icon-points {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .coin-icon {
+      width: 32px;
+      height: 32px;
+      background: #F5D547;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    
+    .points-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: #F5D547;
+    }
+    
+    /* Option 3: Level Badge + Points */
+    .level-points {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .level-badge {
+      background: #F5D547;
+      color: #000;
+      padding: 6px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    
+    .small-points {
+      font-size: 16px;
+      color: #999;
+      font-weight: 600;
+    }
+    
+    /* Option 4: Minimal Dots */
+    .minimal-dots {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .dot-indicator {
+      width: 8px;
+      height: 8px;
+      background: #F5D547;
+      border-radius: 50%;
+    }
+    
+    .dots-value {
+      font-size: 14px;
+      color: #F5D547;
+      font-weight: 600;
+    }
+    
+    /* Option 5: Progress Ring */
+    .progress-ring-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .ring-wrapper {
+      position: relative;
+      width: 36px;
+      height: 36px;
+    }
+    
+    .ring {
+      transform: rotate(-90deg);
+    }
+    
+    .ring-bg {
+      fill: none;
+      stroke: #2A2A2A;
+      stroke-width: 3;
+    }
+    
+    .ring-progress {
+      fill: none;
+      stroke: #F5D547;
+      stroke-width: 3;
+      stroke-dasharray: 100;
+      stroke-dashoffset: 35; /* 65% progress */
+      transition: stroke-dashoffset 0.5s;
+    }
+    
+    .ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12px;
+      font-weight: 700;
+      color: #F5D547;
+    }
+    
+    /* Option 6: Stacked Info */
+    .stacked-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .info-stack {
+      text-align: right;
+    }
+    
+    .stack-points {
+      font-size: 16px;
+      font-weight: 700;
+      color: #F5D547;
+      line-height: 1;
+    }
+    
+    .stack-label {
+      font-size: 10px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Option 7: Animated Glow */
+    .glow-points {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .glow-pill {
+      background: rgba(245, 213, 71, 0.1);
+      border: 1px solid rgba(245, 213, 71, 0.3);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #F5D547;
+      position: relative;
+      animation: glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(245, 213, 71, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(245, 213, 71, 0.5); }
+    }
+    
+    /* Option 8: Compact Badge */
+    .compact-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .badge {
+      background: #1A1A1A;
+      border-radius: 16px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #2A2A2A;
+    }
+    
+    .badge-icon {
+      width: 20px;
+      height: 20px;
+      background: #F5D547;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    .badge-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #F5D547;
+      padding-right: 6px;
+    }
+    
+    /* Option 9: Actions Counter */
+    .actions-counter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .actions-display {
+      text-align: center;
+    }
+    
+    .actions-number {
+      font-size: 20px;
+      font-weight: 700;
+      color: #F5D547;
+      line-height: 1;
+    }
+    
+    .actions-label {
+      font-size: 9px;
+      color: #666;
+      text-transform: uppercase;
+    }
+    
+    /* Option 10: Streak Fire */
+    .streak-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .streak-pill {
+      background: linear-gradient(135deg, #FF6B6B 0%, #F5D547 100%);
+      border-radius: 20px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .streak-icon {
+      font-size: 16px;
+    }
+    
+    .streak-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: #000;
+    }
+    
+    /* Description text */
+    .option-desc {
+      padding: 16px;
+      font-size: 14px;
+      color: #999;
+      background: #0A0A0A;
+      border-top: 1px solid #2A2A2A;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="section-title">Mobile Header Points Options</h1>
+    
+    <!-- Option 1: Simple Points Counter -->
+    <div class="option">
+      <div class="option-title">Option 1: Simple Points Pill</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="simple-points">
+            <div class="points-pill">2,450</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Clean and minimal. Just the points in a subtle pill next to profile.
+      </div>
+    </div>
+    
+    <!-- Option 2: Icon + Points -->
+    <div class="option">
+      <div class="option-title">Option 2: Coin Icon + Number</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="icon-points">
+            <div class="coin-icon">🪙</div>
+            <div class="points-text">2.4k</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Visual coin icon makes it clear these are tokens/points. Abbreviated number saves space.
+      </div>
+    </div>
+    
+    <!-- Option 3: Level Badge + Points -->
+    <div class="option">
+      <div class="option-title">Option 3: Level + Points Combo</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="level-points">
+            <div class="level-badge">LVL 4</div>
+            <div class="small-points">2.4k</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Shows both level and points. Level badge adds gamification feel.
+      </div>
+    </div>
+    
+    <!-- Option 4: Minimal Dots -->
+    <div class="option">
+      <div class="option-title">Option 4: Ultra Minimal</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="minimal-dots">
+            <div class="dot-indicator"></div>
+            <div class="dots-value">2.4k</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Tiny yellow dot indicator with points. Super subtle, doesn't compete for attention.
+      </div>
+    </div>
+    
+    <!-- Option 5: Progress Ring -->
+    <div class="option">
+      <div class="option-title">Option 5: Level Progress Ring</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="progress-ring-container">
+            <div class="ring-wrapper">
+              <svg class="ring" width="36" height="36">
+                <circle class="ring-bg" cx="18" cy="18" r="16"/>
+                <circle class="ring-progress" cx="18" cy="18" r="16"/>
+              </svg>
+              <div class="ring-text">4</div>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Shows level with XP progress toward next level. Visual progress indicator.
+      </div>
+    </div>
+    
+    <!-- Option 6: Stacked Info -->
+    <div class="option">
+      <div class="option-title">Option 6: Stacked Points/Actions</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="stacked-info">
+            <div class="info-stack">
+              <div class="stack-points">2,450</div>
+              <div class="stack-label">18 left</div>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Points on top, actions remaining below. Compact two-line display.
+      </div>
+    </div>
+    
+    <!-- Option 7: Animated Glow -->
+    <div class="option">
+      <div class="option-title">Option 7: Glowing Points</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="glow-points">
+            <div class="glow-pill">2,450</div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Subtle pulsing glow animation draws occasional attention without being distracting.
+      </div>
+    </div>
+    
+    <!-- Option 8: Compact Badge -->
+    <div class="option">
+      <div class="option-title">Option 8: Compact Token Badge</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="compact-badge">
+            <div class="badge">
+              <div class="badge-icon">₹</div>
+              <div class="badge-text">2.4k</div>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Token symbol in small badge format. Feels more like currency/crypto.
+      </div>
+    </div>
+    
+    <!-- Option 9: Actions Focus -->
+    <div class="option">
+      <div class="option-title">Option 9: Actions Counter</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="actions-counter">
+            <div class="actions-display">
+              <div class="actions-number">18</div>
+              <div class="actions-label">actions</div>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Focuses on urgency - how many actions left today. Creates FOMO.
+      </div>
+    </div>
+    
+    <!-- Option 10: Streak Fire -->
+    <div class="option">
+      <div class="option-title">Option 10: Streak Counter</div>
+      <div class="phone-frame">
+        <div class="header">
+          <div class="logo">Learn</div>
+          <div class="streak-display">
+            <div class="streak-pill">
+              <span class="streak-icon">🔥</span>
+              <span class="streak-text">7</span>
+            </div>
+            <div class="profile-btn">M</div>
+          </div>
+        </div>
+        <div class="content-preview">
+          <div style="font-size: 32px;">Discover</div>
+          <div style="font-size: 14px; margin-top: 8px;">What's working for parents today</div>
+        </div>
+      </div>
+      <div class="option-desc">
+        Daily streak counter. Motivates consistent engagement like Duolingo.
+      </div>
+    </div>
+    
+  </div>
+</body>
+</html>
