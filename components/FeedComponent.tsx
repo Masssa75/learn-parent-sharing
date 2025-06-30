@@ -26,6 +26,7 @@ interface Post {
   title: string
   description?: string
   linkUrl?: string
+  imageUrl?: string
   youtubeVideoId?: string
   category?: {
     name: string
@@ -60,7 +61,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   const [loading, setLoading] = useState(true)
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [editingPostId, setEditingPostId] = useState<string | null>(null)
-  const [editFormData, setEditFormData] = useState<{ title: string; description: string; linkUrl: string }>({ title: '', description: '', linkUrl: '' })
+  const [editFormData, setEditFormData] = useState<{ title: string; description: string; linkUrl: string; imageUrl: string }>({ title: '', description: '', linkUrl: '', imageUrl: '' })
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set())
   const [openMenuPostId, setOpenMenuPostId] = useState<string | null>(null)
   const [floatingPoints, setFloatingPoints] = useState<{ [postId: string]: { points: number, key: number } }>({})
@@ -422,13 +424,63 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
     setEditFormData({
       title: post.title,
       description: post.description || '',
-      linkUrl: post.linkUrl || ''
+      linkUrl: post.linkUrl || '',
+      imageUrl: post.imageUrl || ''
     })
   }
 
   const handleCancelEdit = () => {
     setEditingPostId(null)
-    setEditFormData({ title: '', description: '', linkUrl: '' })
+    setEditFormData({ title: '', description: '', linkUrl: '', imageUrl: '' })
+    setUploadingImage(false)
+  }
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)')
+      return
+    }
+
+    // Validate file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      alert('File size must be less than 5MB')
+      return
+    }
+
+    setUploadingImage(true)
+    
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to upload image')
+      }
+      
+      const result = await response.json()
+      setEditFormData({ ...editFormData, imageUrl: result.url })
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Failed to upload image. Please try again.')
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setEditFormData({ ...editFormData, imageUrl: '' })
   }
 
 
@@ -454,7 +506,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
             ...post,
             title: editFormData.title,
             description: editFormData.description,
-            linkUrl: editFormData.linkUrl
+            linkUrl: editFormData.linkUrl,
+            imageUrl: editFormData.imageUrl
           }
         }
         return post
@@ -462,7 +515,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
 
       // Clear edit mode
       setEditingPostId(null)
-      setEditFormData({ title: '', description: '', linkUrl: '' })
+      setEditFormData({ title: '', description: '', linkUrl: '', imageUrl: '' })
+      setUploadingImage(false)
     } catch (error) {
       console.error('Error updating post:', error)
       alert(error instanceof Error ? error.message : 'Failed to update post. Please try again.')
@@ -657,6 +711,55 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                     className="w-full px-4 py-3 bg-dark-surface border border-dark-border rounded-input text-text-primary mb-3 focus:outline-none focus:border-brand-yellow"
                     placeholder="Link URL (optional)"
                   />
+
+                  {/* Image Upload Section */}
+                  <div className="mb-3">
+                    {editFormData.imageUrl ? (
+                      <div className="relative">
+                        <img 
+                          src={editFormData.imageUrl} 
+                          alt="Post image" 
+                          className="w-full h-48 object-cover rounded-card mb-2"
+                        />
+                        <button
+                          onClick={handleRemoveImage}
+                          className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="border-2 border-dashed border-dark-border rounded-card p-4 text-center">
+                        <input
+                          type="file"
+                          id="imageUpload"
+                          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          disabled={uploadingImage}
+                        />
+                        <label 
+                          htmlFor="imageUpload" 
+                          className={`cursor-pointer ${uploadingImage ? 'opacity-50' : ''}`}
+                        >
+                          {uploadingImage ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-yellow"></div>
+                              <span className="text-text-muted">Uploading...</span>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-2">
+                              <svg className="w-8 h-8 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                              <span className="text-text-muted text-sm">Click to add image</span>
+                              <span className="text-text-muted text-xs">JPEG, PNG, GIF, WebP up to 5MB</span>
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    )}
+                  </div>
                   
                 </div>
               ) : (
@@ -680,6 +783,17 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                     </div>
                   )}
                 </>
+              )}
+              
+              {/* Post Image */}
+              {post.imageUrl && (
+                <div className="mb-6">
+                  <img 
+                    src={post.imageUrl} 
+                    alt={post.title}
+                    className="w-full h-auto rounded-card"
+                  />
+                </div>
               )}
               
               {/* YouTube Video */}

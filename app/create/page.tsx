@@ -30,6 +30,8 @@ export default function CreatePage() {
   const [recognition, setRecognition] = useState<any>(null)
   const [interimTranscript, setInterimTranscript] = useState('')
   const [isManualStop, setIsManualStop] = useState(false)
+  const [imageUrl, setImageUrl] = useState('')
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [aiProcessedData, setAiProcessedData] = useState<{
     title: string
     description: string
@@ -43,6 +45,54 @@ export default function CreatePage() {
         ? prev.filter(a => a !== age)
         : [...prev, age]
     )
+  }
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      alert('Please select a valid image file (JPEG, PNG, GIF, or WebP)')
+      return
+    }
+
+    // Validate file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      alert('File size must be less than 5MB')
+      return
+    }
+
+    setUploadingImage(true)
+    
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to upload image')
+      }
+      
+      const result = await response.json()
+      setImageUrl(result.url)
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Failed to upload image. Please try again.')
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setImageUrl('')
   }
   
   // Initialize speech recognition
@@ -223,7 +273,8 @@ export default function CreatePage() {
         description,
         category: selectedCategory.name,
         ageRanges: selectedAges,
-        linkUrl: link
+        linkUrl: link,
+        imageUrl: imageUrl
       }
       
       console.log('Sending post data:', postData)
@@ -371,6 +422,56 @@ export default function CreatePage() {
               className="w-full bg-black border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-muted outline-none focus:border-brand-yellow transition-colors resize-y overflow-hidden"
               style={{ minHeight: '120px' }}
             />
+          </div>
+          
+          {/* Image Upload Section */}
+          <div>
+            {imageUrl ? (
+              <div className="relative">
+                <img 
+                  src={imageUrl} 
+                  alt="Post image" 
+                  className="w-full h-48 object-cover rounded-card mb-2"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs"
+                >
+                  ×
+                </button>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-dark-border rounded-card p-4 text-center">
+                <input
+                  type="file"
+                  id="imageUploadCreate"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  disabled={uploadingImage}
+                />
+                <label 
+                  htmlFor="imageUploadCreate" 
+                  className={`cursor-pointer ${uploadingImage ? 'opacity-50' : ''}`}
+                >
+                  {uploadingImage ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-yellow"></div>
+                      <span className="text-text-muted">Uploading...</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <svg className="w-8 h-8 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      <span className="text-text-muted text-sm">Click to add image</span>
+                      <span className="text-text-muted text-xs">JPEG, PNG, GIF, WebP up to 5MB</span>
+                    </div>
+                  )}
+                </label>
+              </div>
+            )}
           </div>
           
           {/* Category and Age in one row */}
