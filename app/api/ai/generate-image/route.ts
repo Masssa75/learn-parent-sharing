@@ -45,9 +45,10 @@ export async function POST(request: NextRequest) {
       style: style === 'photorealistic' || style === 'minimalist' ? "natural" : "vivid"
     }
 
-    // Create an AbortController with 30 second timeout
+    // Create an AbortController with longer timeout for HD images
+    const timeoutMs = style === 'photorealistic' ? 60000 : 45000
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30000)
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
 
     // Call OpenAI API
     const response = await fetch('https://api.openai.com/v1/images/generations', {
@@ -154,7 +155,10 @@ export async function POST(request: NextRequest) {
     // Check if it's a timeout error
     if (error instanceof Error && error.name === 'AbortError') {
       return NextResponse.json(
-        { error: 'Image generation timed out. Please try again.' },
+        { error: style === 'photorealistic' 
+            ? 'HD image generation takes longer. Please try again or use a different style.' 
+            : 'Image generation timed out. Please try again.' 
+        },
         { status: 504 }
       )
     }

@@ -486,7 +486,7 @@ export default function CreatePage() {
                 {isGeneratingImage ? (
                   <>
                     <div className="w-4 h-4 border-2 border-brand-yellow border-t-transparent rounded-full animate-spin"></div>
-                    <span>Generating image...</span>
+                    <span>Generating {selectedImageStyle === 'photorealistic' ? 'HD ' : ''}image...</span>
                   </>
                 ) : (
                   <>

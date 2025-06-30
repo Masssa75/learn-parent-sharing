@@ -63,6 +63,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
   const [editingPostId, setEditingPostId] = useState<string | null>(null)
   const [editFormData, setEditFormData] = useState<{ title: string; description: string; linkUrl: string; imageUrl?: string }>({ title: '', description: '', linkUrl: '' })
   const [isGeneratingImage, setIsGeneratingImage] = useState(false)
+  const [editImageStyle, setEditImageStyle] = useState<string>('photorealistic')
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set())
   const [openMenuPostId, setOpenMenuPostId] = useState<string | null>(null)
   const router = useRouter()
@@ -352,6 +353,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
       linkUrl: post.linkUrl || '',
       imageUrl: post.imageUrl
     })
+    setEditImageStyle('photorealistic') // Reset to default style
   }
 
   const handleCancelEdit = () => {
@@ -375,7 +377,8 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
         },
         body: JSON.stringify({
           title: editFormData.title,
-          prompt: editFormData.description
+          prompt: editFormData.description,
+          style: editImageStyle
         })
       })
       
@@ -622,6 +625,70 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                   {/* AI Image Generation */}
                   <div className="space-y-3">
                     {!editFormData.imageUrl && (
+                      <>
+                        {/* Image Style Selector */}
+                        <div className="space-y-2">
+                          <label className="text-text-secondary text-sm">Choose image style:</label>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setEditImageStyle('photorealistic')}
+                              className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
+                                editImageStyle === 'photorealistic'
+                                  ? 'bg-brand-yellow text-black border-brand-yellow'
+                                  : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
+                              }`}
+                            >
+                              📷 Photorealistic
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditImageStyle('watercolor')}
+                              className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
+                                editImageStyle === 'watercolor'
+                                  ? 'bg-brand-yellow text-black border-brand-yellow'
+                                  : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
+                              }`}
+                            >
+                              🎨 Watercolor
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditImageStyle('minimalist')}
+                              className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
+                                editImageStyle === 'minimalist'
+                                  ? 'bg-brand-yellow text-black border-brand-yellow'
+                                  : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
+                              }`}
+                            >
+                              ⚪ Minimalist
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditImageStyle('sketch')}
+                              className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
+                                editImageStyle === 'sketch'
+                                  ? 'bg-brand-yellow text-black border-brand-yellow'
+                                  : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
+                              }`}
+                            >
+                              ✏️ Pencil Sketch
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditImageStyle('cartoon')}
+                              className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
+                                editImageStyle === 'cartoon'
+                                  ? 'bg-brand-yellow text-black border-brand-yellow'
+                                  : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
+                              }`}
+                            >
+                              🎭 Cartoon
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Generate Button */}
                       <button
                         type="button"
                         onClick={generateImageForEdit}
@@ -631,7 +698,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                         {isGeneratingImage ? (
                           <>
                             <div className="w-4 h-4 border-2 border-brand-yellow border-t-transparent rounded-full animate-spin"></div>
-                            <span>Generating image...</span>
+                            <span>Generating {editImageStyle === 'photorealistic' ? 'HD ' : ''}image...</span>
                           </>
                         ) : (
                           <>
@@ -644,6 +711,7 @@ export default function FeedComponent({ showAuthPrompt = true, protectedRoute = 
                           </>
                         )}
                       </button>
+                      </>
                     )}
                     
                     {editFormData.imageUrl && (
