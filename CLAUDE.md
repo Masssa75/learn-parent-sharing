@@ -1284,6 +1284,73 @@ Successfully processed and formatted 7 parenting tips:
 
 ---
 
+# 📅 Session Summary: OpenAI Image Generation & Style Selector (June 30, 2025)
+
+## 🎯 Major Accomplishments
+
+### 1. Switched from Gemini to OpenAI DALL-E 3
+- **Issue**: Gemini image generation was producing poor quality results
+- **Solution**: Implemented OpenAI's DALL-E 3 model for image generation
+- **Key Changes**:
+  - Updated `/app/api/ai/generate-image/route.ts` to use OpenAI API
+  - Changed model from incorrect "gpt-image-1" to "dall-e-3"
+  - Fixed "response_format" parameter (was causing 400 errors)
+  - OpenAI API key already configured on Netlify (confirmed working)
+
+### 2. Added Image Style Selector (5 Options)
+- **Created Style UI**: Users can now choose from 5 different artistic styles
+- **Styles Available**:
+  - 📷 **Photorealistic** - HD quality, natural style, professional photography
+  - 🎨 **Watercolor** - Soft artistic paintings with flowing colors
+  - ⚪ **Minimalist** - Clean design with limited colors, natural style
+  - ✏️ **Pencil Sketch** - Hand-drawn sketches with detailed line work
+  - 🎭 **Cartoon** - Friendly illustrations with bright colors (was default)
+- **Default**: Changed to "Photorealistic" as requested by user
+
+### 3. Implementation Details
+- **Create Page** (`/app/create/page.tsx`):
+  - Added `selectedImageStyle` state (default: 'photorealistic')
+  - Style selector UI with 5 buttons above generate button
+  - Selected style highlighted in yellow
+  - Passes style parameter to API
+- **Edit Mode** (`/components/FeedComponent.tsx`):
+  - Added `editImageStyle` state
+  - Same style selector UI in edit mode
+  - Resets to 'photorealistic' when editing starts
+  - ⚠️ **Build may be failing due to FeedComponent changes**
+- **API Route** (`/app/api/ai/generate-image/route.ts`):
+  - Style-specific prompts for each option
+  - HD quality for photorealistic (60s timeout)
+  - Standard quality for others (45s timeout)
+  - Natural vs Vivid style parameter based on selection
+
+### 4. Changed Default Input Mode
+- Switched from "Speak with AI" to "Write" as default mode
+- Users can still toggle between modes
+
+## ⚠️ Known Issues
+- **Build Failures**: Latest builds are failing (mentioned by user)
+- **Edit Functionality**: "Edit post" option only shows for posts user owns
+- **Context Window**: Running out of space, session needs to wrap up
+
+## 🔧 Technical Notes
+- OpenAI API endpoint: `https://api.openai.com/v1/images/generations`
+- Using `b64_json` response format for consistent handling
+- Images stored in Supabase `post-images` bucket
+- Timeout increased for HD images to prevent 504 errors
+
+## 📝 Next Steps for New Instance
+1. Fix build failures (check TypeScript errors)
+2. Verify edit functionality is working properly
+3. Test all 5 styles are generating correctly
+4. Consider adding style preview thumbnails
+
+## 🗝️ Environment Variables
+- `OPENAI_API_KEY` - Already set on Netlify (confirmed working)
+- `GEMINI_API_KEY` - Still configured but no longer used
+
+---
+
 # 📅 Session Summary: Crypto Tokenization System Implementation (June 29, 2025)
 
 ## 🎯 Major Achievement: Tokenization & Points System
