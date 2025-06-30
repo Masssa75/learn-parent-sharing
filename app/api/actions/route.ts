@@ -129,17 +129,19 @@ export async function POST(request: NextRequest) {
       }
       
       // Update post likes count
-      const { error: countError } = await supabase.rpc('increment', {
-        table_name: 'posts',
-        column_name: 'likes_count',
-        row_id: targetId
-      }).catch(() => {
-        // If RPC doesn't exist, do manual update
-        return supabase
-          .from('posts')
-          .update({ likes_count: supabase.raw('likes_count + 1') })
-          .eq('id', targetId)
-      })
+      let countError = null
+      try {
+        const result = await supabase.rpc('increment', {
+          table_name: 'posts',
+          column_name: 'likes_count',
+          row_id: targetId
+        })
+        countError = result.error
+      } catch (error) {
+        // If RPC doesn't exist, skip the increment for now
+        console.log('RPC increment function not available, skipping likes count update')
+        countError = null
+      }
     }
     
     // Store save in saved_posts table if it's a save action

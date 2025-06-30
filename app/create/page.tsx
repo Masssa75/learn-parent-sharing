@@ -28,9 +28,6 @@ export default function CreatePage() {
   const [voiceTranscript, setVoiceTranscript] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
   const [recognition, setRecognition] = useState<any>(null)
-  const [imageUrl, setImageUrl] = useState('')
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false)
-  const [selectedImageStyle, setSelectedImageStyle] = useState<string>('photorealistic')
   const [interimTranscript, setInterimTranscript] = useState('')
   const [isManualStop, setIsManualStop] = useState(false)
   const [aiProcessedData, setAiProcessedData] = useState<{
@@ -205,45 +202,6 @@ export default function CreatePage() {
     }
   }
   
-  // Generate AI image
-  const generateImage = async () => {
-    if (!title || !description) {
-      alert('Please add a title and description before generating an image')
-      return
-    }
-    
-    setIsGeneratingImage(true)
-    try {
-      const response = await fetch('/api/ai/generate-image', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title,
-          prompt: description,
-          style: selectedImageStyle
-        })
-      })
-      
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to generate image')
-      }
-      
-      const data = await response.json()
-      setImageUrl(data.imageUrl)
-      
-      if (data.temporary) {
-        alert('Note: Generated image will expire in ~1 hour. Submit your post to save it permanently.')
-      }
-    } catch (error) {
-      console.error('Image generation error:', error)
-      alert(`Failed to generate image: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsGeneratingImage(false)
-    }
-  }
   
   // Handle voice submit
   const handleVoiceSubmit = async () => {
@@ -265,8 +223,7 @@ export default function CreatePage() {
         description,
         category: selectedCategory.name,
         ageRanges: selectedAges,
-        linkUrl: link,
-        imageUrl: imageUrl || undefined
+        linkUrl: link
       }
       
       console.log('Sending post data:', postData)
@@ -414,134 +371,6 @@ export default function CreatePage() {
               className="w-full bg-black border border-dark-border rounded-input px-4 py-3 text-text-primary text-body placeholder-text-muted outline-none focus:border-brand-yellow transition-colors resize-y overflow-hidden"
               style={{ minHeight: '120px' }}
             />
-          </div>
-          
-          {/* AI Image Generation */}
-          <div className="space-y-3">
-            {!imageUrl && (
-              <>
-                {/* Image Style Selector */}
-                <div className="space-y-2">
-                  <label className="text-text-secondary text-sm">Choose image style:</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedImageStyle('photorealistic')}
-                      className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
-                        selectedImageStyle === 'photorealistic'
-                          ? 'bg-brand-yellow text-black border-brand-yellow'
-                          : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
-                      }`}
-                    >
-                      📷 Photorealistic
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedImageStyle('watercolor')}
-                      className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
-                        selectedImageStyle === 'watercolor'
-                          ? 'bg-brand-yellow text-black border-brand-yellow'
-                          : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
-                      }`}
-                    >
-                      🎨 Watercolor
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedImageStyle('minimalist')}
-                      className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
-                        selectedImageStyle === 'minimalist'
-                          ? 'bg-brand-yellow text-black border-brand-yellow'
-                          : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
-                      }`}
-                    >
-                      ⚪ Minimalist
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedImageStyle('sketch')}
-                      className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
-                        selectedImageStyle === 'sketch'
-                          ? 'bg-brand-yellow text-black border-brand-yellow'
-                          : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
-                      }`}
-                    >
-                      ✏️ Pencil Sketch
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedImageStyle('cartoon')}
-                      className={`px-3 py-2 rounded-input text-sm font-medium transition-all ${
-                        selectedImageStyle === 'cartoon'
-                          ? 'bg-brand-yellow text-black border-brand-yellow'
-                          : 'bg-dark-surface border border-dark-border text-text-secondary hover:border-text-muted'
-                      }`}
-                    >
-                      🎭 Cartoon
-                    </button>
-                  </div>
-                </div>
-
-                {/* Generate Button */}
-              <button
-                type="button"
-                onClick={generateImage}
-                disabled={isGeneratingImage || !title || !description}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-dark-surface border border-dashed border-dark-border rounded-input text-text-secondary hover:border-brand-yellow transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isGeneratingImage ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-brand-yellow border-t-transparent rounded-full animate-spin"></div>
-                    <span>Generating {selectedImageStyle === 'photorealistic' ? 'HD ' : ''}image...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                      <polyline points="21 15 16 10 5 21"></polyline>
-                    </svg>
-                    <span>Generate AI image (optional)</span>
-                  </>
-                )}
-              </button>
-              </>
-            )}
-            
-            {imageUrl && (
-              <div className="relative">
-                <img 
-                  src={imageUrl} 
-                  alt="Generated image" 
-                  className="w-full rounded-input border border-dark-border"
-                />
-                <button
-                  type="button"
-                  onClick={() => setImageUrl('')}
-                  className="absolute top-2 right-2 p-1.5 bg-black/80 rounded-full hover:bg-black transition-colors"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </div>
-            )}
-          </div>
-          
-          {/* Add Photo Button */}
-          <div>
-            <button
-              type="button"
-              className="w-full flex items-center justify-center gap-2.5 px-5 py-5 rounded-input border-2 border-dashed border-dark-border text-text-muted hover:border-text-secondary hover:text-text-secondary transition-all"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
-              Add photo
-            </button>
           </div>
           
           {/* Category and Age in one row */}
