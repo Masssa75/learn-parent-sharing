@@ -14,11 +14,24 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey)
 // Use service key for writing (bypasses RLS)
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Log environment variables (without exposing sensitive data)
-    console.log('Supabase URL:', supabaseUrl ? 'Set' : 'Not set')
-    console.log('Supabase Anon Key:', supabaseAnonKey ? 'Set' : 'Not set')
+    // Get current user if authenticated
+    let currentUserId = null
+    try {
+      const cookieStore = await cookies()
+      const sessionCookie = cookieStore.get('session')
+      
+      if (sessionCookie) {
+        const sessionData = JSON.parse(
+          Buffer.from(sessionCookie.value, 'base64').toString()
+        )
+        currentUserId = sessionData.userId
+      }
+    } catch (error) {
+      // User not authenticated, continue without user-specific data
+      console.log('User not authenticated, fetching public posts')
+    }
     
     // Fetch posts with user and category information
     const { data: posts, error } = await supabase
@@ -50,6 +63,32 @@ export async function GET() {
       }, { status: 500 })
     }
 
+    // If user is authenticated, fetch their likes and saves
+    let userLikes = new Set()
+    let userSaves = new Set()
+    
+    if (currentUserId) {
+      // Fetch user's likes
+      const { data: likes } = await supabase
+        .from('likes')
+        .select('post_id')
+        .eq('user_id', currentUserId)
+      
+      if (likes) {
+        userLikes = new Set(likes.map(like => like.post_id))
+      }
+      
+      // Fetch user's saves
+      const { data: saves } = await supabase
+        .from('saved_posts')
+        .select('post_id')
+        .eq('user_id', currentUserId)
+      
+      if (saves) {
+        userSaves = new Set(saves.map(save => save.post_id))
+      }
+    }
+
     // Transform the data to match the expected format
     const transformedPosts = posts?.map(post => {
       // Extract YouTube video ID from link_url if it's a YouTube link
@@ -75,8 +114,8 @@ export async function GET() {
         ageRange: post.age_ranges?.join(', ') || '',
         likes: post.likes_count || 0,
         comments: post.comments_count || 0,
-        saved: false,
-        liked: false,
+        saved: userSaves.has(post.id),
+        liked: userLikes.has(post.id),
         linkUrl: post.link_url,
         youtubeVideoId: youtubeVideoId,
         imageUrl: post.image_url,

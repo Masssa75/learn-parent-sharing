@@ -71,9 +71,9 @@ export async function POST(request: NextRequest) {
     }
     
     // Check rate limiting based on user level
-    const actionsPerHour = userProfile.level <= 2 ? 5 : 
-                          userProfile.level <= 5 ? 10 : 
-                          userProfile.level <= 8 ? 20 : 1000 // Unlimited for levels 9-10
+    const actionsPerHour = userProfile.level <= 2 ? 20 : 
+                          userProfile.level <= 5 ? 30 : 
+                          userProfile.level <= 8 ? 50 : 1000 // Unlimited for levels 9-10
     
     // Count recent actions
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
@@ -112,6 +112,49 @@ export async function POST(request: NextRequest) {
         details: actionError.message,
         hint: actionError.hint
       }, { status: 500 })
+    }
+    
+    // Store the like in the likes table if it's a like action
+    if (actionType === 'add_to_profile' && targetType === 'post') {
+      const { error: likeError } = await supabase
+        .from('likes')
+        .insert({
+          user_id: userId,
+          post_id: targetId
+        })
+      
+      if (likeError && likeError.code !== '23505') { // 23505 is duplicate key error
+        console.error('Error storing like:', likeError)
+        return NextResponse.json({ error: 'Failed to store like' }, { status: 500 })
+      }
+      
+      // Update post likes count
+      const { error: countError } = await supabase.rpc('increment', {
+        table_name: 'posts',
+        column_name: 'likes_count',
+        row_id: targetId
+      }).catch(() => {
+        // If RPC doesn't exist, do manual update
+        return supabase
+          .from('posts')
+          .update({ likes_count: supabase.raw('likes_count + 1') })
+          .eq('id', targetId)
+      })
+    }
+    
+    // Store save in saved_posts table if it's a save action
+    if (actionType === 'add_to_watchlist' && targetType === 'post') {
+      const { error: saveError } = await supabase
+        .from('saved_posts')
+        .insert({
+          user_id: userId,
+          post_id: targetId
+        })
+      
+      if (saveError && saveError.code !== '23505') {
+        console.error('Error storing save:', saveError)
+        return NextResponse.json({ error: 'Failed to save post' }, { status: 500 })
+      }
     }
     
     // Update user's points and XP

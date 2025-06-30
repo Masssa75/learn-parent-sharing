@@ -52,9 +52,9 @@ export async function GET(request: NextRequest) {
       
       // Calculate rate limit based on user level
       const userLevel = profile?.level || 1
-      const actionsPerHour = userLevel <= 2 ? 5 : 
-                            userLevel <= 5 ? 10 : 
-                            userLevel <= 8 ? 20 : 1000 // Unlimited for levels 9-10
+      const actionsPerHour = userLevel <= 2 ? 20 : 
+                            userLevel <= 5 ? 30 : 
+                            userLevel <= 8 ? 50 : 1000 // Unlimited for levels 9-10
       
       // Count recent actions from user_actions table
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
